@@ -84,3 +84,37 @@ target_include_directories(OpenGL_tutorial_006_shaders PUBLIC Third_party/Includ
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_006_shaders ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
 endif()
+
+
+add_executable(OpenGL_tutorial_007_shaders_sea 
+tutorial_007_shaders_sea.cpp
+Third_party/Includes/glad/glad.h
+Third_party/Includes/GLFW/glfw3.h
+Third_party/Includes/GLFW/glfw3native.h
+Third_party/Includes/KHR/khrplatform.h
+Third_party/glad/src/glad.c
+shader_006.h
+Shaders/sea.vs
+Shaders/sea.fs)
+target_include_directories(OpenGL_tutorial_007_shaders_sea PUBLIC Third_party/Includes .)
+if(WIN32)
+target_link_libraries(OpenGL_tutorial_007_shaders_sea ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
+endif()
+
+
+add_executable(OpenGL_tutorial_008_shaders_rainforest 
+tutorial_008_shaders_rainforest.cpp
+Third_party/Includes/glad/glad.h
+Third_party/Includes/GLFW/glfw3.h
+Third_party/Includes/GLFW/glfw3native.h
+Third_party/Includes/KHR/khrplatform.h
+Third_party/glad/src/glad.c
+stb_image.cpp
+stb_image.h
+shader_006.h
+Shaders/rainforest.vs
+Shaders/rainforest.fs)
+target_include_directories(OpenGL_tutorial_008_shaders_rainforest PUBLIC Third_party/Includes .)
+if(WIN32)
+target_link_libraries(OpenGL_tutorial_008_shaders_rainforest ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
+endif()

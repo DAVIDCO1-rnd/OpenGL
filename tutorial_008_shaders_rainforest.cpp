@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "shader_006.h"
+#include "stb_image.h"
 
 #include <iostream>
 
@@ -13,6 +14,53 @@ void processInput(GLFWwindow *window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+unsigned int textureID;
+
+/*Initializing texture parametrs and loading the texture to openGL*/
+/*parameters:
+textureData - the pixels of the texture
+textureWidth - width of texture
+textureHeight - height of texture
+textureNumOfChannels - num of channels (bytes) for each pixel
+*/
+void initializeTexture(unsigned char *textureData, int textureWidth, int textureHeight, int textureNumOfChannels)
+{
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+	// set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	GLenum format;
+	if (textureNumOfChannels == 1)
+		format = GL_RED;
+	else if (textureNumOfChannels == 3)
+		format = GL_RGB;
+	else if (textureNumOfChannels == 4)
+		format = GL_RGBA;
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, format, GL_UNSIGNED_BYTE, textureData);
+}
+
+void initializeTextureAndLoadImage(char* filePath)
+{
+	// load and create a texture 
+	int textureWidth, textureHeight, textureNumOfChannels;
+	unsigned char *textureData = stbi_load(filePath, &textureWidth, &textureHeight, &textureNumOfChannels, 0);
+	if (textureData)
+	{
+		initializeTexture(textureData, textureWidth, textureHeight, textureNumOfChannels);
+		stbi_image_free(textureData);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+}
 
 int main()
 {
@@ -49,8 +97,8 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader ourShader("C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/clouds.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/clouds.fs"); // you can name your shader files however you like
-    //Shader ourShader("./Shaders/clouds.vs", "./Shaders/clouds.fs");
+    Shader ourShader("C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/rainforest.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/rainforest.fs"); // you can name your shader files however you like
+    //Shader ourShader("./Shaders/rainforest.vs", "./Shaders/rainforest.fs");
 
 	float minVal = -0.9f;
 	float maxVal = 0.9f;
@@ -65,6 +113,8 @@ int main()
 		0, 1, 3,  // first Triangle
 		1, 2, 3   // second Triangle
 	};
+
+	glBindTexture(GL_TEXTURE_2D, textureID);
 
 	unsigned int VBO, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
@@ -88,6 +138,10 @@ int main()
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	char imagePath[] = "C:/Users/David Cohn/Documents/Github/OpenGL/resources/textures/wallpaper.jpg";
+	initializeTextureAndLoadImage(imagePath);
+
+	int frameCounter = 0;
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -113,6 +167,9 @@ int main()
 		unsigned int programID = ourShader.getID();
 		int iResolutionLocation = glGetUniformLocation(programID, "iResolution");
 		glUniform2f(iResolutionLocation, (GLfloat)SCR_WIDTH, (GLfloat)SCR_HEIGHT);
+
+		frameCounter++;
+		ourShader.setInt("iFrame", frameCounter);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
