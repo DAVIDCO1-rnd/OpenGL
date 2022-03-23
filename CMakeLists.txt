@@ -69,3 +69,18 @@ if(WIN32)
 target_link_libraries(OpenGL_tutorial_005_shaders ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
 endif()
 
+
+add_executable(OpenGL_tutorial_006_shaders 
+tutorial_006_shaders.cpp
+Third_party/Includes/glad/glad.h
+Third_party/Includes/GLFW/glfw3.h
+Third_party/Includes/GLFW/glfw3native.h
+Third_party/Includes/KHR/khrplatform.h
+Third_party/glad/src/glad.c
+shader_006.h
+Shaders/clouds.vs
+Shaders/clouds.fs)
+target_include_directories(OpenGL_tutorial_006_shaders PUBLIC Third_party/Includes .)
+if(WIN32)
+target_link_libraries(OpenGL_tutorial_006_shaders ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
+endif()
