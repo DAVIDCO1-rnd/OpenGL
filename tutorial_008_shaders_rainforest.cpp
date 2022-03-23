@@ -138,7 +138,8 @@ int main()
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	char imagePath[] = "C:/Users/David Cohn/Documents/Github/OpenGL/resources/textures/wallpaper.jpg";
+	char imagePath[] = "C:/Users/David Cohn/Documents/Github/OpenGL/resources/textures/rainforest.png";
+	//char imagePath[] = "C:/Users/David Cohn/Documents/Github/OpenGL/resources/textures/dog.jpg";
 	initializeTextureAndLoadImage(imagePath);
 
 	int frameCounter = 0;
