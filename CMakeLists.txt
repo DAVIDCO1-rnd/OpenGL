@@ -118,3 +118,21 @@ target_include_directories(OpenGL_tutorial_008_shaders_rainforest PUBLIC Third_p
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_008_shaders_rainforest ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
 endif()
+
+
+add_executable(OpenGL_tutorial_009_shaders_rippleCam 
+tutorial_009_shaders_rippleCam.cpp
+Third_party/Includes/glad/glad.h
+Third_party/Includes/GLFW/glfw3.h
+Third_party/Includes/GLFW/glfw3native.h
+Third_party/Includes/KHR/khrplatform.h
+Third_party/glad/src/glad.c
+stb_image.cpp
+stb_image.h
+shader_006.h
+Shaders/rippleCam.vs
+Shaders/rippleCam.fs)
+target_include_directories(OpenGL_tutorial_009_shaders_rippleCam PUBLIC Third_party/Includes .)
+if(WIN32)
+target_link_libraries(OpenGL_tutorial_009_shaders_rippleCam ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
+endif()
