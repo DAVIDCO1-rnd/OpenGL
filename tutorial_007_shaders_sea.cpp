@@ -49,7 +49,7 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader ourShader("C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/sea.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/sea.fs"); // you can name your shader files however you like
+    Shader ourShader("D:/Developments/OpenGL/Shaders/sea.vs", "D:/Developments/OpenGL/Shaders/sea.fs"); // you can name your shader files however you like
     //Shader ourShader("./Shaders/sea.vs", "./Shaders/sea.fs");
 
 	float minVal = -0.9f;

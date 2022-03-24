@@ -136,3 +136,22 @@ target_include_directories(OpenGL_tutorial_009_shaders_rippleCam PUBLIC Third_pa
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_009_shaders_rippleCam ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
 endif()
+
+
+
+add_executable(OpenGL_tutorial_010_shaders_hand_drawn 
+tutorial_010_shaders_hand_drawn.cpp
+Third_party/Includes/glad/glad.h
+Third_party/Includes/GLFW/glfw3.h
+Third_party/Includes/GLFW/glfw3native.h
+Third_party/Includes/KHR/khrplatform.h
+Third_party/glad/src/glad.c
+stb_image.cpp
+stb_image.h
+shader_006.h
+Shaders/hand_drawn.vs
+Shaders/hand_drawn.fs)
+target_include_directories(OpenGL_tutorial_010_shaders_hand_drawn PUBLIC Third_party/Includes .)
+if(WIN32)
+target_link_libraries(OpenGL_tutorial_010_shaders_hand_drawn ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
+endif()

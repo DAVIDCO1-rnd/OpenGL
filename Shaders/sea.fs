@@ -1,8 +1,4 @@
-/*
- * "Seascape" by Alexander Alekseev aka TDM - 2014
- * License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
- * Contact: tdmaav@gmail.com
- */
+#version 330 core
 
 out vec4 fragColor;
 

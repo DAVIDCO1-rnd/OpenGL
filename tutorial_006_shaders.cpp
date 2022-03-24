@@ -49,7 +49,7 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader ourShader("C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/clouds.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/clouds.fs"); // you can name your shader files however you like
+    Shader ourShader("D:/Developments/OpenGL/Shaders/clouds.vs", "D:/Developments/OpenGL/Shaders/clouds.fs"); // you can name your shader files however you like
     //Shader ourShader("./Shaders/clouds.vs", "./Shaders/clouds.fs");
 
 	float minVal = -0.9f;

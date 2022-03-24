@@ -97,7 +97,7 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader ourShader("C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/rainforest.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/rainforest.fs"); // you can name your shader files however you like
+    Shader ourShader("D:/Developments/OpenGL/Shaders/rainforest.vs", "D:/Developments/OpenGL/Shaders/rainforest.fs"); // you can name your shader files however you like
     //Shader ourShader("./Shaders/rainforest.vs", "./Shaders/rainforest.fs");
 
 	float minVal = -0.9f;
