@@ -139,8 +139,8 @@ endif()
 
 
 
-add_executable(OpenGL_tutorial_010_shaders_hand_drawn 
-tutorial_010_shaders_hand_drawn.cpp
+add_executable(OpenGL_tutorial_010_shaders_multiple_3d_shapes 
+tutorial_010_shaders_multiple_3d_shapes.cpp
 Third_party/Includes/glad/glad.h
 Third_party/Includes/GLFW/glfw3.h
 Third_party/Includes/GLFW/glfw3native.h
@@ -149,9 +149,45 @@ Third_party/glad/src/glad.c
 stb_image.cpp
 stb_image.h
 shader_006.h
-Shaders/hand_drawn.vs
-Shaders/hand_drawn.fs)
-target_include_directories(OpenGL_tutorial_010_shaders_hand_drawn PUBLIC Third_party/Includes .)
+Shaders/multiple_3d_shapes.vs
+Shaders/multiple_3d_shapes.fs)
+target_include_directories(OpenGL_tutorial_010_shaders_multiple_3d_shapes PUBLIC Third_party/Includes .)
 if(WIN32)
-target_link_libraries(OpenGL_tutorial_010_shaders_hand_drawn ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
+target_link_libraries(OpenGL_tutorial_010_shaders_multiple_3d_shapes ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
 endif()
+
+add_executable(OpenGL_tutorial_011_shaders_happy_jumping 
+tutorial_011_shaders_happy_jumping.cpp
+Third_party/Includes/glad/glad.h
+Third_party/Includes/GLFW/glfw3.h
+Third_party/Includes/GLFW/glfw3native.h
+Third_party/Includes/KHR/khrplatform.h
+Third_party/glad/src/glad.c
+stb_image.cpp
+stb_image.h
+shader_006.h
+Shaders/happy_jumping.vs
+Shaders/happy_jumping.fs)
+target_include_directories(OpenGL_tutorial_011_shaders_happy_jumping PUBLIC Third_party/Includes .)
+if(WIN32)
+target_link_libraries(OpenGL_tutorial_011_shaders_happy_jumping ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
+endif()
+
+add_executable(OpenGL_tutorial_012_shaders_using_mouse 
+tutorial_012_shaders_using_mouse.cpp
+Third_party/Includes/glad/glad.h
+Third_party/Includes/GLFW/glfw3.h
+Third_party/Includes/GLFW/glfw3native.h
+Third_party/Includes/KHR/khrplatform.h
+Third_party/glad/src/glad.c
+stb_image.cpp
+stb_image.h
+shader_006.h
+Shaders/using_mouse.vs
+Shaders/using_mouse.fs)
+target_include_directories(OpenGL_tutorial_012_shaders_using_mouse PUBLIC Third_party/Includes .)
+if(WIN32)
+target_link_libraries(OpenGL_tutorial_012_shaders_using_mouse ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
+endif()
+
+
