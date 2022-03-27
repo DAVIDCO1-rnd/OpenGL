@@ -190,4 +190,21 @@ if(WIN32)
 target_link_libraries(OpenGL_tutorial_012_shaders_using_mouse ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
 endif()
 
+add_executable(OpenGL_tutorial_013_shaders_ray_tracing_two_spheres_and_walls 
+tutorial_013_shaders_ray_tracing_two_spheres_and_walls.cpp
+Third_party/Includes/glad/glad.h
+Third_party/Includes/GLFW/glfw3.h
+Third_party/Includes/GLFW/glfw3native.h
+Third_party/Includes/KHR/khrplatform.h
+Third_party/glad/src/glad.c
+stb_image.cpp
+stb_image.h
+shader_006.h
+Shaders/ray_tracing_two_spheres_and_walls.vs
+Shaders/ray_tracing_two_spheres_and_walls.fs)
+target_include_directories(OpenGL_tutorial_013_shaders_ray_tracing_two_spheres_and_walls PUBLIC Third_party/Includes .)
+if(WIN32)
+target_link_libraries(OpenGL_tutorial_013_shaders_ray_tracing_two_spheres_and_walls ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
+endif()
+
 
