@@ -62,8 +62,8 @@ Third_party/Includes/GLFW/glfw3native.h
 Third_party/Includes/KHR/khrplatform.h
 Third_party/glad/src/glad.c
 learnopengl/shader_s.h
-Shaders/3.3.shader.vs
-Shaders/3.3.shader.fs)
+resources/shaders/3.3.shader.vs
+resources/shaders/3.3.shader.fs)
 target_include_directories(OpenGL_tutorial_005_shaders PUBLIC Third_party/Includes .)
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_005_shaders ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
@@ -78,8 +78,8 @@ Third_party/Includes/GLFW/glfw3native.h
 Third_party/Includes/KHR/khrplatform.h
 Third_party/glad/src/glad.c
 shader_006.h
-Shaders/clouds.vs
-Shaders/clouds.fs)
+resources/shaders/clouds.vs
+resources/shaders/clouds.fs)
 target_include_directories(OpenGL_tutorial_006_shaders PUBLIC Third_party/Includes .)
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_006_shaders ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
@@ -94,8 +94,8 @@ Third_party/Includes/GLFW/glfw3native.h
 Third_party/Includes/KHR/khrplatform.h
 Third_party/glad/src/glad.c
 shader_006.h
-Shaders/sea.vs
-Shaders/sea.fs)
+resources/shaders/sea.vs
+resources/shaders/sea.fs)
 target_include_directories(OpenGL_tutorial_007_shaders_sea PUBLIC Third_party/Includes .)
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_007_shaders_sea ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
@@ -112,8 +112,8 @@ Third_party/glad/src/glad.c
 stb_image.cpp
 stb_image.h
 shader_006.h
-Shaders/rainforest.vs
-Shaders/rainforest.fs)
+resources/shaders/rainforest.vs
+resources/shaders/rainforest.fs)
 target_include_directories(OpenGL_tutorial_008_shaders_rainforest PUBLIC Third_party/Includes .)
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_008_shaders_rainforest ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
@@ -130,8 +130,8 @@ Third_party/glad/src/glad.c
 stb_image.cpp
 stb_image.h
 shader_006.h
-Shaders/rippleCam.vs
-Shaders/rippleCam.fs)
+resources/shaders/rippleCam.vs
+resources/shaders/rippleCam.fs)
 target_include_directories(OpenGL_tutorial_009_shaders_rippleCam PUBLIC Third_party/Includes .)
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_009_shaders_rippleCam ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
@@ -149,8 +149,8 @@ Third_party/glad/src/glad.c
 stb_image.cpp
 stb_image.h
 shader_006.h
-Shaders/multiple_3d_shapes.vs
-Shaders/multiple_3d_shapes.fs)
+resources/shaders/multiple_3d_shapes.vs
+resources/shaders/multiple_3d_shapes.fs)
 target_include_directories(OpenGL_tutorial_010_shaders_multiple_3d_shapes PUBLIC Third_party/Includes .)
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_010_shaders_multiple_3d_shapes ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
@@ -166,8 +166,8 @@ Third_party/glad/src/glad.c
 stb_image.cpp
 stb_image.h
 shader_006.h
-Shaders/happy_jumping.vs
-Shaders/happy_jumping.fs)
+resources/shaders/happy_jumping.vs
+resources/shaders/happy_jumping.fs)
 target_include_directories(OpenGL_tutorial_011_shaders_happy_jumping PUBLIC Third_party/Includes .)
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_011_shaders_happy_jumping ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
@@ -183,8 +183,8 @@ Third_party/glad/src/glad.c
 stb_image.cpp
 stb_image.h
 shader_006.h
-Shaders/using_mouse.vs
-Shaders/using_mouse.fs)
+resources/shaders/using_mouse.vs
+resources/shaders/using_mouse.fs)
 target_include_directories(OpenGL_tutorial_012_shaders_using_mouse PUBLIC Third_party/Includes .)
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_012_shaders_using_mouse ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
@@ -200,11 +200,32 @@ Third_party/glad/src/glad.c
 stb_image.cpp
 stb_image.h
 shader_006.h
-Shaders/ray_tracing_two_spheres_and_walls.vs
-Shaders/ray_tracing_two_spheres_and_walls.fs)
+resources/shaders/ray_tracing_two_spheres_and_walls.vs
+resources/shaders/ray_tracing_two_spheres_and_walls.fs)
 target_include_directories(OpenGL_tutorial_013_shaders_ray_tracing_two_spheres_and_walls PUBLIC Third_party/Includes .)
 if(WIN32)
 target_link_libraries(OpenGL_tutorial_013_shaders_ray_tracing_two_spheres_and_walls ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
+endif()
+
+
+add_executable(OpenGL_tutorial_014_textures1 
+tutorial_014_textures1.cpp
+Third_party/Includes/glad/glad.h
+Third_party/Includes/GLFW/glfw3.h
+Third_party/Includes/GLFW/glfw3native.h
+Third_party/Includes/KHR/khrplatform.h
+Third_party/glad/src/glad.c
+stb_image.cpp
+stb_image.h
+shader_006.h
+resources/shaders/tutorial_014_textures1.vs
+resources/shaders/tutorial_014_textures1.fs)
+target_include_directories(OpenGL_tutorial_014_textures1 PUBLIC 
+Third_party/Includes 
+Third_party/glm-0.9.9.8 
+.)
+if(WIN32)
+target_link_libraries(OpenGL_tutorial_014_textures1 ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
 endif()
 
 
