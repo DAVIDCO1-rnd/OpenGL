@@ -61,7 +61,7 @@ Third_party/Includes/GLFW/glfw3.h
 Third_party/Includes/GLFW/glfw3native.h
 Third_party/Includes/KHR/khrplatform.h
 Third_party/glad/src/glad.c
-learnopengl/shader_s.h
+shaders/shader_s.h
 resources/shaders/3.3.shader.vs
 resources/shaders/3.3.shader.fs)
 target_include_directories(OpenGL_tutorial_005_shaders PUBLIC Third_party/Includes .)
