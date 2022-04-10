@@ -206,6 +206,10 @@ function(create_project_from_sources chapter demo)
             "src/${chapter}/${demo}/*.fs"
             "src/${chapter}/${demo}/*.gs"
     )
+	foreach (SUBSOURCE ${SOURCE})
+		message("SUBSOURCE = ${SUBSOURCE}")
+	endforeach(SUBSOURCE)
+	
 	if (demo STREQUAL "")
 		SET(replaced "")
 		string(REPLACE "/" "_" replaced ${chapter})
@@ -257,6 +261,7 @@ endfunction()
 # then create a project file per tutorial
 foreach(CHAPTER ${CHAPTERS})
     foreach(DEMO ${${CHAPTER}})
+		message(STATUS "CHAPTER = ${CHAPTER},   DEMO=${DEMO}")
 		create_project_from_sources(${CHAPTER} ${DEMO})
     endforeach(DEMO)
 endforeach(CHAPTER)
