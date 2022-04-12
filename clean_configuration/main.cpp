@@ -15,12 +15,50 @@
 #include <IMGUI/imgui_widgets.cpp>
 #include <IMGUI/backends/imgui_impl_glfw.h>
 #include <IMGUI/backends/imgui_impl_opengl3.h>
+#include <glm/glm.hpp>
+#include "glm/gtc/matrix_transform.hpp" //for glm::rotate, glm::translate, glm::scale
+#include <glad/glad.h>
+#include "Shaders/shader.h"
 
 #include <stdio.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+//#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+
+#include <string>
+#include "Mesh.h"
+
+using namespace std;
+
+struct Parameters
+{
+	GLfloat angleX = 0.0f;
+	GLfloat angleY = 0.0f;
+	GLfloat angleZ = 0.0f;
+	GLfloat scaleX = 0.25f;
+	GLfloat scaleY = 0.25f;
+	GLfloat scaleZ = 0.25f;
+	GLfloat scaleUniform = 0.25f; //for uniform scaling (in all the axises)
+	GLfloat translateX = 0.0f;
+	GLfloat translateY = 0.0f;
+	GLfloat translateZ = 0.0f;
+};
+
+Parameters params;
+const unsigned int SCR_WIDTH = 1280;
+const unsigned int SCR_HEIGHT = 720;
+
+/*Updates the modelView matrix by the user parameters*/
+void updateModelViewByUserParameters(glm::mat4 &model)
+{
+	model = glm::rotate(model, glm::radians(params.angleX), glm::vec3(1.0, 0.0, 0.0));
+	model = glm::rotate(model, glm::radians(params.angleY), glm::vec3(0.0, 1.0, 0.0));
+	model = glm::rotate(model, glm::radians(params.angleZ), glm::vec3(0.0, 0.0, 1.0));
+	model = glm::translate(model, glm::vec3(params.translateX, params.translateY, params.translateZ));
+	model = glm::scale(model, glm::vec3(params.scaleX, params.scaleY, params.scaleZ));
+	model = glm::scale(model, glm::vec3(params.scaleUniform, params.scaleUniform, params.scaleUniform));
+}
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
@@ -36,6 +74,25 @@ static void glfw_error_callback(int error, const char* description)
 
 int main(int, char**)
 {
+    string fileName = "room";
+	string filePath = "../../Data/" + fileName + ".obj";
+    Mesh myMesh(filePath);
+	float signedDistOfPlaneFromOrigin = -4.0f;
+	int width = 600;
+	int height = 800;
+	int gridX = 600;
+	int gridY = 800;
+	bool renderMesh = true;
+	bool renderIntersection = true;
+
+    GLfloat planeAngleX = 0.0f;
+	GLfloat planeAngleY = 0.0f;
+	GLfloat planeAngleZ = 0.0f;
+
+	GLfloat lastPlaneRotationX = 0.0f;
+	GLfloat lastPlaneRotationY = 0.0f;
+	GLfloat lastPlaneRotationZ = 0.0f;
+
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -106,6 +163,8 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    Shader shaderWithoutFilters("resources/shaders/shaderWithoutFilters.vs", "resources/shaders/shaderWithoutFilters.fs");
+
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
@@ -130,7 +189,43 @@ int main(int, char**)
             static float f = 0.0f;
             static int counter = 0;
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+            
+            ImGui::Begin("Hello, Rafael!");
+            {
+                static float f = 0.0f;
+                static int counter = 0;
+                ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+                {
+                    //ImGui::InputFloat("rotate X", &params.angleX, 1.0f, 1.0f);
+                    ImGui::InputFloat("rotate Y", &params.angleY, 1.0f, 1.0f);
+                    ImGui::InputFloat("rotate Z", &params.angleZ, 1.0f, 1.0f);
+
+                    ImGui::InputFloat("translate X", &params.translateX, 0.1f, 1.0f);
+                    ImGui::InputFloat("translate Y", &params.translateY, 0.1f, 1.0f);
+                    ImGui::InputFloat("translate Z", &params.translateZ, 0.1f, 1.0f);
+
+                    ImGui::InputFloat("scale X", &params.scaleX, 0.01f, 1.0f);
+                    ImGui::InputFloat("scale Y", &params.scaleY, 0.01f, 1.0f);
+                    ImGui::InputFloat("scale Z", &params.scaleZ, 0.01f, 1.0f);
+                    ImGui::InputFloat("uniform scale", &params.scaleUniform, 0.01f, 1.0f);
+                }
+                {
+                    ImGui::Checkbox("render mesh", &renderMesh);
+                    ImGui::Checkbox("render intersection", &renderIntersection);
+                    
+                    //ImGui::SliderFloat("signed distance of plane from origin", &signedDistOfPlaneFromOrigin, -80.0f, 80.0f);
+                    //ImGui::SliderFloat("rotate X plane", &planeAngleX, -90.0f, 90.0f);
+                    //ImGui::SliderFloat("rotate Y plane", &planeAngleY, -90.0f, 90.0f);
+                    //ImGui::SliderFloat("rotate Z plane", &planeAngleZ, -90.0f, 90.0f);
+
+                    ImGui::InputFloat("signed distance of plane from origin", &signedDistOfPlaneFromOrigin, 0.1f, 1.0f);
+                    ImGui::InputFloat("rotate X plane", &planeAngleX, 1.0f, 1.0f);
+                    ImGui::InputFloat("rotate Y plane", &planeAngleY, 1.0f, 1.0f);
+                    ImGui::InputFloat("rotate Z plane", &planeAngleZ, 1.0f, 1.0f);
+                    //float planeNormalArray[3] = { rotatedPlaneNormal[0], rotatedPlaneNormal[1], rotatedPlaneNormal[2] };
+                    //ImGui::InputFloat3("Plane Normal", planeNormalArray);
+                }
+            }           
 
             ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
             ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
@@ -165,6 +260,22 @@ int main(int, char**)
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
+
+
+		glm::mat4 model, view, projection;
+		updateModelViewByUserParameters(model);
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
+		if (renderMesh)
+		{
+			glLineWidth(1.0);
+			shaderWithoutFilters.use();
+			//sendTransformationToVertexShader(shaderWithoutFilters, model, view, projection);
+			//renderObject(&myMesh);
+		}
+
+
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
