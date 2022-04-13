@@ -17,7 +17,7 @@
 #include <IMGUI/backends/imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp" //for glm::rotate, glm::translate, glm::scale
-#include "Shaders/shader.h"
+#include "Shaders/shader_m.h"
 
 #include <stdio.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -147,8 +147,8 @@ void renderObject(Mesh* mesh)
 
 int main(int, char**)
 {
-    string fileName = "room";
-	string filePath = "../../Data/" + fileName + ".obj";
+    string fileName = "bunny";
+	string filePath = "/home/davidco1/Developments/OpenGL/clean_configuration/Data/" + fileName + ".obj";
     Mesh myMesh(filePath);
 	float signedDistOfPlaneFromOrigin = -4.0f;
 	int width = 600;
@@ -168,8 +168,13 @@ int main(int, char**)
 
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
-    if (!glfwInit())
+    int glfwInitStatus = glfwInit();
+    if (glfwInitStatus == 0)
+    {
         return 1;
+    }
+    // if (!glfwInit())
+    //     return 1;
 
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -236,7 +241,7 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    Shader shaderWithoutFilters("resources/shaders/shaderWithoutFilters.vs", "resources/shaders/shaderWithoutFilters.fs");
+    Shader shaderWithoutFilters("/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.vs", "/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.fs");
 
     // Main loop
     while (!glfwWindowShouldClose(window))
