@@ -67,10 +67,10 @@ include_directories(${CMAKE_BINARY_DIR}/configuration)
 # add_library(STB_IMAGE "src/stb_image.cpp")
 # set(LIBS ${LIBS} STB_IMAGE)
 
-add_library(GLAD "lib/include/IMGUI/backends/imgui_impl_glfw.cpp" "lib/include/IMGUI/backends/imgui_impl_opengl3.cpp")
+add_library(GLAD "Third_party/include/IMGUI/backends/imgui_impl_glfw.cpp" "Third_party/include/IMGUI/backends/imgui_impl_opengl3.cpp")
 set(LIBS ${LIBS} GLAD)
 
-add_library(IMGUI "./lib/include/GLAD/glad/glad.c")
+add_library(IMGUI "./Third_party/include/glad/glad.c")
 set(LIBS ${LIBS} IMGUI)
 
 macro(makeLink src dest target)
@@ -79,13 +79,12 @@ endmacro()
 
 function(create_project_from_sources)
 	file(GLOB SOURCE
-            "src/project_code/*.h"
-            "src/project_code/*.cpp"
-            "src/project_code/*.vs"
-            "src/project_code/*.fs"
-            "src/project_code/*.gs"
+            "include/*.h"
+            "src/*.cpp"
+            "src/shaders/*.vs"
+            "src/shaders/*.fs"
+            "src/shaders/*.gs"
     )
-    set(SOURCE main.cpp Mesh.h Object.h resources/shaders/shaderWithoutFilters.vs resources/shaders/shaderWithoutFilters.fs)
     set(NAME "my_project")
     add_executable(${NAME} ${SOURCE})
 
@@ -97,8 +96,17 @@ function(create_project_from_sources)
 
     target_link_libraries(${NAME} ${LIBS} ${OpenCV_LIBS})
 
-    message("OpenCV Include Directories: " ${OpenCV_INCLUDE_DIRS})
-    message("OpenCV Libraries: " ${OpenCV_LIBS})
+    message("OpenCV Include Directories: ")
+    foreach(OpenCV_INCLUDE_DIR ${OpenCV_INCLUDE_DIRS})
+    message(${OpenCV_INCLUDE_DIR} ", ")
+    endforeach(OpenCV_INCLUDE_DIR)
+
+    message("OpenCV Libraries: ")
+    foreach(OpenCV_LIB ${OpenCV_LIBS})
+    set(ONE_LINER_OPENCVE_LIBS ${ONE_LINER_OPENCVE_LIBS} "/usr/local/lib/lib" ${OpenCV_LIB} ".so, ")
+    endforeach(OpenCV_LIB)    
+    message(${ONE_LINER_OPENCVE_LIBS})
+    
 
     if(MSVC)
 		target_compile_options(${NAME} PRIVATE /std:c++17 /MP)
@@ -116,9 +124,9 @@ function(create_project_from_sources)
     endif(WIN32)
     # copy shader files to build directory
     file(GLOB SHADERS
-             "resources/shaders/*.vs"
-             "resources/shaders/*.fs"
-             "resources/shaders/*.gs"
+             "src/shaders/*.vs"
+             "src/shaders/*.fs"
+             "src/shaders/*.gs"
     )
     foreach(SHADER ${SHADERS})
         if(WIN32)
@@ -142,6 +150,5 @@ endfunction()
 create_project_from_sources()
 
 
-
-include_directories(${CMAKE_SOURCE_DIR}/lib/include)
-include_directories(${CMAKE_SOURCE_DIR}/lib/include/GLAD)
+include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/Third_party/include)

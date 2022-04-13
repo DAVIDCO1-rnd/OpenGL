@@ -17,7 +17,7 @@
 #include <IMGUI/backends/imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp" //for glm::rotate, glm::translate, glm::scale
-#include "Shaders/shader_m.h"
+#include "Shaders/shader_t.h"
 
 #include <opencv2/opencv.hpp>
 
@@ -177,13 +177,13 @@ void saveBuffersForRedneringWholeMesh(Mesh* mesh)
 int main(int, char**)
 {
     string fileName = "teapot";
-	string filePath = "/home/davidco1/Developments/OpenGL/clean_configuration/Data/" + fileName + ".obj";
+	string filePath = "/home/dell/Developments/OpenGL/clean_configuration/Data/" + fileName + ".obj";
 
-	// cv::Mat image;
-	// image = cv::imread("/home/davidco1/Developments/CMake_tutorial/module9_opencv/App_OpenCV/sample.png");
-	// cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE);
-	// cv::imshow("Display Image", image);
-	// cv::waitKey(0);    
+	cv::Mat image;
+	image = cv::imread("/home/dell/Developments/OpenGL/clean_configuration_cmake/sample.png");
+	cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE);
+	cv::imshow("Display Image", image);
+	cv::waitKey(0);    
 
     Mesh myMesh(filePath);
 	bool renderMesh = true;
@@ -263,9 +263,9 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    Shader shaderWithoutFilters("/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.vs", "/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.fs");
-	Shader shaderRed("/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderRed.vs", "/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderRed.fs");
-	Shader shaderAxis("/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderAxis.vs", "/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderAxis.fs");
+    Shader shaderWithoutFilters("/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.vs", "/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.fs");
+	Shader shaderRed("/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderRed.vs", "/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderRed.fs");
+	Shader shaderAxis("/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderAxis.vs", "/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderAxis.fs");
 
     glEnable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
