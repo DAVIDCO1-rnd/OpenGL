@@ -179,32 +179,17 @@ int main(int, char**)
     string fileName = "teapot";
 	string filePath = "/home/davidco1/Developments/OpenGL/clean_configuration/Data/" + fileName + ".obj";
 
-    cv::Mat1i faces;
-    cv::Mat1d vertices;
-
-	cv::Mat image;
-	image = cv::imread("/home/davidco1/Developments/CMake_tutorial/module9_opencv/App_OpenCV/sample.png");
-	cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE);
-	cv::imshow("Display Image", image);
-	cv::waitKey(0);    
+	// cv::Mat image;
+	// image = cv::imread("/home/davidco1/Developments/CMake_tutorial/module9_opencv/App_OpenCV/sample.png");
+	// cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE);
+	// cv::imshow("Display Image", image);
+	// cv::waitKey(0);    
 
     Mesh myMesh(filePath);
-    
-	float signedDistOfPlaneFromOrigin = -4.0f;
-	int width = 600;
-	int height = 800;
-	int gridX = 600;
-	int gridY = 800;
 	bool renderMesh = true;
 	bool renderIntersection = true;
 
-    GLfloat planeAngleX = 0.0f;
-	GLfloat planeAngleY = 0.0f;
-	GLfloat planeAngleZ = 0.0f;
 
-	GLfloat lastPlaneRotationX = 0.0f;
-	GLfloat lastPlaneRotationY = 0.0f;
-	GLfloat lastPlaneRotationZ = 0.0f;
 
     // Setup window
     //glfwSetErrorCallback(glfw_error_callback);
@@ -307,15 +292,9 @@ int main(int, char**)
             ImGui::ShowDemoWindow(&show_demo_window);
 
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            
+        //{
             ImGui::Begin("Hello, Rafael!");
             {
-                static float f = 0.0f;
-                static int counter = 0;
                 ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
                 {
                     ImGui::InputFloat("rotate X", &params.angleX, 1.0f, 1.0f);
@@ -340,10 +319,10 @@ int main(int, char**)
                     //ImGui::SliderFloat("rotate Y plane", &planeAngleY, -90.0f, 90.0f);
                     //ImGui::SliderFloat("rotate Z plane", &planeAngleZ, -90.0f, 90.0f);
 
-                    ImGui::InputFloat("signed distance of plane from origin", &signedDistOfPlaneFromOrigin, 0.1f, 1.0f);
-                    ImGui::InputFloat("rotate X plane", &planeAngleX, 1.0f, 1.0f);
-                    ImGui::InputFloat("rotate Y plane", &planeAngleY, 1.0f, 1.0f);
-                    ImGui::InputFloat("rotate Z plane", &planeAngleZ, 1.0f, 1.0f);
+                    //ImGui::InputFloat("signed distance of plane from origin", &signedDistOfPlaneFromOrigin, 0.1f, 1.0f);
+                    // ImGui::InputFloat("rotate X plane", &planeAngleX, 1.0f, 1.0f);
+                    // ImGui::InputFloat("rotate Y plane", &planeAngleY, 1.0f, 1.0f);
+                    // ImGui::InputFloat("rotate Z plane", &planeAngleZ, 1.0f, 1.0f);
                     //float planeNormalArray[3] = { rotatedPlaneNormal[0], rotatedPlaneNormal[1], rotatedPlaneNormal[2] };
                     //ImGui::InputFloat3("Plane Normal", planeNormalArray);
                 }
@@ -353,17 +332,16 @@ int main(int, char**)
             ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
             ImGui::Checkbox("Another Window", &show_another_window);
 
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+            //ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
+            // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+            //     counter++;
+            // ImGui::SameLine();
+            // ImGui::Text("counter = %d", counter);
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
-        }
+        //}
 
         // 3. Show another simple window.
         if (show_another_window)

@@ -44,7 +44,7 @@ public:
 		vector<float> xVals;
 		vector<float> yVals;
 		vector<float> zVals;
-		for (int i = 0; i < vertices.size(); i++)
+		for (std::size_t i = 0; i < vertices.size(); i++)
 		{
 			xVals.push_back(vertices[i][0]);
 			yVals.push_back(vertices[i][1]);
