@@ -86,6 +86,13 @@ function(create_project_from_sources)
     set(SOURCE main.cpp Mesh.h Object.h resources/shaders/shaderWithoutFilters.vs resources/shaders/shaderWithoutFilters.fs)
     set(NAME "my_project")
     add_executable(${NAME} ${SOURCE})
+
+    #OpenCV_INCLUDE_DIRS is defined in /usr/local/lib/cmake/opencv4/OpenCVConfig.cmake line 25
+    target_include_directories(${NAME} PRIVATE ${OpenCV_INCLUDE_DIRS})
+
+    #OpenCV_LIBS is defined in /usr/local/lib/cmake/opencv4/OpenCVConfig.cmake line 24
+    target_link_libraries(${NAME} PRIVATE ${OpenCV_LIBS})
+
     target_link_libraries(${NAME} ${LIBS})
     if(MSVC)
 		target_compile_options(${NAME} PRIVATE /std:c++17 /MP)
@@ -127,6 +134,8 @@ endfunction()
 
 
 create_project_from_sources()
+
+
 
 include_directories(${CMAKE_SOURCE_DIR}/lib/include)
 include_directories(${CMAKE_SOURCE_DIR}/lib/include/GLAD)
