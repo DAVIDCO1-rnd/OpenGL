@@ -19,6 +19,9 @@
 #include "glm/gtc/matrix_transform.hpp" //for glm::rotate, glm::translate, glm::scale
 #include "Shaders/shader_m.h"
 
+#include <opencv2/opencv.hpp>
+
+
 #include <stdio.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -29,6 +32,7 @@
 #include "Mesh.h"
 
 using namespace std;
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -168,10 +172,22 @@ void saveBuffersForRedneringWholeMesh(Mesh* mesh)
 
 
 
+
+
 int main(int, char**)
 {
     string fileName = "teapot";
 	string filePath = "/home/davidco1/Developments/OpenGL/clean_configuration/Data/" + fileName + ".obj";
+
+    cv::Mat1i faces;
+    cv::Mat1d vertices;
+
+	cv::Mat image;
+	image = cv::imread("/home/davidco1/Developments/CMake_tutorial/module9_opencv/App_OpenCV/sample.png");
+	cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE);
+	cv::imshow("Display Image", image);
+	cv::waitKey(0);    
+
     Mesh myMesh(filePath);
     
 	float signedDistOfPlaneFromOrigin = -4.0f;
@@ -258,11 +274,14 @@ int main(int, char**)
     //IM_ASSERT(font != NULL);
 
     // Our state
-    bool show_demo_window = true;
+    bool show_demo_window = false;
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     Shader shaderWithoutFilters("/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.vs", "/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.fs");
+	Shader shaderRed("/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderRed.vs", "/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderRed.fs");
+	Shader shaderAxis("/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderAxis.vs", "/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderAxis.fs");
+
     glEnable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -378,7 +397,7 @@ int main(int, char**)
 			shaderWithoutFilters.use();           
 			sendTransformationToVertexShader(shaderWithoutFilters, model, view, projection);          
 			renderObject(&myMesh);
-		}
+		}       
 
         // Rendering
         ImGui::Render();

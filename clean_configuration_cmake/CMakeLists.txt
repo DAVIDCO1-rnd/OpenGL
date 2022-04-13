@@ -20,6 +20,8 @@ endif(WIN32)
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 # find the required packages
+find_package(OpenCV REQUIRED)
+message(STATUS "OpenCV included at ${OpenCV_INCLUDE_DIRS}")
 find_package(GLM REQUIRED)
 message(STATUS "GLM included at ${GLM_INCLUDE_DIR}")
 find_package(GLFW3 REQUIRED)
@@ -91,9 +93,13 @@ function(create_project_from_sources)
     target_include_directories(${NAME} PRIVATE ${OpenCV_INCLUDE_DIRS})
 
     #OpenCV_LIBS is defined in /usr/local/lib/cmake/opencv4/OpenCVConfig.cmake line 24
-    target_link_libraries(${NAME} PRIVATE ${OpenCV_LIBS})
+    #target_link_libraries(${NAME} PRIVATE ${OpenCV_LIBS})
 
-    target_link_libraries(${NAME} ${LIBS})
+    target_link_libraries(${NAME} ${LIBS} ${OpenCV_LIBS})
+
+    message("OpenCV Include Directories: " ${OpenCV_INCLUDE_DIRS})
+    message("OpenCV Libraries: " ${OpenCV_LIBS})
+
     if(MSVC)
 		target_compile_options(${NAME} PRIVATE /std:c++17 /MP)
         target_link_options(${NAME} PUBLIC /ignore:4099)
