@@ -4,7 +4,7 @@
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
 
-
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <IMGUI/imgui.h>
@@ -17,7 +17,6 @@
 #include <IMGUI/backends/imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp" //for glm::rotate, glm::translate, glm::scale
-#include <glad/glad.h>
 #include "Shaders/shader.h"
 
 #include <stdio.h>
@@ -30,6 +29,39 @@
 #include "Mesh.h"
 
 using namespace std;
+
+void printOpenGLError(GLenum err)
+{
+	switch (err)
+	{
+	case GL_INVALID_ENUM:
+		cout << "Error: GL_INVALID_ENUM" << endl;
+		system("pause");
+		break;
+	case GL_INVALID_VALUE:
+		cout << "Error: GL_INVALID_VALUE" << endl;
+		system("pause");
+		break;
+	case GL_INVALID_OPERATION:
+		cout << "Error: GL_INVALID_OPERATION" << endl;
+		system("pause");
+		break;
+	case GL_INVALID_FRAMEBUFFER_OPERATION:
+		cout << "Error: GL_INVALID_FRAMEBUFFER_OPERATION" << endl;
+		system("pause");
+		break;
+	case GL_OUT_OF_MEMORY:
+		cout << "Error: GL_OUT_OF_MEMORY" << endl;
+		system("pause");
+		break;
+	case GL_NO_ERROR:
+		cout << "No error reported" << endl;
+		break;
+	default:
+		cout << "Unknown error" << endl;
+		break;
+	}
+}
 
 struct Parameters
 {
@@ -70,6 +102,47 @@ void updateModelViewByUserParameters(glm::mat4 &model)
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+}
+
+/*saving the matrices relevant for transformation to the vertex shader*/
+void sendTransformationToVertexShader(Shader shader, glm::mat4 model, glm::mat4 view, glm::mat4 projection)
+{
+	shader.setMat4("model", model);
+	shader.setMat4("view", view);
+	shader.setMat4("projection", projection);
+}
+
+void renderObject(Mesh* mesh)
+{
+	GLenum err011 = glGetError();
+	if (err011 != GL_NO_ERROR)
+	{
+		cout << "err011" << endl;
+		printOpenGLError(err011);
+	}
+	glBindVertexArray(mesh->VAO);
+	GLenum err012 = glGetError();
+	if (err012 != GL_NO_ERROR)
+	{
+		cout << "err012" << endl;
+		printOpenGLError(err012);
+	}
+
+	glDrawElements(GL_TRIANGLES, (GLsizei)mesh->getIndices().size(), GL_UNSIGNED_INT, 0);
+	GLenum err013 = glGetError();
+	if (err013 != GL_NO_ERROR)
+	{
+		cout << "err013" << endl;
+		printOpenGLError(err013);
+	}
+
+	glBindVertexArray(0);
+	GLenum err014 = glGetError();
+	if (err014 != GL_NO_ERROR)
+	{
+		cout << "err014" << endl;
+		printOpenGLError(err014);
+	}
 }
 
 int main(int, char**)
@@ -271,8 +344,8 @@ int main(int, char**)
 		{
 			glLineWidth(1.0);
 			shaderWithoutFilters.use();
-			//sendTransformationToVertexShader(shaderWithoutFilters, model, view, projection);
-			//renderObject(&myMesh);
+			sendTransformationToVertexShader(shaderWithoutFilters, model, view, projection);
+			renderObject(&myMesh);
 		}
 
 

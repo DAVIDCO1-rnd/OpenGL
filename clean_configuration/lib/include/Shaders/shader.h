@@ -5,7 +5,7 @@
 // #include "GL3W/gl3w.h"
 // #include "GL3W/glcorearb.h"
 
-#include <glad/glad.h>
+//#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include <string>
