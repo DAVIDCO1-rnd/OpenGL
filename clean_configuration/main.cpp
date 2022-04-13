@@ -30,6 +30,9 @@
 
 using namespace std;
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+
 void printOpenGLError(GLenum err)
 {
 	switch (err)
@@ -68,10 +71,10 @@ struct Parameters
 	GLfloat angleX = 0.0f;
 	GLfloat angleY = 0.0f;
 	GLfloat angleZ = 0.0f;
-	GLfloat scaleX = 0.25f;
-	GLfloat scaleY = 0.25f;
-	GLfloat scaleZ = 0.25f;
-	GLfloat scaleUniform = 0.25f; //for uniform scaling (in all the axises)
+	GLfloat scaleX = 0.5f;
+	GLfloat scaleY = 0.5f;
+	GLfloat scaleZ = 0.5f;
+	GLfloat scaleUniform = 0.5f; //for uniform scaling (in all the axises)
 	GLfloat translateX = 0.0f;
 	GLfloat translateY = 0.0f;
 	GLfloat translateZ = 0.0f;
@@ -143,13 +146,34 @@ void renderObject(Mesh* mesh)
 		cout << "err014" << endl;
 		printOpenGLError(err014);
 	}
+
 }
+
+void saveBuffersForRedneringWholeMesh(Mesh* mesh)
+{
+	glGenVertexArrays(1, &(mesh->VAO));
+	glGenBuffers(1, &(mesh->VBO));
+	glGenBuffers(1, &(mesh->EBO));
+	glBindVertexArray(mesh->VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
+	glBufferData(GL_ARRAY_BUFFER, mesh->getVertices().size() * sizeof(float), &(mesh->getVertices())[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->getIndices().size() * sizeof(unsigned int), &(mesh->getIndices())[0], GL_STATIC_DRAW);
+
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(0);
+}
+
+
 
 int main(int, char**)
 {
-    string fileName = "bunny";
+    string fileName = "teapot";
 	string filePath = "/home/davidco1/Developments/OpenGL/clean_configuration/Data/" + fileName + ".obj";
     Mesh myMesh(filePath);
+    
 	float signedDistOfPlaneFromOrigin = -4.0f;
 	int width = 600;
 	int height = 800;
@@ -167,44 +191,41 @@ int main(int, char**)
 	GLfloat lastPlaneRotationZ = 0.0f;
 
     // Setup window
-    glfwSetErrorCallback(glfw_error_callback);
+    //glfwSetErrorCallback(glfw_error_callback);
     int glfwInitStatus = glfwInit();
     if (glfwInitStatus == 0)
     {
         return 1;
     }
-    // if (!glfwInit())
-    //     return 1;
-
-    // Decide GL+GLSL versions
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-    // GL ES 2.0 + GLSL 100
-    const char* glsl_version = "#version 100";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-#elif defined(__APPLE__)
-    // GL 3.2 + GLSL 150
-    const char* glsl_version = "#version 150";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
-#else
-    // GL 3.0 + GLSL 130
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
-#endif
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1); // Enable vsync
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //glfwSetCursorPosCallback(window, mouse_callback);
+    //glfwSetScrollCallback(window, scroll_callback);
+
+    // glad: load all OpenGL function pointers
+    // ---------------------------------------
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -242,6 +263,10 @@ int main(int, char**)
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     Shader shaderWithoutFilters("/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.vs", "/home/davidco1/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.fs");
+    glEnable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    saveBuffersForRedneringWholeMesh(&myMesh);
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -274,7 +299,7 @@ int main(int, char**)
                 static int counter = 0;
                 ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
                 {
-                    //ImGui::InputFloat("rotate X", &params.angleX, 1.0f, 1.0f);
+                    ImGui::InputFloat("rotate X", &params.angleX, 1.0f, 1.0f);
                     ImGui::InputFloat("rotate Y", &params.angleY, 1.0f, 1.0f);
                     ImGui::InputFloat("rotate Z", &params.angleZ, 1.0f, 1.0f);
 
@@ -331,29 +356,32 @@ int main(int, char**)
             ImGui::End();
         }
 
-        // Rendering
-        ImGui::Render();
+
         int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glfwGetFramebufferSize(window, &display_w, &display_h);      
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 		glm::mat4 model, view, projection;
+        model = glm::mat4(1.0);
+        view = glm::mat4(1.0);
+        projection = glm::mat4(1.0);
 		updateModelViewByUserParameters(model);
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 		if (renderMesh)
 		{
-			glLineWidth(1.0);
-			shaderWithoutFilters.use();
-			sendTransformationToVertexShader(shaderWithoutFilters, model, view, projection);
+			glLineWidth(1.0);             
+			shaderWithoutFilters.use();           
+			sendTransformationToVertexShader(shaderWithoutFilters, model, view, projection);          
 			renderObject(&myMesh);
 		}
 
-
+        // Rendering
+        ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
@@ -369,3 +397,14 @@ int main(int, char**)
 
     return 0;
 }
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
+
