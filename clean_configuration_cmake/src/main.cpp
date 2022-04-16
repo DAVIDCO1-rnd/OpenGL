@@ -20,6 +20,10 @@
 #include "Shaders/shader_t.h"
 
 #include <opencv2/opencv.hpp>
+#include "ModelParameters.h"
+
+//#include <filesystem>
+//namespace fs = std::filesystem;
 
 
 #include <stdio.h>
@@ -37,67 +41,13 @@ using namespace std;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 
-void printOpenGLError(GLenum err)
-{
-	switch (err)
-	{
-	case GL_INVALID_ENUM:
-		cout << "Error: GL_INVALID_ENUM" << endl;
-		system("pause");
-		break;
-	case GL_INVALID_VALUE:
-		cout << "Error: GL_INVALID_VALUE" << endl;
-		system("pause");
-		break;
-	case GL_INVALID_OPERATION:
-		cout << "Error: GL_INVALID_OPERATION" << endl;
-		system("pause");
-		break;
-	case GL_INVALID_FRAMEBUFFER_OPERATION:
-		cout << "Error: GL_INVALID_FRAMEBUFFER_OPERATION" << endl;
-		system("pause");
-		break;
-	case GL_OUT_OF_MEMORY:
-		cout << "Error: GL_OUT_OF_MEMORY" << endl;
-		system("pause");
-		break;
-	case GL_NO_ERROR:
-		cout << "No error reported" << endl;
-		break;
-	default:
-		cout << "Unknown error" << endl;
-		break;
-	}
-}
 
-struct Parameters
-{
-	GLfloat angleX = 0.0f;
-	GLfloat angleY = 0.0f;
-	GLfloat angleZ = 0.0f;
-	GLfloat scaleX = 0.5f;
-	GLfloat scaleY = 0.5f;
-	GLfloat scaleZ = 0.5f;
-	GLfloat scaleUniform = 0.5f; //for uniform scaling (in all the axises)
-	GLfloat translateX = 0.0f;
-	GLfloat translateY = 0.0f;
-	GLfloat translateZ = 0.0f;
-};
 
-Parameters params;
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
 
-/*Updates the modelView matrix by the user parameters*/
-void updateModelViewByUserParameters(glm::mat4 &model)
-{
-	model = glm::rotate(model, glm::radians(params.angleX), glm::vec3(1.0, 0.0, 0.0));
-	model = glm::rotate(model, glm::radians(params.angleY), glm::vec3(0.0, 1.0, 0.0));
-	model = glm::rotate(model, glm::radians(params.angleZ), glm::vec3(0.0, 0.0, 1.0));
-	model = glm::translate(model, glm::vec3(params.translateX, params.translateY, params.translateZ));
-	model = glm::scale(model, glm::vec3(params.scaleX, params.scaleY, params.scaleZ));
-	model = glm::scale(model, glm::vec3(params.scaleUniform, params.scaleUniform, params.scaleUniform));
-}
+
+
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
@@ -119,75 +69,14 @@ void sendTransformationToVertexShader(Shader shader, glm::mat4 model, glm::mat4 
 	shader.setMat4("projection", projection);
 }
 
-void renderObject(Mesh* mesh)
-{
-	GLenum err011 = glGetError();
-	if (err011 != GL_NO_ERROR)
-	{
-		cout << "err011" << endl;
-		printOpenGLError(err011);
-	}
-	glBindVertexArray(mesh->VAO);
-	GLenum err012 = glGetError();
-	if (err012 != GL_NO_ERROR)
-	{
-		cout << "err012" << endl;
-		printOpenGLError(err012);
-	}
-
-	glDrawElements(GL_TRIANGLES, (GLsizei)mesh->getIndices().size(), GL_UNSIGNED_INT, 0);
-	GLenum err013 = glGetError();
-	if (err013 != GL_NO_ERROR)
-	{
-		cout << "err013" << endl;
-		printOpenGLError(err013);
-	}
-
-	glBindVertexArray(0);
-	GLenum err014 = glGetError();
-	if (err014 != GL_NO_ERROR)
-	{
-		cout << "err014" << endl;
-		printOpenGLError(err014);
-	}
-
-}
-
-void saveBuffersForRedneringWholeMesh(Mesh* mesh)
-{
-	glGenVertexArrays(1, &(mesh->VAO));
-	glGenBuffers(1, &(mesh->VBO));
-	glGenBuffers(1, &(mesh->EBO));
-	glBindVertexArray(mesh->VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-	glBufferData(GL_ARRAY_BUFFER, mesh->getVertices().size() * sizeof(float), &(mesh->getVertices())[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->getIndices().size() * sizeof(unsigned int), &(mesh->getIndices())[0], GL_STATIC_DRAW);
-
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(0);
-}
-
-
-
 
 
 int main(int, char**)
 {
-    string fileName = "teapot";
-	string filePath = "/home/dell/Developments/OpenGL/clean_configuration/Data/" + fileName + ".obj";
 
-	cv::Mat image;
-	image = cv::imread("/home/dell/Developments/OpenGL/clean_configuration_cmake/sample.png");
-	cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE);
-	cv::imshow("Display Image", image);
-	cv::waitKey(0);    
 
-    Mesh myMesh(filePath);
 	bool renderMesh = true;
-	bool renderIntersection = true;
+	
 
 
 
@@ -204,7 +93,7 @@ int main(int, char**)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Checking LOS Algorithm", NULL, NULL);
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
@@ -216,6 +105,8 @@ int main(int, char**)
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+
     //glfwSetCursorPosCallback(window, mouse_callback);
     //glfwSetScrollCallback(window, scroll_callback);
 
@@ -270,7 +161,35 @@ int main(int, char**)
     glEnable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    saveBuffersForRedneringWholeMesh(&myMesh);
+    
+    
+
+    // fs::path modelsFolder1 ("/home/dell/Developments/OpenGL/clean_configuration/Data");
+    // fs::path modelName1 ("teapot.obj");
+    // fs::path modelFullPath1 = modelsFolder1 / modelName1;
+    // cout << modelFullPath1 << std::endl;
+
+
+    string modelsFolder = "/home/dell/Developments/OpenGL/clean_configuration/Data/"; 
+
+    string modelName1 = "teapot";
+    string filePath1 = modelsFolder + modelName1 + ".obj";
+    ModelParameters meshParams1;
+    Mesh mesh1(modelName1, filePath1, meshParams1); 
+    mesh1.saveBuffersForRedneringWholeMesh();  
+
+    string modelName2 = "bunny";
+    string filePath2 = modelsFolder + modelName2 + ".obj";
+    ModelParameters meshParams2;
+    meshParams2.scaleUniform = 0.02f;
+    Mesh mesh2(modelName2, filePath2, meshParams2); 
+    mesh2.saveBuffersForRedneringWholeMesh();      
+
+    std::vector<Mesh> meshes;
+    meshes.push_back(mesh1);  
+    meshes.push_back(mesh2);
+
+    
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -291,57 +210,86 @@ int main(int, char**)
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
 
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-        //{
-            ImGui::Begin("Hello, Rafael!");
+
+
+        static size_t item_current_idx = 0; // Here we store our selection data as an index.
+
+        string modelName = meshes[item_current_idx].getModelName();
+        ImGui::Begin(modelName.c_str());
+        {
+            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+            vector<string> items;
+            for (size_t i=0 ; i<meshes.size() ; i++)
             {
-                ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+                items.push_back(meshes[i].getModelName());
+            }            
+            //string items[] = { meshes[0].getModelName(), meshes[1].getModelName()};
+            
+            if (ImGui::BeginListBox("models"))
+            {
+                for (size_t n = 0; n < items.size(); n++)
                 {
-                    ImGui::InputFloat("rotate X", &params.angleX, 1.0f, 1.0f);
-                    ImGui::InputFloat("rotate Y", &params.angleY, 1.0f, 1.0f);
-                    ImGui::InputFloat("rotate Z", &params.angleZ, 1.0f, 1.0f);
+                    const bool is_selected = (item_current_idx == n);
+                    if (ImGui::Selectable(items[n].c_str(), is_selected))
+                        item_current_idx = n;
 
-                    ImGui::InputFloat("translate X", &params.translateX, 0.1f, 1.0f);
-                    ImGui::InputFloat("translate Y", &params.translateY, 0.1f, 1.0f);
-                    ImGui::InputFloat("translate Z", &params.translateZ, 0.1f, 1.0f);
-
-                    ImGui::InputFloat("scale X", &params.scaleX, 0.01f, 1.0f);
-                    ImGui::InputFloat("scale Y", &params.scaleY, 0.01f, 1.0f);
-                    ImGui::InputFloat("scale Z", &params.scaleZ, 0.01f, 1.0f);
-                    ImGui::InputFloat("uniform scale", &params.scaleUniform, 0.01f, 1.0f);
+                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                    // if (is_selected)
+                    //     ImGui::SetItemDefaultFocus();
                 }
-                {
-                    ImGui::Checkbox("render mesh", &renderMesh);
-                    ImGui::Checkbox("render intersection", &renderIntersection);
-                    
-                    //ImGui::SliderFloat("signed distance of plane from origin", &signedDistOfPlaneFromOrigin, -80.0f, 80.0f);
-                    //ImGui::SliderFloat("rotate X plane", &planeAngleX, -90.0f, 90.0f);
-                    //ImGui::SliderFloat("rotate Y plane", &planeAngleY, -90.0f, 90.0f);
-                    //ImGui::SliderFloat("rotate Z plane", &planeAngleZ, -90.0f, 90.0f);
+                ImGui::EndListBox();
+            }          
 
-                    //ImGui::InputFloat("signed distance of plane from origin", &signedDistOfPlaneFromOrigin, 0.1f, 1.0f);
-                    // ImGui::InputFloat("rotate X plane", &planeAngleX, 1.0f, 1.0f);
-                    // ImGui::InputFloat("rotate Y plane", &planeAngleY, 1.0f, 1.0f);
-                    // ImGui::InputFloat("rotate Z plane", &planeAngleZ, 1.0f, 1.0f);
-                    //float planeNormalArray[3] = { rotatedPlaneNormal[0], rotatedPlaneNormal[1], rotatedPlaneNormal[2] };
-                    //ImGui::InputFloat3("Plane Normal", planeNormalArray);
-                }
-            }           
+            {
+                ModelParameters meshParams = meshes[item_current_idx].getParams();
 
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
+                meshParams.angleX = meshes[item_current_idx].getParams().angleX;
+                meshParams.angleY = meshes[item_current_idx].getParams().angleY;
+                meshParams.angleZ = meshes[item_current_idx].getParams().angleZ;
 
-            //ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+                meshParams.translateX = meshes[item_current_idx].getParams().translateX;
+                meshParams.translateY = meshes[item_current_idx].getParams().translateY;
+                meshParams.translateZ = meshes[item_current_idx].getParams().translateZ;
 
-            // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            //     counter++;
-            // ImGui::SameLine();
-            // ImGui::Text("counter = %d", counter);
+                meshParams.scaleX = meshes[item_current_idx].getParams().scaleX;
+                meshParams.scaleY = meshes[item_current_idx].getParams().scaleY;
+                meshParams.scaleZ = meshes[item_current_idx].getParams().scaleZ;
 
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::End();
-        //}
+                meshParams.scaleUniform = meshes[item_current_idx].getParams().scaleUniform;
+
+                ImGui::InputFloat("rotate X", &meshParams.angleX, 1.0f, 1.0f);
+                ImGui::InputFloat("rotate Y", &meshParams.angleY, 1.0f, 1.0f);
+                ImGui::InputFloat("rotate Z", &meshParams.angleZ, 1.0f, 1.0f);
+
+                ImGui::InputFloat("translate X", &meshParams.translateX, 0.1f, 1.0f);
+                ImGui::InputFloat("translate Y", &meshParams.translateY, 0.1f, 1.0f);
+                ImGui::InputFloat("translate Z", &meshParams.translateZ, 0.1f, 1.0f);
+
+                ImGui::InputFloat("scale X", &meshParams.scaleX, 0.01f, 1.0f);
+                ImGui::InputFloat("scale Y", &meshParams.scaleY, 0.01f, 1.0f);
+                ImGui::InputFloat("scale Z", &meshParams.scaleZ, 0.01f, 1.0f);
+                ImGui::InputFloat("uniform scale", &meshParams.scaleUniform, 0.01f, 1.0f);
+                ImGui::Checkbox("render mesh", &renderMesh);
+
+                meshes[item_current_idx].setParams(meshParams);                
+            }
+        }           
+
+        // ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+        // ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+        // ImGui::Checkbox("Another Window", &show_another_window);
+
+        //ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+
+        // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+        //     counter++;
+        // ImGui::SameLine();
+        // ImGui::Text("counter = %d", counter);
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
+
 
         // 3. Show another simple window.
         if (show_another_window)
@@ -361,20 +309,23 @@ int main(int, char**)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		glm::mat4 model, view, projection;
-        model = glm::mat4(1.0);
+		glm::mat4 view, projection;
         view = glm::mat4(1.0);
         projection = glm::mat4(1.0);
-		updateModelViewByUserParameters(model);
+        for (size_t i = 0 ; i < meshes.size() ; i++) {
+            meshes[i].updateModelMatrixByUserParameters();
+        }		
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 		if (renderMesh)
 		{
 			glLineWidth(1.0);             
-			shaderWithoutFilters.use();           
-			sendTransformationToVertexShader(shaderWithoutFilters, model, view, projection);          
-			renderObject(&myMesh);
+			shaderWithoutFilters.use();      
+            for (size_t i = 0 ; i < meshes.size() ; i++) {
+                sendTransformationToVertexShader(shaderWithoutFilters, meshes[i].getModelMatrix(), view, projection);          
+                meshes[i].renderObject();
+            }
 		}       
 
         // Rendering
