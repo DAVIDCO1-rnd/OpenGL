@@ -37,7 +37,7 @@ if(WIN32)
   set(LIBS glfw3 opengl32 assimp freetype irrKlang)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 elseif(UNIX AND NOT APPLE)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -O0")
   find_package(OpenGL REQUIRED)
   add_definitions(${OPENGL_DEFINITIONS})
   find_package(X11 REQUIRED)
@@ -85,6 +85,9 @@ function(create_project_from_sources)
             "src/shaders/*.fs"
             "src/shaders/*.gs"
     )
+    foreach(SUBSOURCE ${SOURCE})
+      message(STATUS "SUBSOURCE = ${SUBSOURCE}")
+    endforeach(SUBSOURCE)
     set(NAME "my_project")
     add_executable(${NAME} ${SOURCE})
 
@@ -109,7 +112,7 @@ function(create_project_from_sources)
     
 
     if(MSVC)
-		target_compile_options(${NAME} PRIVATE /std:c++17 /MP)
+		target_compile_options(${NAME} PRIVATE /std:c++17 /MP INTERFACE -O0)
         target_link_options(${NAME} PUBLIC /ignore:4099)
     endif(MSVC)
     if(WIN32)
