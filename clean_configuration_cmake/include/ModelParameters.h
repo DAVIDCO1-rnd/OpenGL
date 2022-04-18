@@ -22,10 +22,10 @@ public:
         angleX = 0.0f;
         angleY = 0.0f;
         angleZ = 0.0f;
-        scaleX = 0.5f;
-        scaleY = 0.5f;
-        scaleZ = 0.5f;
-        scaleUniform = 0.5f; //for uniform scaling (in all the axises)
+        scaleX = 1.0f;
+        scaleY = 1.0f;
+        scaleZ = 1.0f;
+        scaleUniform = 1.0f; //for uniform scaling (in all the axises)
         translateX = 0.0f;
         translateY = 0.0f;
         translateZ = 0.0f;        

@@ -19,7 +19,7 @@
 #include "glm/gtc/matrix_transform.hpp" //for glm::rotate, glm::translate, glm::scale
 #include "Shaders/shader_t.h"
 
-#include <opencv2/opencv.hpp>
+#include "RayMesh.h"
 #include "ModelParameters.h"
 
 //#include <filesystem>
@@ -73,6 +73,40 @@ void sendTransformationToVertexShader(Shader shader, glm::mat4 model, glm::mat4 
 
 int main(int, char**)
 {
+
+
+    string modelsFolder = "/home/dell/Developments/OpenGL/clean_configuration/Data/"; 
+
+    string modelName1 = "bunny";
+    string filePath1 = modelsFolder + modelName1 + ".obj";
+    ModelParameters meshParams1;
+    Mesh mesh1(modelName1, filePath1, meshParams1); 
+     
+
+    string modelName2 = "teapot";
+    string filePath2 = modelsFolder + modelName2 + ".obj";
+    ModelParameters meshParams2;
+    meshParams2.scaleUniform = 0.02f;
+    Mesh mesh2(modelName2, filePath2, meshParams2); 
+         
+
+    std::vector<Mesh> meshes;
+    meshes.push_back(mesh1);  
+    //meshes.push_back(mesh2);
+
+    cv::Vec3d point = cv::Vec3d(5.0, 5.0, 5.0);
+    cv::Vec3d vec = cv::Vec3d(1.0, 1.0, 1.0);
+    Ray ray(point, vec);
+    RayMesh rayMesh(ray);
+
+    cv::Vec3d intersectionPointForMesh1;
+    double min_t_for_mesh1;
+    bool isIntersectingMesh1 = rayMesh.calcIntersectionBetweenRayAndSingleMesh(mesh1, intersectionPointForMesh1, min_t_for_mesh1);
+
+    cv::Vec3d intersectionPoint;
+    double min_t; 
+    size_t meshIntersectionIndex;   
+    bool isIntersectingAllMeshes = rayMesh.calcIntersectionBetweenRayAndMultiplesMeshes(meshes, intersectionPoint, min_t, meshIntersectionIndex);
 
 
 	bool renderMesh = true;
@@ -161,33 +195,11 @@ int main(int, char**)
     glEnable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    
-    
 
-    // fs::path modelsFolder1 ("/home/dell/Developments/OpenGL/clean_configuration/Data");
-    // fs::path modelName1 ("teapot.obj");
-    // fs::path modelFullPath1 = modelsFolder1 / modelName1;
-    // cout << modelFullPath1 << std::endl;
-
-
-    string modelsFolder = "/home/dell/Developments/OpenGL/clean_configuration/Data/"; 
-
-    string modelName1 = "teapot";
-    string filePath1 = modelsFolder + modelName1 + ".obj";
-    ModelParameters meshParams1;
-    Mesh mesh1(modelName1, filePath1, meshParams1); 
-    mesh1.saveBuffersForRedneringWholeMesh();  
-
-    string modelName2 = "bunny";
-    string filePath2 = modelsFolder + modelName2 + ".obj";
-    ModelParameters meshParams2;
-    meshParams2.scaleUniform = 0.02f;
-    Mesh mesh2(modelName2, filePath2, meshParams2); 
-    mesh2.saveBuffersForRedneringWholeMesh();      
-
-    std::vector<Mesh> meshes;
-    meshes.push_back(mesh1);  
-    meshes.push_back(mesh2);
+    for (size_t i=0 ; i<meshes.size() ; i++)
+    {
+        meshes[i].saveBuffersForRedneringWholeMesh(); 
+    }
 
     
 
@@ -315,8 +327,8 @@ int main(int, char**)
         for (size_t i = 0 ; i < meshes.size() ; i++) {
             meshes[i].updateModelMatrixByUserParameters();
         }		
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -250.0f));
+		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 
 		if (renderMesh)
 		{

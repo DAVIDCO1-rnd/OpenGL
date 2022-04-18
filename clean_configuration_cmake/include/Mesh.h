@@ -15,6 +15,11 @@ private:
 	string fileName;
 	vector<unsigned int> indices;
 	vector<float> vertices;
+
+	cv::Mat1i indicesOpenCV;
+	cv::Mat1d verticesOpenCV; 
+	
+
 	glm::mat4 modelMatrix;
 	ModelParameters params;
 
@@ -53,6 +58,42 @@ private:
 		return true;
 	}
 
+
+	bool loadOBJOpenCV(string path, cv::Mat1d & out_vertices, cv::Mat1i & out_faces)
+	{
+		out_vertices.release();
+		out_faces.release();
+		//printf("Loading OBJ file %s...\n", path.c_str());
+
+		FILE * file = fopen(path.c_str(), "r");
+		if (file == NULL) {
+			printf("Impossible to open the file !\n");
+			return false;
+		}
+
+		while (1) {
+			char lineHeader[128];
+			int res = fscanf(file, "%s", lineHeader);
+			if (res == EOF)
+				break;
+
+			if (strcmp(lineHeader, "v") == 0) {
+				double vertexData[3];
+				fscanf(file, "%lf %lf %lf\n", &vertexData[0], &vertexData[1], &vertexData[2]);
+				cv::Mat1d vertex = cv::Mat1d(1, 3, vertexData);
+				out_vertices.push_back(vertex);
+			}
+			else if (strcmp(lineHeader, "f") == 0) {
+				int faceData[3];
+				fscanf(file, "%d %d %d\n", &faceData[0], &faceData[1], &faceData[2]);
+				cv::Mat1i face = cv::Mat1i(1, 3, faceData);
+				out_faces.push_back(face);
+			}
+		}
+		//printf("Finised loading OBJ file %s...\n", path.c_str());
+		return true;
+	}	
+
 public:
 	unsigned int VAO, VBO, EBO; //are public to let opengl change them
 
@@ -61,6 +102,7 @@ public:
 		this->vertices.clear();
 		this->indices.clear();
 		loadOBJ(fileName, this->vertices, this->indices);
+		loadOBJOpenCV(fileName, this->verticesOpenCV, this->indicesOpenCV);
 	}
 
 	Mesh(string modelName, string fileName, ModelParameters params)
@@ -149,6 +191,14 @@ public:
 		return vertices;
 	}
 
+	cv::Mat1i getIndicesOpenCV() {
+		return indicesOpenCV;
+	}
+
+	cv::Mat1d getVerticesOpenCV() {
+		return verticesOpenCV;
+	}
+
 	string getModelName() {
 		return modelName;
 	}
@@ -159,6 +209,14 @@ public:
 
 	void setParams(ModelParameters params) {
 		this->params = params;
+	}
+
+	cv::Mat1d calcRotatedVertices(cv::Mat1d rotation)
+	{
+		cv::Mat1d transposedVertices = this->verticesOpenCV.t();
+		cv::Mat1d transposedRotatedVertices = rotation * transposedVertices;
+		cv::Mat1d rotatedVertices = transposedRotatedVertices.t();
+		return rotatedVertices;
 	}
 
 
