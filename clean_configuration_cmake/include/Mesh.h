@@ -10,7 +10,7 @@ using std::vector;
 
 class Mesh
 {
-private:
+protected:
 	string modelName;
 	string fileName;
 	vector<unsigned int> indices;

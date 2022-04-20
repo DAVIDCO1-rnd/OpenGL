@@ -93,23 +93,24 @@ public:
                 
                 double currentVertexX = rotatedVertices.at<double>(currentIndex, 0);
                 double currentVertexY = rotatedVertices.at<double>(currentIndex, 1);
+                double eps = 0.00001;
 
-                if (currentVertexX > rayPointX)
+                if (currentVertexX > rayPointX + eps)
                 {
                     biggerX++;
                 }
 
-                if (currentVertexY > rayPointY)
+                if (currentVertexY > rayPointY + eps)
                 {
                     biggerY++;
                 }  
 
-                if (currentVertexX < rayPointX)
+                if (currentVertexX < rayPointX - eps) 
                 {
                     smallerX++;
                 }
 
-                if (currentVertexY < rayPointY)
+                if (currentVertexY < rayPointY - eps)
                 {
                     smallerY++;
                 }
@@ -189,15 +190,7 @@ public:
 
         Mat mat12 = (Mat_<double>(2,2) << p3p[0], p3p[1], p23[0], p23[1]);
         Mat mat22 = (Mat_<double>(2,2) << p1p[0], p1p[1], p31[0], p31[1]);
-        Mat mat32 = (Mat_<double>(2,2) << p2p[0], p2p[1], p12[0], p12[1]);
-
-        printMatrix("mat11", mat11);
-        printMatrix("mat21", mat21);
-        printMatrix("mat31", mat31);
-
-        printMatrix("mat11", mat12);
-        printMatrix("mat22", mat22);
-        printMatrix("mat32", mat32);        
+        Mat mat32 = (Mat_<double>(2,2) << p2p[0], p2p[1], p12[0], p12[1]);      
 
         double detMat11 = calcDeterminant(mat11);
         double detMat21 = calcDeterminant(mat21);
@@ -234,19 +227,19 @@ public:
         return isPointInsideTriangle;
     }
 
-    bool calcIntersectionBetweenRayAndMultipleTriangles(Ray ray, Mesh mesh, std::vector<int> trianglesIndexesThatMightIntersectRay, cv::Vec3d& intersectionPoint, double& min_t)
+    bool calcIntersectionBetweenRayAndMultipleTriangles(Ray ray, Mesh* mesh, std::vector<int> trianglesIndexesThatMightIntersectRay, cv::Vec3d& intersectionPoint, double& min_t)
     {
         bool isIntersecting = false;
         min_t = -1;
         for (size_t i=0 ; i<trianglesIndexesThatMightIntersectRay.size() ; i++)
         {
             int currentTriangleIndex = trianglesIndexesThatMightIntersectRay[i];
-            cv::Mat1i meshTriangles = mesh.getIndicesOpenCV();
+            cv::Mat1i meshTriangles = mesh->getIndicesOpenCV();
             cv::Mat1i currentTriangleVerticesIndexes = meshTriangles.row(currentTriangleIndex);
             int vertexIndex1 = currentTriangleVerticesIndexes.at<int>(0);
             int vertexIndex2 = currentTriangleVerticesIndexes.at<int>(1);
             int vertexIndex3 = currentTriangleVerticesIndexes.at<int>(2);
-            cv::Mat1d meshVertices = mesh.getVerticesOpenCV();
+            cv::Mat1d meshVertices = mesh->getVerticesOpenCV();
 
             cv::Vec3d point1(meshVertices.row(vertexIndex1).at<double>(0), meshVertices.row(vertexIndex1).at<double>(1), meshVertices.row(vertexIndex1).at<double>(2));
             cv::Vec3d point2(meshVertices.row(vertexIndex2).at<double>(0), meshVertices.row(vertexIndex2).at<double>(1), meshVertices.row(vertexIndex2).at<double>(2));
@@ -276,11 +269,11 @@ public:
     }
 
     
-    bool calcIntersectionBetweenRayAndMultiplesMeshes(std::vector<Mesh> meshes, cv::Vec3d& intersectionPoint, double& min_t, size_t& meshIntersectionIndex) {
+    bool calcIntersectionBetweenRayAndMultiplesMeshes(std::vector<Mesh*> meshes, cv::Vec3d& intersectionPoint, double& min_t, size_t& meshIntersectionIndex) {
         min_t = -1;
         bool isIntersecting = false;
         for (size_t i=0 ; i<meshes.size() ; i++) {
-            Mesh currentMesh = meshes[i];
+            Mesh* currentMesh = meshes[i];
             double min_t_for_current_mesh;
             cv::Vec3d intersectionPointForCurrentMesh;
             bool isIntersectingCurrentMesh = calcIntersectionBetweenRayAndSingleMesh(currentMesh, intersectionPointForCurrentMesh, min_t_for_current_mesh);
@@ -298,12 +291,12 @@ public:
         return isIntersecting;
     }
 
-    bool calcIntersectionBetweenRayAndSingleMesh(Mesh mesh, cv::Vec3d& intersectionPoint, double& min_t) {
+    bool calcIntersectionBetweenRayAndSingleMesh(Mesh* mesh, cv::Vec3d& intersectionPoint, double& min_t) {
         MathUseful mathUseful;
         cv::Mat rotation = mathUseful.calcRotation(ray.unitVec());
         Ray rayParallelToZ = ray.calcRotatedRay(rotation);
-        cv::Mat1d rotatedVertices = mesh.calcRotatedVertices(rotation);
-        cv::Mat1i trianglesIndexes = mesh.getIndicesOpenCV();
+        cv::Mat1d rotatedVertices = mesh->calcRotatedVertices(rotation);
+        cv::Mat1i trianglesIndexes = mesh->getIndicesOpenCV();
         std::vector<int> trianglesIndexesThatMightIntersectRay = calcTrianglesThatMightIntersectRay(rotatedVertices, rayParallelToZ, trianglesIndexes);
 
 

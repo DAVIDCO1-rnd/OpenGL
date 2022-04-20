@@ -20,7 +20,10 @@
 #include "Shaders/shader_t.h"
 
 #include "RayMesh.h"
+#include "CircleMesh.h"
 #include "ModelParameters.h"
+
+
 
 //#include <filesystem>
 //namespace fs = std::filesystem;
@@ -49,6 +52,8 @@ const unsigned int SCR_HEIGHT = 720;
 
 
 
+
+
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
 // Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
@@ -70,44 +75,81 @@ void sendTransformationToVertexShader(Shader shader, glm::mat4 model, glm::mat4 
 }
 
 
-
 int main(int, char**)
 {
 
+    size_t circleIndex = 0;
+    string modelsFolder = "/home/dell/Developments/OpenGL/clean_configuration_cmake/Data/"; 
 
-    string modelsFolder = "/home/dell/Developments/OpenGL/clean_configuration/Data/"; 
-
-    string modelName1 = "bunny";
+    string modelName1 = "circle";
     string filePath1 = modelsFolder + modelName1 + ".obj";
     ModelParameters meshParams1;
-    Mesh mesh1(modelName1, filePath1, meshParams1); 
+    CircleMesh circleMesh(modelName1, filePath1, meshParams1);
+
      
 
-    string modelName2 = "teapot";
+    string modelName2 = "bunny";
     string filePath2 = modelsFolder + modelName2 + ".obj";
     ModelParameters meshParams2;
     meshParams2.scaleUniform = 0.02f;
     Mesh mesh2(modelName2, filePath2, meshParams2); 
          
 
-    std::vector<Mesh> meshes;
-    meshes.push_back(mesh1);  
-    //meshes.push_back(mesh2);
+    std::vector<Mesh*> meshes;
+    meshes.push_back(&circleMesh);  
+    meshes.push_back(&mesh2);
 
-    cv::Vec3d point = cv::Vec3d(5.0, 5.0, 5.0);
-    cv::Vec3d vec = cv::Vec3d(1.0, 1.0, 1.0);
-    Ray ray(point, vec);
-    RayMesh rayMesh(ray);
 
-    cv::Vec3d intersectionPointForMesh1;
-    double min_t_for_mesh1;
-    bool isIntersectingMesh1 = rayMesh.calcIntersectionBetweenRayAndSingleMesh(mesh1, intersectionPointForMesh1, min_t_for_mesh1);
+    std::vector<float> circleVertices = circleMesh.getVertices();
+    int numOfVerticesInCircle = circleVertices.size() / 3;
+    std::vector<bool> circlePointsWithLos(numOfVerticesInCircle, false);
+    for (int i=0 ; i<numOfVerticesInCircle ; i++)
+    {
+        double circleX = (double)circleVertices[3*i + 0];
+        double circleY = (double)circleVertices[3*i + 1];
+        double circleZ = (double)circleVertices[3*i + 2];
+        cv::Vec3d currentCirclePoint = cv::Vec3d(circleX, circleY, circleZ);
+        cv::Vec3d point = cv::Vec3d(5.0, 5.0, 5.0);
+        cv::Vec3d vec = currentCirclePoint - point;
+        Ray ray(point, vec);
+        RayMesh rayMesh(ray);
 
-    cv::Vec3d intersectionPoint;
-    double min_t; 
-    size_t meshIntersectionIndex;   
-    bool isIntersectingAllMeshes = rayMesh.calcIntersectionBetweenRayAndMultiplesMeshes(meshes, intersectionPoint, min_t, meshIntersectionIndex);
+        cv::Vec3d intersectionPoint;
+        double min_t; 
+        size_t meshIntersectionIndex;   
+        bool isIntersecting = rayMesh.calcIntersectionBetweenRayAndMultiplesMeshes(meshes, intersectionPoint, min_t, meshIntersectionIndex);
+        if (isIntersecting == true && meshIntersectionIndex == circleIndex)
+        {
+            circlePointsWithLos[i] = true;
+        }  
+    }
 
+    vector<unsigned int> circleTrianglesIndicesWithLos;
+    vector<unsigned int> circleTrianglesIndicesWithoutLos;
+    vector<unsigned int> circleTrianglesIndices = circleMesh.getIndices();
+    int numOfTrianglesInCircle = circleTrianglesIndices.size() / 3;
+    for (int i=0 ; i<numOfTrianglesInCircle ; i++)
+    {
+        int circleVertexIndex1 = (double)circleTrianglesIndices[3*i + 0];
+        int circleVertexIndex2 = (double)circleTrianglesIndices[3*i + 1];
+        int circleVertexIndex3 = (double)circleTrianglesIndices[3*i + 2];
+
+        if (circlePointsWithLos[circleVertexIndex1] && circlePointsWithLos[circleVertexIndex2] && circlePointsWithLos[circleVertexIndex3])
+        {
+            circleTrianglesIndicesWithLos.push_back(circleVertexIndex1);
+            circleTrianglesIndicesWithLos.push_back(circleVertexIndex2);
+            circleTrianglesIndicesWithLos.push_back(circleVertexIndex3);
+        }
+        else
+        {
+            circleTrianglesIndicesWithoutLos.push_back(circleVertexIndex1);
+            circleTrianglesIndicesWithoutLos.push_back(circleVertexIndex2);
+            circleTrianglesIndicesWithoutLos.push_back(circleVertexIndex3);
+        }
+    }    
+
+    circleMesh.indicesWithLos(circleTrianglesIndicesWithLos);
+    circleMesh.indicesWithoutLos(circleTrianglesIndicesWithoutLos);
 
 	bool renderMesh = true;
 	
@@ -188,17 +230,20 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    Shader shaderWithoutFilters("/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.vs", "/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderWithoutFilters.fs");
-	Shader shaderRed("/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderRed.vs", "/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderRed.fs");
-	Shader shaderAxis("/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderAxis.vs", "/home/dell/Developments/OpenGL/clean_configuration/resources/shaders/shaderAxis.fs");
+    Shader shaderWithoutFilters("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.fs");
+	Shader shaderRed("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.fs");
+	Shader shaderBlue("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.fs");
 
     glEnable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
-    for (size_t i=0 ; i<meshes.size() ; i++)
+    circleMesh.generateBuffers();
+    circleMesh.saveBuffersForRedneringPolygonesWithLOS();
+    circleMesh.saveBuffersForRedneringPolygonesWithoutLOS();
+    for (size_t i=1 ; i<meshes.size() ; i++)
     {
-        meshes[i].saveBuffersForRedneringWholeMesh(); 
+        meshes[i]->saveBuffersForRedneringWholeMesh(); 
     }
 
     
@@ -226,7 +271,7 @@ int main(int, char**)
 
         static size_t item_current_idx = 0; // Here we store our selection data as an index.
 
-        string modelName = meshes[item_current_idx].getModelName();
+        string modelName = meshes[item_current_idx]->getModelName();
         ImGui::Begin(modelName.c_str());
         {
             ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
@@ -234,7 +279,7 @@ int main(int, char**)
             vector<string> items;
             for (size_t i=0 ; i<meshes.size() ; i++)
             {
-                items.push_back(meshes[i].getModelName());
+                items.push_back(meshes[i]->getModelName());
             }            
             //string items[] = { meshes[0].getModelName(), meshes[1].getModelName()};
             
@@ -254,21 +299,21 @@ int main(int, char**)
             }          
 
             {
-                ModelParameters meshParams = meshes[item_current_idx].getParams();
+                ModelParameters meshParams = meshes[item_current_idx]->getParams();
 
-                meshParams.angleX = meshes[item_current_idx].getParams().angleX;
-                meshParams.angleY = meshes[item_current_idx].getParams().angleY;
-                meshParams.angleZ = meshes[item_current_idx].getParams().angleZ;
+                meshParams.angleX = meshes[item_current_idx]->getParams().angleX;
+                meshParams.angleY = meshes[item_current_idx]->getParams().angleY;
+                meshParams.angleZ = meshes[item_current_idx]->getParams().angleZ;
 
-                meshParams.translateX = meshes[item_current_idx].getParams().translateX;
-                meshParams.translateY = meshes[item_current_idx].getParams().translateY;
-                meshParams.translateZ = meshes[item_current_idx].getParams().translateZ;
+                meshParams.translateX = meshes[item_current_idx]->getParams().translateX;
+                meshParams.translateY = meshes[item_current_idx]->getParams().translateY;
+                meshParams.translateZ = meshes[item_current_idx]->getParams().translateZ;
 
-                meshParams.scaleX = meshes[item_current_idx].getParams().scaleX;
-                meshParams.scaleY = meshes[item_current_idx].getParams().scaleY;
-                meshParams.scaleZ = meshes[item_current_idx].getParams().scaleZ;
+                meshParams.scaleX = meshes[item_current_idx]->getParams().scaleX;
+                meshParams.scaleY = meshes[item_current_idx]->getParams().scaleY;
+                meshParams.scaleZ = meshes[item_current_idx]->getParams().scaleZ;
 
-                meshParams.scaleUniform = meshes[item_current_idx].getParams().scaleUniform;
+                meshParams.scaleUniform = meshes[item_current_idx]->getParams().scaleUniform;
 
                 ImGui::InputFloat("rotate X", &meshParams.angleX, 1.0f, 1.0f);
                 ImGui::InputFloat("rotate Y", &meshParams.angleY, 1.0f, 1.0f);
@@ -284,7 +329,7 @@ int main(int, char**)
                 ImGui::InputFloat("uniform scale", &meshParams.scaleUniform, 0.01f, 1.0f);
                 ImGui::Checkbox("render mesh", &renderMesh);
 
-                meshes[item_current_idx].setParams(meshParams);                
+                meshes[item_current_idx]->setParams(meshParams);                
             }
         }           
 
@@ -325,18 +370,27 @@ int main(int, char**)
         view = glm::mat4(1.0);
         projection = glm::mat4(1.0);
         for (size_t i = 0 ; i < meshes.size() ; i++) {
-            meshes[i].updateModelMatrixByUserParameters();
+            meshes[i]->updateModelMatrixByUserParameters();
         }		
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -250.0f));
 		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 
 		if (renderMesh)
 		{
-			glLineWidth(1.0);             
-			shaderWithoutFilters.use();      
-            for (size_t i = 0 ; i < meshes.size() ; i++) {
-                sendTransformationToVertexShader(shaderWithoutFilters, meshes[i].getModelMatrix(), view, projection);          
-                meshes[i].renderObject();
+			glLineWidth(1.0); 
+
+			shaderRed.use();            
+            sendTransformationToVertexShader(shaderRed, circleMesh.getModelMatrix(), view, projection);
+            circleMesh.renderPolygones(CircleMesh::PolygonsWithLos);  
+
+			shaderBlue.use();            
+            sendTransformationToVertexShader(shaderBlue, circleMesh.getModelMatrix(), view, projection);            
+            circleMesh.renderPolygones(CircleMesh::PolygonsWithoutLos);
+
+            shaderWithoutFilters.use();   
+            for (size_t i = 1 ; i < meshes.size() ; i++) {
+                sendTransformationToVertexShader(shaderWithoutFilters, meshes[i]->getModelMatrix(), view, projection);          
+                meshes[i]->renderObject();
             }
 		}       
 
@@ -366,5 +420,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
+
+
+
 
 
