@@ -14,13 +14,13 @@ public:
     enum PolygonsType {PolygonsWithLos, PolygonsWithoutLos};
 
     CircleMesh(string modelName, string fileName, ModelParameters params) : Mesh(modelName, fileName, params) {
-        int numOfAngles = 360;
-        int numOfRadiuses = 150;
+        int numOfAngles = 72;
+        int numOfRadiuses = 20;
         float radius = 90.0f;
-        float minRadius = 1.0f;        
+        float minRadius = 0.1f;        
         float circleCenterX = 0.0f;
         float circleCenterY = 0.0f;
-        float zVal = 20.0f;        
+        float zVal = 200.0f;        
         createMesh(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
     }
 
@@ -41,7 +41,7 @@ public:
 	{
 		glBindVertexArray(this->VAO_WITH_LOS);
 		glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-		glBufferData(GL_ARRAY_BUFFER, this->getVertices().size() * sizeof(float), &(this->getVertices())[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, this->verticesInModelCoordinates.size() * sizeof(float), &(this->verticesInModelCoordinates)[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO_WITH_LOS);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indicesWithLos.size() * sizeof(unsigned int), &(_indicesWithLos)[0], GL_STATIC_DRAW);
 	
@@ -55,7 +55,7 @@ public:
 	{
 		glBindVertexArray(this->VAO_WITHOUT_LOS);
 		glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-		glBufferData(GL_ARRAY_BUFFER, this->getVertices().size() * sizeof(float), &(this->getVertices())[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, this->verticesInModelCoordinates.size() * sizeof(float), &(this->verticesInModelCoordinates)[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO_WITHOUT_LOS);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indicesWithoutLos.size() * sizeof(unsigned int), &(_indicesWithoutLos)[0], GL_STATIC_DRAW);
 	
@@ -204,16 +204,16 @@ public:
     }
 
     void convertVerticesToMat1d() {
-        int numOfVertices = this->vertices.size() / 3;
+        int numOfVertices = this->verticesInModelCoordinates.size() / 3;
         double vertexData[3];
-        this->verticesOpenCV.release();
+        this->_verticesOpenCVInModelCoordinates.release();
         for (int i=0 ; i < numOfVertices ; i++)
         {            
-            vertexData[0] = this->vertices[3*i + 0];
-            vertexData[1] = this->vertices[3*i + 1];
-            vertexData[2] = this->vertices[3*i + 2];
+            vertexData[0] = this->verticesInModelCoordinates[3*i + 0];
+            vertexData[1] = this->verticesInModelCoordinates[3*i + 1];
+            vertexData[2] = this->verticesInModelCoordinates[3*i + 2];
             cv::Mat1d vertex = cv::Mat1d(1, 3, vertexData);
-            this->verticesOpenCV.push_back(vertex);            
+            this->_verticesOpenCVInModelCoordinates.push_back(vertex);            
         }
     }
 
@@ -232,7 +232,7 @@ public:
     }    
 
     void createMesh(int numOfAngles, float radius, float minRadius, int numOfRadiuses, float circleCenterX, float circleCenterY, float zVal) {
-        this->vertices = BuildVerticesForCircleTriangulation(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
+        this->verticesInModelCoordinates = BuildVerticesForCircleTriangulation(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
         this->indices = BuildTrianglesIndicesForCircleTriangulation(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
         convertVerticesToMat1d();
         convertIndicesToMat1i();        

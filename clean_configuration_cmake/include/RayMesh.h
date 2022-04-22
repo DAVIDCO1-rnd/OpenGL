@@ -239,7 +239,7 @@ public:
             int vertexIndex1 = currentTriangleVerticesIndexes.at<int>(0);
             int vertexIndex2 = currentTriangleVerticesIndexes.at<int>(1);
             int vertexIndex3 = currentTriangleVerticesIndexes.at<int>(2);
-            cv::Mat1d meshVertices = mesh->getVerticesOpenCV();
+            cv::Mat1d meshVertices = mesh->calculateVerticesOpenCVInWorldCoordinates();
 
             cv::Vec3d point1(meshVertices.row(vertexIndex1).at<double>(0), meshVertices.row(vertexIndex1).at<double>(1), meshVertices.row(vertexIndex1).at<double>(2));
             cv::Vec3d point2(meshVertices.row(vertexIndex2).at<double>(0), meshVertices.row(vertexIndex2).at<double>(1), meshVertices.row(vertexIndex2).at<double>(2));

@@ -95,3 +95,27 @@ Vec3d MathUseful::normalizeVec(Vec3d vec)
 	unitVec[2] = vec[2] / normVec;
 	return unitVec;
 }
+
+// bool MathUseful::fromCV2GLM(const cv::Mat& cvmat, glm::mat4* glmmat) {
+//     if (cvmat.cols != 4 || cvmat.rows != 4 || cvmat.type() != CV_64F) {
+//         std::cout << "Mat_CV2GLM Matrix conversion error!" << std::endl;
+//         return false;
+//     }
+//     memcpy(glm::value_ptr(*glmmat), cvmat.data, 16 * sizeof(double));
+//     *glmmat = glm::transpose(*glmmat);
+//     return true;
+// }
+
+bool MathUseful::fromGLM2CV(const glm::mat4& glmmat, cv::Mat cvmat) {
+
+    for (int i=0 ; i<4 ; i++)
+    {
+        for (int j=0 ; j<4 ; j++)
+        {
+            double val = glmmat[i][j];
+            cvmat.at<double>(i,j) = val;
+        }
+    }
+    cvmat = cvmat.t();
+    return true;
+}

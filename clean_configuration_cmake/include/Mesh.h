@@ -5,6 +5,12 @@
 #include "OpenGLErrors.h"
 #include <iostream>
 
+#include "opencv2/core/core.hpp"
+#include "opencv2/core/core_c.h"
+
+#include "MatrixDebugger.h"
+#include "MathUseful.h"
+
 using std::vector;
 
 
@@ -14,16 +20,39 @@ protected:
 	string modelName;
 	string fileName;
 	vector<unsigned int> indices;
-	vector<float> vertices;
+	vector<float> verticesInModelCoordinates;
+	//vector<float> verticesInWorldCoordinates;
+
+	vector<glm::vec3> _verticesInModelCoordinatesGLM;
+	vector<glm::vec3> _verticesInWorldCoordinatesGLM;
 
 	cv::Mat1i indicesOpenCV;
-	cv::Mat1d verticesOpenCV; 
+
+	cv::Mat1d _verticesOpenCVInModelCoordinates;
+	cv::Mat1d _verticesOpenCVInWorldCoordinates; 
 	
+	cv::Mat _modelMatrixCV;
 
 	glm::mat4 modelMatrix;
 	ModelParameters params;
 
-	bool loadOBJ(string path, vector<float>& out_vertices, vector<unsigned int>& out_faces)
+	glm::vec3 convertVertexFromModelToWorldCoords(glm::vec3 vertexInModelCoords)
+	{
+		glm::vec4 vertexInModelCoords4d = glm::vec4(vertexInModelCoords, 1.0f);
+		glm::vec4 vertexInWorldCoords4d = this->modelMatrix * vertexInModelCoords4d;
+		glm::vec3 vertexInWorldCoords = glm::vec3(vertexInWorldCoords4d[0], vertexInWorldCoords4d[1], vertexInWorldCoords4d[2]);
+		return vertexInWorldCoords;
+	}
+
+	void convertModelCoordsToWorldCoords()
+	{
+		int numOfVertices = this->_verticesInModelCoordinatesGLM.size();
+		for (int i=0 ; i<numOfVertices ; i++) {
+			this->_verticesInWorldCoordinatesGLM[i] = convertVertexFromModelToWorldCoords(this->_verticesInModelCoordinatesGLM[i]);
+		}
+	}
+
+	bool loadOBJ(string path, vector<unsigned int>& out_faces)
 	{
 		//printf("Loading OBJ file %s...\n", path.c_str());
 
@@ -42,9 +71,14 @@ protected:
 			if (strcmp(lineHeader, "v") == 0) {
 				vector<float> vertex(3);
 				fscanf(file, "%f %f %f\n", &vertex[0], &vertex[1], &vertex[2]);
-				out_vertices.push_back(vertex[0]);
-				out_vertices.push_back(vertex[1]);
-				out_vertices.push_back(vertex[2]);
+				this->verticesInModelCoordinates.push_back(vertex[0]);
+				this->verticesInModelCoordinates.push_back(vertex[1]);
+				this->verticesInModelCoordinates.push_back(vertex[2]);
+				glm::vec3 vertexInModelCoords(vertex[0], vertex[1], vertex[2]);
+				glm::vec3 vertexInWorldCoords = convertVertexFromModelToWorldCoords(vertexInModelCoords);
+
+				this->_verticesInModelCoordinatesGLM.push_back(vertexInModelCoords);
+				this->_verticesInWorldCoordinatesGLM.push_back(vertexInWorldCoords);
 			}
 			else if (strcmp(lineHeader, "f") == 0) {
 				unsigned int index1, index2, index3;
@@ -99,30 +133,47 @@ public:
 
 	void loadMesh(string fileName)
 	{
-		this->vertices.clear();
+		this->verticesInModelCoordinates.clear();
 		this->indices.clear();
-		loadOBJ(fileName, this->vertices, this->indices);
-		loadOBJOpenCV(fileName, this->verticesOpenCV, this->indicesOpenCV);
-	}
+		loadOBJ(fileName, this->indices);
+		loadOBJOpenCV(fileName, this->_verticesOpenCVInModelCoordinates, this->indicesOpenCV);
+	}	
 
 	Mesh(string modelName, string fileName, ModelParameters params)
 	{
 		this->modelName = modelName;
 		this->fileName = fileName;
 		this->params = params;
-		modelMatrix = glm::mat4(1.0f);
+		this->modelMatrix = glm::mat4(1.0f);
+		this->_modelMatrixCV = cv::Mat::eye(4, 4, CV_64F);
+		updateModelMatrixByUserParameters();
 		loadMesh(fileName);
+	}
+
+	cv::Mat1d calcAverageOfAxises() {
+		cv::Mat1d rowMean;
+		cv::reduce(this->_verticesOpenCVInModelCoordinates, rowMean, 0, CV_REDUCE_AVG);
+		std::cout << this->modelName << std::endl;
+		MatrixDebugger::printMatrix("rowMean", rowMean);
+		return rowMean;	
 	}
 
 	void updateModelMatrixByUserParameters()
 	{
 		glm::mat4 identityMatrix = glm::mat4(1.0f);
-		modelMatrix = glm::rotate(identityMatrix, glm::radians(params.angleX), glm::vec3(1.0, 0.0, 0.0));
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(params.angleY), glm::vec3(0.0, 1.0, 0.0));
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(params.angleZ), glm::vec3(0.0, 0.0, 1.0));
-		modelMatrix = glm::translate(modelMatrix, glm::vec3(params.translateX, params.translateY, params.translateZ));
-		modelMatrix = glm::scale(modelMatrix, glm::vec3(params.scaleX, params.scaleY, params.scaleZ));
-		modelMatrix = glm::scale(modelMatrix, glm::vec3(params.scaleUniform, params.scaleUniform, params.scaleUniform));
+		this->modelMatrix = glm::rotate(identityMatrix, glm::radians(params.angleX), glm::vec3(1.0, 0.0, 0.0));
+		this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(params.angleY), glm::vec3(0.0, 1.0, 0.0));
+		this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(params.angleZ), glm::vec3(0.0, 0.0, 1.0));
+		this->modelMatrix = glm::translate(this->modelMatrix, glm::vec3(params.translateX, params.translateY, params.translateZ));
+		this->modelMatrix = glm::scale(this->modelMatrix, glm::vec3(params.scaleX, params.scaleY, params.scaleZ));
+		this->modelMatrix = glm::scale(this->modelMatrix, glm::vec3(params.scaleUniform, params.scaleUniform, params.scaleUniform));
+
+		MathUseful mathUseful;
+		bool success = mathUseful.fromGLM2CV(this->modelMatrix, this->_modelMatrixCV);
+		if (success == false) {
+			throw "convertion from GLM to CV failed!";
+		}
+		//MatrixDebugger::printMatrix("this->_modelMatrixCV", this->_modelMatrixCV);
 	}
 
 	void saveBuffersForRedneringWholeMesh()
@@ -132,7 +183,7 @@ public:
 		glGenBuffers(1, &(this->EBO));
 		glBindVertexArray(this->VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-		glBufferData(GL_ARRAY_BUFFER, this->getVertices().size() * sizeof(float), &(this->getVertices())[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, this->verticesInModelCoordinates.size() * sizeof(float), &(this->verticesInModelCoordinates)[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->getIndices().size() * sizeof(unsigned int), &(this->getIndices())[0], GL_STATIC_DRAW);
 
@@ -186,18 +237,38 @@ public:
 		return indices;
 	}
 
-	vector<float> getVertices()
+	vector<float> getVerticesInModelCoordinates()
 	{
-		return vertices;
+		return verticesInModelCoordinates;
+	}
+
+	vector<glm::vec3> getVerticesInWorldCoordinatesGLM()
+	{
+		convertModelCoordsToWorldCoords();
+		return this->_verticesInWorldCoordinatesGLM;
 	}
 
 	cv::Mat1i getIndicesOpenCV() {
 		return indicesOpenCV;
 	}
 
-	cv::Mat1d getVerticesOpenCV() {
-		return verticesOpenCV;
+	cv::Mat1d getVerticesOpenCVInModelCoordinates() {
+		return this->_verticesOpenCVInModelCoordinates;
 	}
+
+	cv::Mat1d calculateVerticesOpenCVInWorldCoordinates() {
+		cv::Mat ones = cv::Mat::ones(this->_verticesOpenCVInModelCoordinates.rows, 1, CV_64F);
+		cv::Mat matArray[] = { this->_verticesOpenCVInModelCoordinates, ones};		
+		cv::Mat verticesOpenCVInModelCoordinates4d;
+		cv::hconcat(matArray, 2, verticesOpenCVInModelCoordinates4d);
+		cv::Mat verticesOpenCVInModelCoordinates4dTransposed = verticesOpenCVInModelCoordinates4d.t();
+		//MatrixDebugger::printMatrix("this->_modelMatrixCV", this->_modelMatrixCV);
+		cv::Mat verticesOpenCVInWorldCoordinates4dTransposed = this->_modelMatrixCV * verticesOpenCVInModelCoordinates4dTransposed;
+		cv::Mat verticesOpenCVInWorldCoordinates4d = verticesOpenCVInWorldCoordinates4dTransposed.t();
+		this->_verticesOpenCVInWorldCoordinates = verticesOpenCVInWorldCoordinates4d.colRange(0,3);
+		//MatrixDebugger::printMatrix("this->verticesOpenCVInWorldCoordinates", this->verticesOpenCVInWorldCoordinates);
+		return this->_verticesOpenCVInWorldCoordinates;
+	}	
 
 	string getModelName() {
 		return modelName;
@@ -213,7 +284,8 @@ public:
 
 	cv::Mat1d calcRotatedVertices(cv::Mat1d rotation)
 	{
-		cv::Mat1d transposedVertices = this->verticesOpenCV.t();
+		this->_verticesOpenCVInWorldCoordinates = calculateVerticesOpenCVInWorldCoordinates();
+		cv::Mat1d transposedVertices = this->_verticesOpenCVInWorldCoordinates.t();
 		cv::Mat1d transposedRotatedVertices = rotation * transposedVertices;
 		cv::Mat1d rotatedVertices = transposedRotatedVertices.t();
 		return rotatedVertices;

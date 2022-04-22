@@ -1,5 +1,8 @@
 
+#pragma once
 #include <opencv2/opencv.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp> //for glm::value_ptr
 
 using namespace cv;
 
@@ -19,4 +22,7 @@ public:
         if (num < 0) return -1;
         return 0;
     }
+
+    //bool fromCV2GLM(const cv::Mat& cvmat, glm::mat4* glmmat);
+    bool fromGLM2CV(const glm::mat4& glmmat, cv::Mat cvmat);
 };

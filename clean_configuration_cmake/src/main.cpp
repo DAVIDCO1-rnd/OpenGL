@@ -17,11 +17,17 @@
 #include <IMGUI/backends/imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp" //for glm::rotate, glm::translate, glm::scale
+
+
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 #include "Shaders/shader_t.h"
 
 #include "RayMesh.h"
 #include "CircleMesh.h"
 #include "ModelParameters.h"
+#include "Camera.h"
 
 
 
@@ -51,6 +57,19 @@ const unsigned int SCR_HEIGHT = 720;
 
 
 
+glm::vec3 camera1Pos   = glm::vec3(0.0f, 0.0f,  -50.0f);
+glm::vec3 camera1Front = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 camera1Up    = glm::vec3(0.0f, 1.0f,  0.0f);
+float camera1Angle = 45.0f;
+float camera1Near = 0.1f;
+float camera1Far = 1000.0f;
+Camera camera1(camera1Pos, camera1Front, camera1Up, camera1Angle, camera1Near, camera1Far, SCR_WIDTH, SCR_HEIGHT);
+
+
+std::vector<Camera*> cameras;
+size_t cameraIndex = 0;
+
+
 
 
 
@@ -74,33 +93,8 @@ void sendTransformationToVertexShader(Shader shader, glm::mat4 model, glm::mat4 
 	shader.setMat4("projection", projection);
 }
 
-
-int main(int, char**)
-{
-
-    size_t circleIndex = 0;
-    string modelsFolder = "/home/dell/Developments/OpenGL/clean_configuration_cmake/Data/"; 
-
-    string modelName1 = "circle";
-    string filePath1 = modelsFolder + modelName1 + ".obj";
-    ModelParameters meshParams1;
-    CircleMesh circleMesh(modelName1, filePath1, meshParams1);
-
-     
-
-    string modelName2 = "bunny";
-    string filePath2 = modelsFolder + modelName2 + ".obj";
-    ModelParameters meshParams2;
-    meshParams2.scaleUniform = 0.02f;
-    Mesh mesh2(modelName2, filePath2, meshParams2); 
-         
-
-    std::vector<Mesh*> meshes;
-    meshes.push_back(&circleMesh);  
-    meshes.push_back(&mesh2);
-
-
-    std::vector<float> circleVertices = circleMesh.getVertices();
+void calcLOS(CircleMesh& circleMesh, size_t circleIndex, std::vector<Mesh*> meshes) {
+    std::vector<float> circleVertices = circleMesh.getVerticesInModelCoordinates();
     int numOfVerticesInCircle = circleVertices.size() / 3;
     std::vector<bool> circlePointsWithLos(numOfVerticesInCircle, false);
     for (int i=0 ; i<numOfVerticesInCircle ; i++)
@@ -109,7 +103,7 @@ int main(int, char**)
         double circleY = (double)circleVertices[3*i + 1];
         double circleZ = (double)circleVertices[3*i + 2];
         cv::Vec3d currentCirclePoint = cv::Vec3d(circleX, circleY, circleZ);
-        cv::Vec3d point = cv::Vec3d(5.0, 5.0, 5.0);
+        cv::Vec3d point(camera1Pos[0], camera1Pos[1], camera1Pos[2]);
         cv::Vec3d vec = currentCirclePoint - point;
         Ray ray(point, vec);
         RayMesh rayMesh(ray);
@@ -150,6 +144,38 @@ int main(int, char**)
 
     circleMesh.indicesWithLos(circleTrianglesIndicesWithLos);
     circleMesh.indicesWithoutLos(circleTrianglesIndicesWithoutLos);
+}
+
+
+
+
+int main(int, char**)
+{
+    cameras.push_back(&camera1);
+    size_t circleIndex = 0;
+    string modelsFolder = "/home/dell/Developments/OpenGL/clean_configuration_cmake/Data/"; 
+
+    string modelName1 = "circle";
+    string filePath1 = modelsFolder + modelName1 + ".obj";
+    ModelParameters meshParams1;
+    CircleMesh circleMesh(modelName1, filePath1, meshParams1);
+
+     
+
+    string modelName2 = "bunny";
+    string filePath2 = modelsFolder + modelName2 + ".obj";
+    ModelParameters meshParams2;
+    meshParams2.angleZ = 30;
+    meshParams2.scaleUniform = 0.1f;
+    Mesh mesh2(modelName2, filePath2, meshParams2); 
+         
+
+    std::vector<Mesh*> meshes;
+    meshes.push_back(&circleMesh);  
+    meshes.push_back(&mesh2);
+
+
+    
 
 	bool renderMesh = true;
 	
@@ -235,12 +261,12 @@ int main(int, char**)
 	Shader shaderBlue("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.fs");
 
     glEnable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
+    calcLOS(circleMesh, circleIndex, meshes);
     circleMesh.generateBuffers();
-    circleMesh.saveBuffersForRedneringPolygonesWithLOS();
-    circleMesh.saveBuffersForRedneringPolygonesWithoutLOS();
+
     for (size_t i=1 ; i<meshes.size() ; i++)
     {
         meshes[i]->saveBuffersForRedneringWholeMesh(); 
@@ -250,7 +276,9 @@ int main(int, char**)
 
     // Main loop
     while (!glfwWindowShouldClose(window))
-    {
+    {        
+        circleMesh.saveBuffersForRedneringPolygonesWithLOS();
+        circleMesh.saveBuffersForRedneringPolygonesWithoutLOS();        
         // Poll and handle events (inputs, window resize, etc.)
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
         // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -366,33 +394,39 @@ int main(int, char**)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		glm::mat4 view, projection;
-        view = glm::mat4(1.0);
-        projection = glm::mat4(1.0);
+        // // camera
+        // glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  250.0f);
+        // glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+        // glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+		// glm::mat4 projection;
+        // glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        // projection = glm::mat4(1.0);		
+		// projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+
         for (size_t i = 0 ; i < meshes.size() ; i++) {
             meshes[i]->updateModelMatrixByUserParameters();
-        }		
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -250.0f));
-		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+        }        
 
 		if (renderMesh)
 		{
 			glLineWidth(1.0); 
 
 			shaderRed.use();            
-            sendTransformationToVertexShader(shaderRed, circleMesh.getModelMatrix(), view, projection);
+            sendTransformationToVertexShader(shaderRed, circleMesh.getModelMatrix(), cameras[cameraIndex]->view(), cameras[cameraIndex]->projection());
             circleMesh.renderPolygones(CircleMesh::PolygonsWithLos);  
 
 			shaderBlue.use();            
-            sendTransformationToVertexShader(shaderBlue, circleMesh.getModelMatrix(), view, projection);            
+            sendTransformationToVertexShader(shaderBlue, circleMesh.getModelMatrix(), cameras[cameraIndex]->view(), cameras[cameraIndex]->projection());            
             circleMesh.renderPolygones(CircleMesh::PolygonsWithoutLos);
 
             shaderWithoutFilters.use();   
             for (size_t i = 1 ; i < meshes.size() ; i++) {
-                sendTransformationToVertexShader(shaderWithoutFilters, meshes[i]->getModelMatrix(), view, projection);          
+                sendTransformationToVertexShader(shaderWithoutFilters, meshes[i]->getModelMatrix(), cameras[cameraIndex]->view(), cameras[cameraIndex]->projection());          
                 meshes[i]->renderObject();
             }
-		}       
+		}
+
+               
 
         // Rendering
         ImGui::Render();
