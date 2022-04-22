@@ -2,17 +2,24 @@ clear;
 close all;
 clc;
 
-angle_delta = 10;
-radius = 100;
-radius_delta = 10;
+
+
 circle_center = [0, 0];
+z_val = 30;
 
-angles = 0 : angle_delta : 360;
+
+num_of_angles = 3;
+angles = linspace(0, 360, num_of_angles+1);
 angles = angles(1:end-1);
-radiuses = radius_delta : radius_delta : radius;
 
-num_of_angles = length(angles);
-num_of_radiuses = length(radiuses);
+
+radius = 90;
+min_radius = 10;
+num_of_radiuses = 2;
+radiuses = linspace(min_radius, radius, num_of_radiuses);
+
+
+
 
 circle_center_x = circle_center(1);
 circle_center_y = circle_center(2);
@@ -28,7 +35,11 @@ vertex_index = 0;
 for radiusIndex = num_of_radiuses:-1:1
     for angleIndex = 1:num_of_angles
         currentRadius = radiuses(radiusIndex);
+        currentRadius1 = min_radius + (radiusIndex - 1) * (radius - min_radius)/(num_of_radiuses - 1);
+        
         currentAngle = angles(angleIndex);
+        currentAngle1 = (angleIndex-1) * 360/num_of_angles;
+        
         current_vertex_x = circle_center_x + currentRadius*cosd(currentAngle);
         current_vertex_y = circle_center_y + currentRadius*sind(currentAngle);
         
@@ -73,7 +84,6 @@ for angleIndex = 1:num_of_angles
         index2 = first_index;
     end    
     singleFaceIndexes = [index, index2, indexOfCenter];
-    singleFaceIndexes
     facesIndexes = [facesIndexes ; singleFaceIndexes];
     index = index + 1;
 end
@@ -87,7 +97,7 @@ axis equal;
 
 fileID = fopen('circle.obj','w');
 
-z_val = 500;
+
 for vertex_index = 1:num_of_vertices
     current_vertex = vertices(vertex_index, :);
     x_val = current_vertex(1);
@@ -96,6 +106,7 @@ for vertex_index = 1:num_of_vertices
 end
 
 num_of_faces = size(facesIndexes, 1);
+num_of_faces1 = num_of_angles * 2 * (num_of_radiuses - 1) + num_of_angles;
 
 fprintf(fileID,'\n\n\n');
 
