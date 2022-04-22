@@ -168,11 +168,19 @@ int main(int, char**)
     meshParams2.angleZ = 30;
     meshParams2.scaleUniform = 0.1f;
     Mesh mesh2(modelName2, filePath2, meshParams2); 
+
+    string modelName3 = "room";
+    string filePath3 = modelsFolder + modelName3 + ".obj";
+    ModelParameters meshParams3;
+    meshParams3.translateY = 30;
+    meshParams3.translateZ = 100;
+    Mesh mesh3(modelName3, filePath3, meshParams3);     
          
 
     std::vector<Mesh*> meshes;
     meshes.push_back(&circleMesh);  
     meshes.push_back(&mesh2);
+    meshes.push_back(&mesh3);
 
 
     
@@ -261,7 +269,7 @@ int main(int, char**)
 	Shader shaderBlue("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.fs");
 
     glEnable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
     calcLOS(circleMesh, circleIndex, meshes);
