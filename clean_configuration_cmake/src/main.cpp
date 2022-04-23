@@ -57,7 +57,7 @@ const unsigned int SCR_HEIGHT = 720;
 
 
 
-glm::vec3 camera1Pos   = glm::vec3(0.0f, 0.0f,  -50.0f);
+glm::vec3 camera1Pos   = glm::vec3(0.0f, 0.0f,  -20.0f);
 glm::vec3 camera1Front = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 camera1Up    = glm::vec3(0.0f, 1.0f,  0.0f);
 float camera1Angle = 45.0f;
@@ -66,8 +66,17 @@ float camera1Far = 1000.0f;
 Camera camera1(camera1Pos, camera1Front, camera1Up, camera1Angle, camera1Near, camera1Far, SCR_WIDTH, SCR_HEIGHT);
 
 
+glm::vec3 camera2Pos   = glm::vec3(0.0f, 30.0f,  -20.0f);
+glm::vec3 camera2Front = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 camera2Up    = glm::vec3(0.0f, 1.0f,  0.0f);
+float camera2Angle = 45.0f;
+float camera2Near = 0.1f;
+float camera2Far = 1000.0f;
+Camera camera2(camera2Pos, camera2Front, camera2Up, camera2Angle, camera2Near, camera2Far, SCR_WIDTH, SCR_HEIGHT);
+
+
 std::vector<Camera*> cameras;
-size_t cameraIndex = 0;
+size_t cameraIndex = 1;
 
 
 
@@ -152,6 +161,7 @@ void calcLOS(CircleMesh& circleMesh, size_t circleIndex, std::vector<Mesh*> mesh
 int main(int, char**)
 {
     cameras.push_back(&camera1);
+    cameras.push_back(&camera2);
     size_t circleIndex = 0;
     string modelsFolder = "/home/dell/Developments/OpenGL/clean_configuration_cmake/Data/"; 
 
@@ -269,7 +279,7 @@ int main(int, char**)
 	Shader shaderBlue("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.fs");
 
     glEnable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
     calcLOS(circleMesh, circleIndex, meshes);
