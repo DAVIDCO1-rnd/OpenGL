@@ -155,7 +155,107 @@ void calcLOS(CircleMesh& circleMesh, size_t circleIndex, std::vector<Mesh*> mesh
     circleMesh.indicesWithoutLos(circleTrianglesIndicesWithoutLos);
 }
 
+void displayImGui(bool show_demo_window, size_t item_current_idx, std::vector<Mesh*> meshes, ImVec4 clear_color, bool renderMesh, bool show_another_window) {
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
 
+        ImGui::NewFrame();
+
+
+        if (show_demo_window)
+            ImGui::ShowDemoWindow(&show_demo_window);
+        string modelName = meshes[item_current_idx]->getModelName();
+        ImGui::Begin(modelName.c_str());
+        {
+            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+            vector<string> items;
+            for (size_t i=0 ; i<meshes.size() ; i++)
+            {
+                items.push_back(meshes[i]->getModelName());
+            }            
+            //string items[] = { meshes[0].getModelName(), meshes[1].getModelName()};
+            
+            if (ImGui::BeginListBox("models"))
+            {
+                for (size_t n = 0; n < items.size(); n++)
+                {
+                    const bool is_selected = (item_current_idx == n);
+                    if (ImGui::Selectable(items[n].c_str(), is_selected))
+                        item_current_idx = n;
+
+                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                    // if (is_selected)
+                    //     ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndListBox();
+            }          
+
+            {
+                ModelParameters meshParams = meshes[item_current_idx]->getParams();
+
+                meshParams.angleX = meshes[item_current_idx]->getParams().angleX;
+                meshParams.angleY = meshes[item_current_idx]->getParams().angleY;
+                meshParams.angleZ = meshes[item_current_idx]->getParams().angleZ;
+
+                meshParams.translateX = meshes[item_current_idx]->getParams().translateX;
+                meshParams.translateY = meshes[item_current_idx]->getParams().translateY;
+                meshParams.translateZ = meshes[item_current_idx]->getParams().translateZ;
+
+                meshParams.scaleX = meshes[item_current_idx]->getParams().scaleX;
+                meshParams.scaleY = meshes[item_current_idx]->getParams().scaleY;
+                meshParams.scaleZ = meshes[item_current_idx]->getParams().scaleZ;
+
+                meshParams.scaleUniform = meshes[item_current_idx]->getParams().scaleUniform;
+
+                ImGui::InputFloat("rotate X", &meshParams.angleX, 1.0f, 1.0f);
+                ImGui::InputFloat("rotate Y", &meshParams.angleY, 1.0f, 1.0f);
+                ImGui::InputFloat("rotate Z", &meshParams.angleZ, 1.0f, 1.0f);
+
+                ImGui::InputFloat("translate X", &meshParams.translateX, 0.1f, 1.0f);
+                ImGui::InputFloat("translate Y", &meshParams.translateY, 0.1f, 1.0f);
+                ImGui::InputFloat("translate Z", &meshParams.translateZ, 0.1f, 1.0f);
+
+                ImGui::InputFloat("scale X", &meshParams.scaleX, 0.01f, 1.0f);
+                ImGui::InputFloat("scale Y", &meshParams.scaleY, 0.01f, 1.0f);
+                ImGui::InputFloat("scale Z", &meshParams.scaleZ, 0.01f, 1.0f);
+                ImGui::InputFloat("uniform scale", &meshParams.scaleUniform, 0.01f, 1.0f);
+                ImGui::Checkbox("render mesh", &renderMesh);
+
+                meshes[item_current_idx]->setParams(meshParams);                
+            }
+        }
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
+
+        // 3. Show another simple window.
+        if (show_another_window)
+        {
+            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+            ImGui::Text("Hello from another window!");
+            if (ImGui::Button("Close Me"))
+                show_another_window = false;
+            ImGui::End();
+        }    
+}
+
+void initializeImGui(GLFWwindow* window, const char* glsl_version) {
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+}
 
 
 int main(int, char**)
@@ -238,21 +338,9 @@ int main(int, char**)
         return -1;
     }
 
+    //initializeImGui(window, glsl_version);
 
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Load Fonts
     // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
@@ -290,8 +378,7 @@ int main(int, char**)
         meshes[i]->saveBuffersForRedneringWholeMesh(); 
     }
 
-    
-
+    initializeImGui(window, glsl_version);
     // Main loop
     while (!glfwWindowShouldClose(window))
     {        
@@ -303,106 +390,11 @@ int main(int, char**)
         // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
-
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
-
-
-
         static size_t item_current_idx = 0; // Here we store our selection data as an index.
 
-        string modelName = meshes[item_current_idx]->getModelName();
-        ImGui::Begin(modelName.c_str());
-        {
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            vector<string> items;
-            for (size_t i=0 ; i<meshes.size() ; i++)
-            {
-                items.push_back(meshes[i]->getModelName());
-            }            
-            //string items[] = { meshes[0].getModelName(), meshes[1].getModelName()};
-            
-            if (ImGui::BeginListBox("models"))
-            {
-                for (size_t n = 0; n < items.size(); n++)
-                {
-                    const bool is_selected = (item_current_idx == n);
-                    if (ImGui::Selectable(items[n].c_str(), is_selected))
-                        item_current_idx = n;
-
-                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                    // if (is_selected)
-                    //     ImGui::SetItemDefaultFocus();
-                }
-                ImGui::EndListBox();
-            }          
-
-            {
-                ModelParameters meshParams = meshes[item_current_idx]->getParams();
-
-                meshParams.angleX = meshes[item_current_idx]->getParams().angleX;
-                meshParams.angleY = meshes[item_current_idx]->getParams().angleY;
-                meshParams.angleZ = meshes[item_current_idx]->getParams().angleZ;
-
-                meshParams.translateX = meshes[item_current_idx]->getParams().translateX;
-                meshParams.translateY = meshes[item_current_idx]->getParams().translateY;
-                meshParams.translateZ = meshes[item_current_idx]->getParams().translateZ;
-
-                meshParams.scaleX = meshes[item_current_idx]->getParams().scaleX;
-                meshParams.scaleY = meshes[item_current_idx]->getParams().scaleY;
-                meshParams.scaleZ = meshes[item_current_idx]->getParams().scaleZ;
-
-                meshParams.scaleUniform = meshes[item_current_idx]->getParams().scaleUniform;
-
-                ImGui::InputFloat("rotate X", &meshParams.angleX, 1.0f, 1.0f);
-                ImGui::InputFloat("rotate Y", &meshParams.angleY, 1.0f, 1.0f);
-                ImGui::InputFloat("rotate Z", &meshParams.angleZ, 1.0f, 1.0f);
-
-                ImGui::InputFloat("translate X", &meshParams.translateX, 0.1f, 1.0f);
-                ImGui::InputFloat("translate Y", &meshParams.translateY, 0.1f, 1.0f);
-                ImGui::InputFloat("translate Z", &meshParams.translateZ, 0.1f, 1.0f);
-
-                ImGui::InputFloat("scale X", &meshParams.scaleX, 0.01f, 1.0f);
-                ImGui::InputFloat("scale Y", &meshParams.scaleY, 0.01f, 1.0f);
-                ImGui::InputFloat("scale Z", &meshParams.scaleZ, 0.01f, 1.0f);
-                ImGui::InputFloat("uniform scale", &meshParams.scaleUniform, 0.01f, 1.0f);
-                ImGui::Checkbox("render mesh", &renderMesh);
-
-                meshes[item_current_idx]->setParams(meshParams);                
-            }
-        }           
-
-        // ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        // ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        // ImGui::Checkbox("Another Window", &show_another_window);
-
-        //ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-
-        // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-        //     counter++;
-        // ImGui::SameLine();
-        // ImGui::Text("counter = %d", counter);
-
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::End();
+        displayImGui(show_demo_window, item_current_idx, meshes, clear_color, renderMesh, show_another_window);
 
 
-        // 3. Show another simple window.
-        if (show_another_window)
-        {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
-            ImGui::End();
-        }
 
 
         int display_w, display_h;

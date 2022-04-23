@@ -1,8 +1,9 @@
 #ifndef MODEL_CLASS_H
 #define MODEL_CLASS_H
 
-#include<json/json.h>
-#include"Mesh.h"
+#include <json/json.h>
+#include "Mesh.h"
+#include "ModelParameters.h"
 
 using json = nlohmann::json;
 
@@ -11,15 +12,20 @@ class Model
 {
 public:
 	// Loads in a model from a file and stores tha information in 'data', 'JSON', and 'file'
-	Model(const char* file);
+	Model(const char* file, std::string modelName);
 
 	void Draw(Shader& shader, Camera& camera);
+	ModelParameters getParams();
+	std::string getModelName();	
+	void setParams(ModelParameters params);
 
 private:
 	// Variables for easy access
 	const char* file;
 	std::vector<unsigned char> data;
 	json JSON;
+	ModelParameters params;
+	std::string modelName;
 
 	// All the meshes and transformations
 	std::vector<Mesh> meshes;

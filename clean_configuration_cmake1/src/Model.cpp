@@ -1,7 +1,8 @@
 #include"Model.h"
 
-Model::Model(const char* file)
+Model::Model(const char* file, std::string modelName)
 {
+	this->modelName = modelName;
 	// Make a JSON object
 	std::string text = get_file_contents(file);
 	JSON = json::parse(text);
@@ -14,6 +15,10 @@ Model::Model(const char* file)
 	traverseNode(0);
 }
 
+std::string Model::getModelName() {
+	return modelName;
+}
+
 void Model::Draw(Shader& shader, Camera& camera)
 {
 	// Go over all meshes and draw each one
@@ -21,6 +26,14 @@ void Model::Draw(Shader& shader, Camera& camera)
 	{
 		meshes[i].Mesh::Draw(shader, camera, matricesMeshes[i]);
 	}
+}
+
+ModelParameters Model::getParams() {
+	return params;
+}
+
+void Model::setParams(ModelParameters params) {
+	this->params = params;
 }
 
 void Model::loadMesh(unsigned int indMesh)
@@ -286,7 +299,7 @@ std::vector<Vertex> Model::assembleVertices
 )
 {
 	std::vector<Vertex> vertices;
-	for (int i = 0; i < positions.size(); i++)
+	for (size_t i = 0; i < positions.size(); i++)
 	{
 		vertices.push_back
 		(
@@ -305,7 +318,7 @@ std::vector<Vertex> Model::assembleVertices
 std::vector<glm::vec2> Model::groupFloatsVec2(std::vector<float> floatVec)
 {
 	std::vector<glm::vec2> vectors;
-	for (int i = 0; i < floatVec.size(); i)
+	for (size_t i = 0; i < floatVec.size(); i)
 	{
 		vectors.push_back(glm::vec2(floatVec[i++], floatVec[i++]));
 	}
@@ -314,7 +327,7 @@ std::vector<glm::vec2> Model::groupFloatsVec2(std::vector<float> floatVec)
 std::vector<glm::vec3> Model::groupFloatsVec3(std::vector<float> floatVec)
 {
 	std::vector<glm::vec3> vectors;
-	for (int i = 0; i < floatVec.size(); i)
+	for (size_t i = 0; i < floatVec.size(); i)
 	{
 		vectors.push_back(glm::vec3(floatVec[i++], floatVec[i++], floatVec[i++]));
 	}
