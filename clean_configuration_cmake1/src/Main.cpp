@@ -17,10 +17,12 @@
 #include"Model.h"
 #include "ModelParameters.h"
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 
-const unsigned int width = 800;
-const unsigned int height = 800;
+
+const unsigned int width = 1280;
+const unsigned int height = 720;
 
 void displayImGui(size_t item_current_idx, std::vector<Model*> models, ImVec4 clear_color, bool renderMesh) {
         // Start the Dear ImGui frame
@@ -145,6 +147,7 @@ int main()
 	}
 	// Introduce the window into the current context
 	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	//Load GLAD so it configures OpenGL
 	gladLoadGL();
@@ -282,4 +285,13 @@ int main()
 	// Terminate GLFW before ending the program
 	glfwTerminate();
 	return 0;
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
 }
