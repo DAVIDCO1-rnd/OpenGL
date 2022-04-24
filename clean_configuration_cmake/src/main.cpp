@@ -57,13 +57,22 @@ const unsigned int SCR_HEIGHT = 720;
 
 
 
-glm::vec3 camera1Pos   = glm::vec3(0.0f, 0.0f,  -50.0f);
+glm::vec3 camera1Pos   = glm::vec3(0.0f, 0.0f,  -20.0f);
 glm::vec3 camera1Front = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 camera1Up    = glm::vec3(0.0f, 1.0f,  0.0f);
 float camera1Angle = 45.0f;
 float camera1Near = 0.1f;
 float camera1Far = 1000.0f;
 Camera camera1(camera1Pos, camera1Front, camera1Up, camera1Angle, camera1Near, camera1Far, SCR_WIDTH, SCR_HEIGHT);
+
+
+glm::vec3 camera2Pos   = glm::vec3(0.0f, 30.0f,  -20.0f);
+glm::vec3 camera2Front = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 camera2Up    = glm::vec3(0.0f, 1.0f,  0.0f);
+float camera2Angle = 45.0f;
+float camera2Near = 0.1f;
+float camera2Far = 1000.0f;
+Camera camera2(camera2Pos, camera2Front, camera2Up, camera2Angle, camera2Near, camera2Far, SCR_WIDTH, SCR_HEIGHT);
 
 
 std::vector<Camera*> cameras;
@@ -124,9 +133,9 @@ void calcLOS(CircleMesh& circleMesh, size_t circleIndex, std::vector<Mesh*> mesh
     int numOfTrianglesInCircle = circleTrianglesIndices.size() / 3;
     for (int i=0 ; i<numOfTrianglesInCircle ; i++)
     {
-        int circleVertexIndex1 = (double)circleTrianglesIndices[3*i + 0];
-        int circleVertexIndex2 = (double)circleTrianglesIndices[3*i + 1];
-        int circleVertexIndex3 = (double)circleTrianglesIndices[3*i + 2];
+        int circleVertexIndex1 = circleTrianglesIndices[3*i + 0];
+        int circleVertexIndex2 = circleTrianglesIndices[3*i + 1];
+        int circleVertexIndex3 = circleTrianglesIndices[3*i + 2];
 
         if (circlePointsWithLos[circleVertexIndex1] && circlePointsWithLos[circleVertexIndex2] && circlePointsWithLos[circleVertexIndex3])
         {
@@ -146,159 +155,17 @@ void calcLOS(CircleMesh& circleMesh, size_t circleIndex, std::vector<Mesh*> mesh
     circleMesh.indicesWithoutLos(circleTrianglesIndicesWithoutLos);
 }
 
-
-
-
-int main(int, char**)
-{
-    cameras.push_back(&camera1);
-    size_t circleIndex = 0;
-    string modelsFolder = "/home/dell/Developments/OpenGL/clean_configuration_cmake/Data/"; 
-
-    string modelName1 = "circle";
-    string filePath1 = modelsFolder + modelName1 + ".obj";
-    ModelParameters meshParams1;
-    CircleMesh circleMesh(modelName1, filePath1, meshParams1);
-
-     
-
-    string modelName2 = "bunny";
-    string filePath2 = modelsFolder + modelName2 + ".obj";
-    ModelParameters meshParams2;
-    meshParams2.angleZ = 30;
-    meshParams2.scaleUniform = 0.1f;
-    Mesh mesh2(modelName2, filePath2, meshParams2); 
-         
-
-    std::vector<Mesh*> meshes;
-    meshes.push_back(&circleMesh);  
-    meshes.push_back(&mesh2);
-
-
-    
-
-	bool renderMesh = true;
-	
-
-
-
-    // Setup window
-    //glfwSetErrorCallback(glfw_error_callback);
-    int glfwInitStatus = glfwInit();
-    if (glfwInitStatus == 0)
-    {
-        return 1;
-    }
-    const char* glsl_version = "#version 130";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Checking LOS Algorithm", NULL, NULL);
-    if (window == NULL)
-        return 1;
-    glfwMakeContextCurrent(window);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-
-    //glfwSetCursorPosCallback(window, mouse_callback);
-    //glfwSetScrollCallback(window, scroll_callback);
-
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
-
-
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
-
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-    //IM_ASSERT(font != NULL);
-
-    // Our state
-    bool show_demo_window = false;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-    Shader shaderWithoutFilters("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.fs");
-	Shader shaderRed("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.fs");
-	Shader shaderBlue("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.fs");
-
-    glEnable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
-    calcLOS(circleMesh, circleIndex, meshes);
-    circleMesh.generateBuffers();
-
-    for (size_t i=1 ; i<meshes.size() ; i++)
-    {
-        meshes[i]->saveBuffersForRedneringWholeMesh(); 
-    }
-
-    
-
-    // Main loop
-    while (!glfwWindowShouldClose(window))
-    {        
-        circleMesh.saveBuffersForRedneringPolygonesWithLOS();
-        circleMesh.saveBuffersForRedneringPolygonesWithoutLOS();        
-        // Poll and handle events (inputs, window resize, etc.)
-        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
-        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
-        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-        glfwPollEvents();
-
+void displayImGui(bool show_demo_window, std::vector<Mesh*> meshes, ImVec4 clear_color, bool renderMesh, bool show_another_window) {
+        static size_t item_current_idx = 0; // Here we store our selection data as an index.
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
+
         ImGui::NewFrame();
 
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
-
-
-
-        static size_t item_current_idx = 0; // Here we store our selection data as an index.
-
         string modelName = meshes[item_current_idx]->getModelName();
         ImGui::Begin(modelName.c_str());
         {
@@ -359,22 +226,9 @@ int main(int, char**)
 
                 meshes[item_current_idx]->setParams(meshParams);                
             }
-        }           
-
-        // ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        // ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        // ImGui::Checkbox("Another Window", &show_another_window);
-
-        //ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-
-        // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-        //     counter++;
-        // ImGui::SameLine();
-        // ImGui::Text("counter = %d", counter);
-
+        }
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
-
 
         // 3. Show another simple window.
         if (show_another_window)
@@ -384,7 +238,164 @@ int main(int, char**)
             if (ImGui::Button("Close Me"))
                 show_another_window = false;
             ImGui::End();
-        }
+        }    
+}
+
+void initializeImGui(GLFWwindow* window, const char* glsl_version) {
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+}
+
+
+int main(int, char**)
+{
+    cameras.push_back(&camera1);
+    //cameras.push_back(&camera2);
+    size_t circleIndex = 0;
+    string modelsFolder = "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/Data/"; 
+
+    string modelName1 = "circle";
+    string filePath1 = modelsFolder + modelName1 + ".obj";
+    ModelParameters meshParams1;
+    CircleMesh circleMesh(modelName1, filePath1, meshParams1);
+
+     
+
+    string modelName2 = "bunny";
+    string filePath2 = modelsFolder + modelName2 + ".obj";
+    ModelParameters meshParams2;
+    meshParams2.angleZ = 30;
+    meshParams2.scaleUniform = 0.05f;
+    Mesh mesh2(modelName2, filePath2, meshParams2); 
+
+    string modelName3 = "room";
+    string filePath3 = modelsFolder + modelName3 + ".obj";
+    ModelParameters meshParams3;
+    meshParams3.translateY = 30;
+    meshParams3.translateZ = 100;
+    Mesh mesh3(modelName3, filePath3, meshParams3);     
+         
+
+    std::vector<Mesh*> meshes;
+    meshes.push_back(&circleMesh);  
+    meshes.push_back(&mesh2);
+    meshes.push_back(&mesh3);
+
+
+    
+
+	bool renderMesh = true;
+	
+
+
+
+    // Setup window
+    //glfwSetErrorCallback(glfw_error_callback);
+    int glfwInitStatus = glfwInit();
+    if (glfwInitStatus == 0)
+    {
+        return 1;
+    }
+    const char* glsl_version = "#version 130";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    // Create window with graphics context
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Checking LOS Algorithm", NULL, NULL);
+    if (window == NULL)
+        return 1;
+    glfwMakeContextCurrent(window);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+
+    //glfwSetCursorPosCallback(window, mouse_callback);
+    //glfwSetScrollCallback(window, scroll_callback);
+
+    // glad: load all OpenGL function pointers
+    // ---------------------------------------
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+
+    //initializeImGui(window, glsl_version);
+
+
+
+    // Load Fonts
+    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
+    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
+    // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
+    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
+    // - Read 'docs/FONTS.md' for more instructions and details.
+    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
+    //io.Fonts->AddFontDefault();
+    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
+    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
+    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+    //IM_ASSERT(font != NULL);
+
+    // Our state
+    bool show_demo_window = false;
+    bool show_another_window = false;
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    Shader shaderWithoutFilters("/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.fs");
+	Shader shaderRed("/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.fs");
+	Shader shaderBlue("/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.fs");
+
+    glEnable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+
+    calcLOS(circleMesh, circleIndex, meshes);
+    circleMesh.generateBuffers();
+
+    for (size_t i=1 ; i<meshes.size() ; i++)
+    {
+        meshes[i]->saveBuffersForRedneringWholeMesh(); 
+    }
+
+    initializeImGui(window, glsl_version);
+    // Main loop
+    while (!glfwWindowShouldClose(window))
+    {        
+        circleMesh.saveBuffersForRedneringPolygonesWithLOS();
+        circleMesh.saveBuffersForRedneringPolygonesWithoutLOS();        
+        // Poll and handle events (inputs, window resize, etc.)
+        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
+        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
+        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+        glfwPollEvents();
+        
+
+        displayImGui(show_demo_window, meshes, clear_color, renderMesh, show_another_window);
+
+
 
 
         int display_w, display_h;
