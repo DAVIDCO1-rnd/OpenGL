@@ -194,16 +194,19 @@ int main()
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
 	std::string parentDir = "/home/davidco1/Developments/OpenGL/clean_configuration_cmake1";
 
-	std::string modelPath = "/Resources/models/bunny/scene.gltf";
+	std::string modelName1 = "bunny";
+	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";
 	//std::string modelPath = "/Resources/models/cut_fish/scene.gltf";
-	//std::string modelPath = "/Resources/models/map/scene.gltf";
+
+	std::string modelName2 = "map";
+	std::string modelPath2 = "/Resources/models/" + modelName2 + "/scene.gltf";
 	//std::string modelPath = "/Resources/models/Box/glTF/Box.gltf";
 	//std::string modelPath = "/Resources/models/Duck/glTF/Duck.gltf";
 	//std::string modelPath = "/Resources/models/Avocado/glTF-Quantized/Avocado.gltf";
 	//std::string modelPath = "/Resources/models/ToyCar/glTF/ToyCar.gltf";
 
 	// Load in a model
-	Model model((parentDir + modelPath).c_str(), "bunny");
+	Model model((parentDir + modelPath2).c_str(), modelName2);
 
 	std::vector<Model*> models;
 	models.push_back(&model);
