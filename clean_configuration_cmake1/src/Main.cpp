@@ -1,6 +1,6 @@
 //------- Ignore this ----------
-#include<filesystem>
-namespace fs = std::filesystem;
+//#include<filesystem>
+//namespace fs = std::filesystem;
 //------------------------------
 
 #include <IMGUI/imgui.h>
@@ -22,95 +22,97 @@ namespace fs = std::filesystem;
 const unsigned int width = 800;
 const unsigned int height = 800;
 
-// void displayImGui(size_t item_current_idx, std::vector<Model*> models, ImVec4 clear_color, bool renderMesh) {
-//         // Start the Dear ImGui frame
-//         ImGui_ImplOpenGL3_NewFrame();
-//         ImGui_ImplGlfw_NewFrame();
+void displayImGui(size_t item_current_idx, std::vector<Model*> models, ImVec4 clear_color, bool renderMesh) {
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
 
-//         ImGui::NewFrame();
+        ImGui::NewFrame();
 
 
-//         std::string modelName = models[item_current_idx]->getModelName();
-//         ImGui::Begin(modelName.c_str());
-//         {
-//             ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+        std::string modelName = models[item_current_idx]->getModelName();
+        ImGui::Begin(modelName.c_str());
+        {
+            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-//             std::vector<std::string> items;
-//             for (size_t i=0 ; i<models.size() ; i++)
-//             {
-//                 items.push_back(models[i]->getModelName());
-//             }            
-//             //string items[] = { meshes[0].getModelName(), meshes[1].getModelName()};
+            std::vector<std::string> items;
+            for (size_t i=0 ; i<models.size() ; i++)
+            {
+                items.push_back(models[i]->getModelName());
+            }            
+            //string items[] = { meshes[0].getModelName(), meshes[1].getModelName()};
             
-//             if (ImGui::BeginListBox("models"))
-//             {
-//                 for (size_t n = 0; n < items.size(); n++)
-//                 {
-//                     const bool is_selected = (item_current_idx == n);
-//                     if (ImGui::Selectable(items[n].c_str(), is_selected))
-//                         item_current_idx = n;
+            if (ImGui::BeginListBox("models"))
+            {
+                for (size_t n = 0; n < items.size(); n++)
+                {
+                    const bool is_selected = (item_current_idx == n);
+                    if (ImGui::Selectable(items[n].c_str(), is_selected))
+                        item_current_idx = n;
 
-//                     // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-//                     // if (is_selected)
-//                     //     ImGui::SetItemDefaultFocus();
-//                 }
-//                 ImGui::EndListBox();
-//             }          
+                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                    // if (is_selected)
+                    //     ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndListBox();
+            }          
 
-//             {
-//                 ModelParameters meshParams = models[item_current_idx]->getParams();
+            {
+                ModelParameters meshParams = models[item_current_idx]->getParams();
 
-//                 meshParams.angleX = models[item_current_idx]->getParams().angleX;
-//                 meshParams.angleY = models[item_current_idx]->getParams().angleY;
-//                 meshParams.angleZ = models[item_current_idx]->getParams().angleZ;
+                meshParams.angleX = models[item_current_idx]->getParams().angleX;
+                meshParams.angleY = models[item_current_idx]->getParams().angleY;
+                meshParams.angleZ = models[item_current_idx]->getParams().angleZ;
 
-//                 meshParams.translateX = models[item_current_idx]->getParams().translateX;
-//                 meshParams.translateY = models[item_current_idx]->getParams().translateY;
-//                 meshParams.translateZ = models[item_current_idx]->getParams().translateZ;
+                meshParams.translateX = models[item_current_idx]->getParams().translateX;
+                meshParams.translateY = models[item_current_idx]->getParams().translateY;
+                meshParams.translateZ = models[item_current_idx]->getParams().translateZ;
 
-//                 meshParams.scaleX = models[item_current_idx]->getParams().scaleX;
-//                 meshParams.scaleY = models[item_current_idx]->getParams().scaleY;
-//                 meshParams.scaleZ = models[item_current_idx]->getParams().scaleZ;
+                meshParams.scaleX = models[item_current_idx]->getParams().scaleX;
+                meshParams.scaleY = models[item_current_idx]->getParams().scaleY;
+                meshParams.scaleZ = models[item_current_idx]->getParams().scaleZ;
 
-//                 meshParams.scaleUniform = models[item_current_idx]->getParams().scaleUniform;
+                meshParams.scaleUniform = models[item_current_idx]->getParams().scaleUniform;
 
-//                 ImGui::InputFloat("rotate X", &meshParams.angleX, 1.0f, 1.0f);
-//                 ImGui::InputFloat("rotate Y", &meshParams.angleY, 1.0f, 1.0f);
-//                 ImGui::InputFloat("rotate Z", &meshParams.angleZ, 1.0f, 1.0f);
+                ImGui::InputFloat("rotate X", &meshParams.angleX, 1.0f, 1.0f);
+                ImGui::InputFloat("rotate Y", &meshParams.angleY, 1.0f, 1.0f);
+                ImGui::InputFloat("rotate Z", &meshParams.angleZ, 1.0f, 1.0f);
 
-//                 ImGui::InputFloat("translate X", &meshParams.translateX, 0.1f, 1.0f);
-//                 ImGui::InputFloat("translate Y", &meshParams.translateY, 0.1f, 1.0f);
-//                 ImGui::InputFloat("translate Z", &meshParams.translateZ, 0.1f, 1.0f);
+                ImGui::InputFloat("translate X", &meshParams.translateX, 0.1f, 1.0f);
+                ImGui::InputFloat("translate Y", &meshParams.translateY, 0.1f, 1.0f);
+                ImGui::InputFloat("translate Z", &meshParams.translateZ, 0.1f, 1.0f);
 
-//                 ImGui::InputFloat("scale X", &meshParams.scaleX, 0.01f, 1.0f);
-//                 ImGui::InputFloat("scale Y", &meshParams.scaleY, 0.01f, 1.0f);
-//                 ImGui::InputFloat("scale Z", &meshParams.scaleZ, 0.01f, 1.0f);
-//                 ImGui::InputFloat("uniform scale", &meshParams.scaleUniform, 0.01f, 1.0f);
-//                 ImGui::Checkbox("render mesh", &renderMesh);
+                ImGui::InputFloat("scale X", &meshParams.scaleX, 0.01f, 1.0f);
+                ImGui::InputFloat("scale Y", &meshParams.scaleY, 0.01f, 1.0f);
+                ImGui::InputFloat("scale Z", &meshParams.scaleZ, 0.01f, 1.0f);
+                ImGui::InputFloat("uniform scale", &meshParams.scaleUniform, 0.01f, 1.0f);
+                ImGui::Checkbox("render mesh", &renderMesh);
 
-//                 models[item_current_idx]->setParams(meshParams);                
-//             }
-//         }
-//         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-//         ImGui::End(); 
-// }
+                models[item_current_idx]->setParams(meshParams);                
+            }
+        }
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End(); 
+}
 
-// void initializeImGui(GLFWwindow* window, const char* glsl_version) {
-//     // Setup Dear ImGui context
-//     IMGUI_CHECKVERSION();
-//     ImGui::CreateContext();
-//     ImGuiIO& io = ImGui::GetIO(); (void)io;
-//     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-//     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+void initializeImGui(GLFWwindow* window, const char* glsl_version) {
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-//     // Setup Dear ImGui style
-//     ImGui::StyleColorsDark();
-//     //ImGui::StyleColorsClassic();
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
 
-//     // Setup Platform/Renderer backends
-//     ImGui_ImplGlfw_InitForOpenGL(window, true);
-//     ImGui_ImplOpenGL3_Init(glsl_version);
-// }
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+}
+
+
 
 
 int main()
@@ -150,7 +152,7 @@ int main()
 
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader shaderProgram("/home/dell/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader shaderProgram("/home/davidco1/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -179,7 +181,8 @@ int main()
 	* folder and then give a relative path from this folder to whatever resource you want to get to.
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
-	std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
+	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
+	std::string parentDir = "/home/davidco1/Developments/OpenGL/clean_configuration_cmake1";
 
 	std::string modelPath = "/Resources/models/bunny/scene.gltf";
 	//std::string modelPath = "/Resources/models/cut_fish/scene.gltf";
@@ -201,13 +204,23 @@ int main()
 	// Original code from the tutorial
 	// Model model("models/bunny/scene.gltf");
 
-	//initializeImGui(window, glsl_version);
+
+
+
+	bool useImGui = true;
+
+	if (useImGui) {
+		initializeImGui(window, glsl_version);
+	}
+
+	
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
-
-		//displayImGui(item_current_idx, models, clear_color, renderMesh);
+		if (useImGui) {
+			displayImGui(item_current_idx, models, clear_color, renderMesh);
+		}
 
 
 		// Specify the color of the background
@@ -223,9 +236,11 @@ int main()
 		// Draw a model
 		model.Draw(shaderProgram, camera);
 
-        // // Rendering
-        // ImGui::Render();
-        // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());		
+		if (useImGui) {
+			// Rendering
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());	
+		}	
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
@@ -238,10 +253,12 @@ int main()
 	// Delete all the objects we've created
 	shaderProgram.Delete();
 
-    // // Cleanup
-    // ImGui_ImplOpenGL3_Shutdown();
-    // ImGui_ImplGlfw_Shutdown();
-    // ImGui::DestroyContext();
+	if (useImGui) {
+		// Cleanup
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+	}
 
 	// Delete window before ending the program
 	glfwDestroyWindow(window);

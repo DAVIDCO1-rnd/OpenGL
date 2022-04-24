@@ -76,7 +76,7 @@ Camera camera2(camera2Pos, camera2Front, camera2Up, camera2Angle, camera2Near, c
 
 
 std::vector<Camera*> cameras;
-size_t cameraIndex = 1;
+size_t cameraIndex = 0;
 
 
 
@@ -133,9 +133,9 @@ void calcLOS(CircleMesh& circleMesh, size_t circleIndex, std::vector<Mesh*> mesh
     int numOfTrianglesInCircle = circleTrianglesIndices.size() / 3;
     for (int i=0 ; i<numOfTrianglesInCircle ; i++)
     {
-        int circleVertexIndex1 = (double)circleTrianglesIndices[3*i + 0];
-        int circleVertexIndex2 = (double)circleTrianglesIndices[3*i + 1];
-        int circleVertexIndex3 = (double)circleTrianglesIndices[3*i + 2];
+        int circleVertexIndex1 = circleTrianglesIndices[3*i + 0];
+        int circleVertexIndex2 = circleTrianglesIndices[3*i + 1];
+        int circleVertexIndex3 = circleTrianglesIndices[3*i + 2];
 
         if (circlePointsWithLos[circleVertexIndex1] && circlePointsWithLos[circleVertexIndex2] && circlePointsWithLos[circleVertexIndex3])
         {
@@ -155,7 +155,8 @@ void calcLOS(CircleMesh& circleMesh, size_t circleIndex, std::vector<Mesh*> mesh
     circleMesh.indicesWithoutLos(circleTrianglesIndicesWithoutLos);
 }
 
-void displayImGui(bool show_demo_window, size_t item_current_idx, std::vector<Mesh*> meshes, ImVec4 clear_color, bool renderMesh, bool show_another_window) {
+void displayImGui(bool show_demo_window, std::vector<Mesh*> meshes, ImVec4 clear_color, bool renderMesh, bool show_another_window) {
+        static size_t item_current_idx = 0; // Here we store our selection data as an index.
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -261,9 +262,9 @@ void initializeImGui(GLFWwindow* window, const char* glsl_version) {
 int main(int, char**)
 {
     cameras.push_back(&camera1);
-    cameras.push_back(&camera2);
+    //cameras.push_back(&camera2);
     size_t circleIndex = 0;
-    string modelsFolder = "/home/dell/Developments/OpenGL/clean_configuration_cmake/Data/"; 
+    string modelsFolder = "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/Data/"; 
 
     string modelName1 = "circle";
     string filePath1 = modelsFolder + modelName1 + ".obj";
@@ -276,7 +277,7 @@ int main(int, char**)
     string filePath2 = modelsFolder + modelName2 + ".obj";
     ModelParameters meshParams2;
     meshParams2.angleZ = 30;
-    meshParams2.scaleUniform = 0.1f;
+    meshParams2.scaleUniform = 0.05f;
     Mesh mesh2(modelName2, filePath2, meshParams2); 
 
     string modelName3 = "room";
@@ -362,9 +363,9 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    Shader shaderWithoutFilters("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.fs");
-	Shader shaderRed("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.fs");
-	Shader shaderBlue("/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.fs");
+    Shader shaderWithoutFilters("/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.fs");
+	Shader shaderRed("/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.fs");
+	Shader shaderBlue("/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.fs");
 
     glEnable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -390,9 +391,9 @@ int main(int, char**)
         // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
-        static size_t item_current_idx = 0; // Here we store our selection data as an index.
+        
 
-        displayImGui(show_demo_window, item_current_idx, meshes, clear_color, renderMesh, show_another_window);
+        displayImGui(show_demo_window, meshes, clear_color, renderMesh, show_another_window);
 
 
 
