@@ -18,6 +18,8 @@ public:
 	ModelParameters getParams();
 	std::string getModelName();	
 	void setParams(ModelParameters params);
+	void updateModelMatrixByUserParameters();
+	glm::mat4 getModelMatrix();
 
 private:
 	// Variables for easy access
@@ -26,6 +28,7 @@ private:
 	json JSON;
 	ModelParameters params;
 	std::string modelName;
+	glm::mat4 modelMatrix;
 
 	// All the meshes and transformations
 	std::vector<Mesh> meshes;

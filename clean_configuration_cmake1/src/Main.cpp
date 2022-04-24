@@ -112,7 +112,12 @@ void initializeImGui(GLFWwindow* window, const char* glsl_version) {
     ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
-
+void sendTransformationToVertexShader(Shader shader, glm::mat4 model, glm::mat4 view, glm::mat4 projection)
+{
+	shader.setMat4("model", model);
+	shader.setMat4("view", view);
+	shader.setMat4("projection", projection);
+}
 
 
 int main()
@@ -152,7 +157,7 @@ int main()
 
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader shaderProgram("/home/davidco1/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("/home/davidco1/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -160,9 +165,11 @@ int main()
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPos);
 
-	shaderProgram.Activate();
-	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+	defaultShader.Activate();
+	glUniform4f(glGetUniformLocation(defaultShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(defaultShader.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+
+
 
 
 
@@ -229,12 +236,22 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Handles camera inputs
-		camera.Inputs(window);
+		//camera.Inputs(window);
 		// Updates and exports the camera matrix to the Vertex Shader
 		camera.updateMatrix(45.0f, 0.1f, 100.0f);
 
-		// Draw a model
-		model.Draw(shaderProgram, camera);
+        for (size_t i = 0 ; i < models.size() ; i++) {
+            models[i]->updateModelMatrixByUserParameters();
+        } 		
+
+		
+		
+		
+
+		defaultShader.Activate();            
+		sendTransformationToVertexShader(defaultShader, model.getModelMatrix(), camera.view, camera.projection);
+
+		model.Draw(defaultShader, camera);		
 
 		if (useImGui) {
 			// Rendering
@@ -251,7 +268,7 @@ int main()
 
 
 	// Delete all the objects we've created
-	shaderProgram.Delete();
+	defaultShader.Delete();
 
 	if (useImGui) {
 		// Cleanup
