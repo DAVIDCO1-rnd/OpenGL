@@ -24,7 +24,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 const unsigned int width = 1280;
 const unsigned int height = 720;
 
-void displayImGui(size_t item_current_idx, std::vector<Model*> models, ImVec4 clear_color, bool renderMesh) {
+void displayImGui(size_t& item_current_idx, std::vector<Model*> models, ImVec4& clear_color, bool& renderMesh) {
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -137,7 +137,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
-	GLFWwindow* window = glfwCreateWindow(width, height, "YoutubeOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "LOS algorithm", NULL, NULL);
 	// Error check if the window fails to create
 	if (window == NULL)
 	{
@@ -160,7 +160,7 @@ int main()
 
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader defaultShader("/home/davidco1/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("/home/dell/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -192,25 +192,69 @@ int main()
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
-	std::string parentDir = "/home/davidco1/Developments/OpenGL/clean_configuration_cmake1";
+	std::string parentDir = "/home/dell/Developments/OpenGL/clean_configuration_cmake1";
 
 	std::string modelName1 = "bunny";
-	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";
-	//std::string modelPath = "/Resources/models/cut_fish/scene.gltf";
+	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	
 
 	std::string modelName2 = "map";
 	std::string modelPath2 = "/Resources/models/" + modelName2 + "/scene.gltf";
-	//std::string modelPath = "/Resources/models/Box/glTF/Box.gltf";
+
+	// std::string modelName3 = "Avocado";
+	// std::string modelPath3 = "/Resources/models/Avocado/glTF/Avocado.gltf";
+
+
+	std::string modelName3 = "grindstone";
+	std::string modelPath3 = "/Resources/models/" + modelName3 + "/scene.gltf";
+
+	std::string modelName4 = "toy_freddy";
+	std::string modelPath4 = "/Resources/models/" + modelName4 + "/scene.gltf";	
+
+
+	
+
+
 	//std::string modelPath = "/Resources/models/Duck/glTF/Duck.gltf";
 	//std::string modelPath = "/Resources/models/Avocado/glTF-Quantized/Avocado.gltf";
 	//std::string modelPath = "/Resources/models/ToyCar/glTF/ToyCar.gltf";
 
 	// Load in a model
-	Model model((parentDir + modelPath2).c_str(), modelName2);
+	Model model1((parentDir + modelPath1).c_str(), modelName1);
+	ModelParameters params1;
+	params1.angleX = 119.0f;
+	params1.angleY = -72.0f;
+	params1.scaleUniform = 2.83f;
+	model1.setParams(params1);
+
+	Model model2((parentDir + modelPath2).c_str(), modelName2);
+	ModelParameters params2;	
+	params2.angleY = -62.0f;
+	params2.translateX = 1.0f;
+	params2.translateY = -0.1f;
+	params2.scaleUniform = 0.04f;
+	model2.setParams(params2);
+
+	Model model3((parentDir + modelPath3).c_str(), modelName3);
+	ModelParameters params3;
+	params3.angleX = 68.0f;
+	params3.angleY = 126.0f;
+	params3.angleZ = 17.0f;
+	params3.translateX = 0.2f;
+	params3.translateY = 0.0f;
+	params3.translateZ = -0.4f;
+	params3.scaleUniform = 0.5f;
+	model3.setParams(params3);	
+
+	//Model model4((parentDir + modelPath4).c_str(), modelName4);
+	//ModelParameters params4;
+	//model4.setParams(params4);	
 
 	std::vector<Model*> models;
-	models.push_back(&model);
-	size_t item_current_idx = 0;
+	models.push_back(&model1);
+	// models.push_back(&model2);
+	// models.push_back(&model3);
+	//models.push_back(&model4);
+	size_t item_current_idx = 0;	
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	bool renderMesh = true;
 
@@ -237,7 +281,7 @@ int main()
 
 
 		// Specify the color of the background
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -254,10 +298,13 @@ int main()
 		
 		
 
-		defaultShader.Activate();            
-		sendTransformationToVertexShader(defaultShader, model.getModelMatrix(), camera.view, camera.projection);
+		defaultShader.Activate();
+		for (size_t i = 0 ; i < models.size() ; i++) {          
+			sendTransformationToVertexShader(defaultShader, models[i]->getModelMatrix(), camera.view, camera.projection);
+			models[i]->Draw(defaultShader, camera);
+		}
 
-		model.Draw(defaultShader, camera);		
+				
 
 		if (useImGui) {
 			// Rendering
