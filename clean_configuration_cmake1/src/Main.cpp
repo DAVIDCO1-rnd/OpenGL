@@ -160,7 +160,7 @@ int main()
 
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader defaultShader("/home/davidco1/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("/home/dell/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "/home/dell/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -192,7 +192,7 @@ int main()
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
-	std::string parentDir = "/home/davidco1/Developments/OpenGL/clean_configuration_cmake1";
+	std::string parentDir = "/home/dell/Developments/OpenGL/clean_configuration_cmake1";
 
 	std::string modelName1 = "bunny";
 	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	
