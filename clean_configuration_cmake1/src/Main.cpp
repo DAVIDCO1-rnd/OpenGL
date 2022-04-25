@@ -24,7 +24,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 const unsigned int width = 1280;
 const unsigned int height = 720;
 
-void displayImGui(size_t& item_current_idx, std::vector<Model*> models, ImVec4 clear_color, bool renderMesh) {
+void displayImGui(size_t& item_current_idx, std::vector<Model*> models, ImVec4& clear_color, bool& renderMesh) {
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -207,6 +207,12 @@ int main()
 	std::string modelName3 = "grindstone";
 	std::string modelPath3 = "/Resources/models/" + modelName3 + "/scene.gltf";
 
+	std::string modelName4 = "toy_freddy";
+	std::string modelPath4 = "/Resources/models/" + modelName4 + "/scene.gltf";	
+
+
+	
+
 
 	//std::string modelPath = "/Resources/models/Duck/glTF/Duck.gltf";
 	//std::string modelPath = "/Resources/models/Avocado/glTF-Quantized/Avocado.gltf";
@@ -239,10 +245,15 @@ int main()
 	params3.scaleUniform = 0.5f;
 	model3.setParams(params3);	
 
+	//Model model4((parentDir + modelPath4).c_str(), modelName4);
+	//ModelParameters params4;
+	//model4.setParams(params4);	
+
 	std::vector<Model*> models;
 	models.push_back(&model1);
-	models.push_back(&model2);
-	models.push_back(&model3);
+	// models.push_back(&model2);
+	// models.push_back(&model3);
+	//models.push_back(&model4);
 	size_t item_current_idx = 0;	
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	bool renderMesh = true;
@@ -270,7 +281,7 @@ int main()
 
 
 		// Specify the color of the background
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
