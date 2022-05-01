@@ -15,11 +15,16 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 if(WIN32)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+	set(OpenCV_DIR ${CMAKE_SOURCE_DIR}/Third_party/opencv_4.5.5/build)
+	set(GLM_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/Third_party/glm)
+	set(GLFW3_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/Third_party/glfw-3.3.7/include)
+	set(GLFW3_LIBRARY ${CMAKE_SOURCE_DIR}/Third_party/glfw-3.3.7/build/src/Debug)
 endif(WIN32)
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 # find the required packages
+
 find_package(OpenCV REQUIRED)
 message(STATUS "OpenCV included at ${OpenCV_INCLUDE_DIRS}")
 find_package(GLM REQUIRED)
