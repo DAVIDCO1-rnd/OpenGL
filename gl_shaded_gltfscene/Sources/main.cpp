@@ -14,8 +14,8 @@ int main(int argc, char* argv[])
 		("t,title", "Window Title(default is 'gl_shaded_gltfscene')", cxxopts::value<std::string>()->default_value("gl_shaded_gltfscene"))
 		("x,width", "Window width (default is 1200)", cxxopts::value<int>()->default_value("1200"))
 		("y,height", "Window height (default is 900)", cxxopts::value<int>()->default_value("900"))
-		("s,scene", "GLTF Scene filepath(default is '" RESOURCES_DIR "scenes/FlightHelmet/FlightHelmet.gltf')",
-			cxxopts::value<std::string>()->default_value(RESOURCES_DIR "scenes/FlightHelmet/FlightHelmet.gltf"))
+		("s,scene", "GLTF Scene filepath(default is '" RESOURCES_DIR "scenes/smi67/smi67.gltf')",
+			cxxopts::value<std::string>()->default_value(RESOURCES_DIR "scenes/smi67/smi67.gltf"))
 		("e,envmap", "HDR SkyDome image filepath(default is '" RESOURCES_DIR  "scenes/environment.hdr')",
 			cxxopts::value<std::string>()->default_value(RESOURCES_DIR "scenes/environment.hdr"))
 		("h,help", "Print usage");

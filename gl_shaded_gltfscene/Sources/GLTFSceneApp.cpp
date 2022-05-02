@@ -59,8 +59,8 @@ bool GLTFSceneApp::OnInitialize(std::shared_ptr<GL3::Window> window, const cxxop
 		Core::VertexFormat::Position3Normal3TexCoord2Color4))
 		return false;
 
-	if (!_skyDome.Initialize(configure["envmap"].as<std::string>()))
-		return false;
+	//if (!_skyDome.Initialize(configure["envmap"].as<std::string>()))
+	//	return false;
 
 	glGenBuffers(1, &_uniformBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, _uniformBuffer);
@@ -91,19 +91,19 @@ void GLTFSceneApp::OnDraw()
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, _uniformBuffer);
 
 	//! Bind skybox shader and render attached skydome
-	auto& skyboxShader = _shaders["skybox"];
-	skyboxShader->BindShaderProgram();
-	_skyDome.Render(skyboxShader, GL_BLEND_SRC_ALPHA);
+	//auto& skyboxShader = _shaders["skybox"];
+	//skyboxShader->BindShaderProgram();
+	//_skyDome.Render(skyboxShader, GL_BLEND_SRC_ALPHA);
 
 	//! Bind PBR shader
 	auto& pbrShader = _shaders["default"];
 	pbrShader->BindShaderProgram();
 
 	//! Attach IBL precalculated textures to the PBR shader
-	const auto& iblTextures = _skyDome.GetIBLTextureSet();
-	glBindTextureUnit(0, iblTextures.irradianceCube);
-	glBindTextureUnit(1, iblTextures.brdfLUT);
-	glBindTextureUnit(2, iblTextures.prefilteredCube);
+	//const auto& iblTextures = _skyDome.GetIBLTextureSet();
+	//glBindTextureUnit(0, iblTextures.irradianceCube);
+	//glBindTextureUnit(1, iblTextures.brdfLUT);
+	//glBindTextureUnit(2, iblTextures.prefilteredCube);
 
 	_cameras[0]->BindCamera(0);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, _uniformBuffer);
