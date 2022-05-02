@@ -40,14 +40,39 @@ void Camera::updateViewMatrixByUserParameters()
 	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(params.angleY), glm::vec3(0.0, 1.0, 0.0));
 	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(params.angleZ), glm::vec3(0.0, 0.0, 1.0));
 	this->viewMatrix = glm::translate(this->viewMatrix, glm::vec3(params.translateX, params.translateY, params.translateZ));
-	this->viewMatrix = glm::scale(this->viewMatrix, glm::vec3(params.scaleX, params.scaleY, params.scaleZ));
-	this->viewMatrix = glm::scale(this->viewMatrix, glm::vec3(params.scaleUniform, params.scaleUniform, params.scaleUniform));
 }
 
 void Camera::updateProjectionMatrixByUserParameters() {
 
 }
 
+glm::mat4 Camera::getViewMatrix() const {
+	return this->viewMatrix;
+}
+
+void Camera::setViewMatrix(glm::mat4 viewMatrix) {
+	this->viewMatrix = viewMatrix;
+}
+
+glm::mat4 Camera::getProjectionMatrix() const {
+	return this->projectionMatrix;
+}
+
+void Camera::setProjectionMatrix(glm::mat4 projectionMatrix) {
+	this->projectionMatrix = projectionMatrix;
+}
+
+std::string Camera::getCameraName() const {
+	return this->cameraName;
+}
+
+CameraParameters Camera::getParams() const {
+	return params;
+}
+
+void Camera::setParams(CameraParameters params) {
+	this->params = params;
+}
 
 
 void Camera::Inputs(GLFWwindow* window)

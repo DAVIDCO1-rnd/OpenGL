@@ -165,7 +165,7 @@ namespace ImGuiCameras
 			}
 
 			{
-				ModelParameters cameraParams = cameras[cameraIndex]->getParams();
+				CameraParameters cameraParams = cameras[cameraIndex]->getParams();
 
 				cameraParams.angleX = cameras[cameraIndex]->getParams().angleX;
 				cameraParams.angleY = cameras[cameraIndex]->getParams().angleY;

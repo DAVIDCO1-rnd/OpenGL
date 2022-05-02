@@ -12,6 +12,26 @@
 #include <string>
 #include"shaderClass.h"
 
+class CameraParameters {
+public:
+	GLfloat angleX;
+	GLfloat angleY;
+	GLfloat angleZ;
+	GLfloat translateX;
+	GLfloat translateY;
+	GLfloat translateZ;
+
+
+	CameraParameters() {
+		angleX = 0.0f;
+		angleY = 0.0f;
+		angleZ = 0.0f;
+		translateX = 0.0f;
+		translateY = 0.0f;
+		translateZ = 0.0f;
+	}
+};
+
 
 class Camera
 {
@@ -19,6 +39,7 @@ private:
 	glm::mat4 viewMatrix = glm::mat4(1.0f);
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	std::string cameraName;
+	CameraParameters params;
 
 public:
 	// Stores the main vectors of the camera
@@ -51,20 +72,18 @@ public:
 	void updateViewMatrixByUserParameters();
 	void updateProjectionMatrixByUserParameters();
 
-	glm::mat4 getViewMatrix() const {
-		return this->viewMatrix;
-	}
+	glm::mat4 getViewMatrix() const;
 
-	void setViewMatrix(glm::mat4 viewMatrix) {
-		this->viewMatrix = viewMatrix;
-	}
+	void setViewMatrix(glm::mat4 viewMatrix);
 
-	glm::mat4 getProjectionMatrix() const {
-		return this->projectionMatrix;
-	}
+	glm::mat4 getProjectionMatrix() const;
 
-	void setProjectionMatrix(glm::mat4 projectionMatrix) {
-		this->projectionMatrix = projectionMatrix;
-	}
+	void setProjectionMatrix(glm::mat4 projectionMatrix);
+
+	std::string getCameraName() const;
+
+	CameraParameters getParams() const;
+
+	void setParams(CameraParameters params);
 };
 #endif
