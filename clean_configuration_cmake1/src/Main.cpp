@@ -26,14 +26,48 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 const unsigned int width = 1280;
 const unsigned int height = 720;
 
+namespace ImGuiGeneral
+{
+	void imGuiStartNewFrame() {
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+	}
+
+	void imGuiWrapperInitializeImGui(GLFWwindow* window, const char* glsl_version) {
+		// Setup Dear ImGui context
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+		// Setup Dear ImGui style
+		ImGui::StyleColorsDark();
+		//ImGui::StyleColorsClassic();
+
+		// Setup Platform/Renderer backends
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		ImGui_ImplOpenGL3_Init(glsl_version);
+	}
+
+	void imGuiWrapperRender() {
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
+
+	void imGuiWrapperCleanUp() {
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+	}
+}
+
 namespace ImGuiModels
 {
 	void imGuiWrapperDisplayImGui(size_t& modelIndex, std::vector<Model*> models, float* clearColor, bool& renderMesh) {
 		// Start the Dear ImGui frame
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
 
-		ImGui::NewFrame();
 
 		ImGui::Begin("Model parameters");
 		{
@@ -98,45 +132,17 @@ namespace ImGuiModels
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
-
-	void imGuiWrapperInitializeImGui(GLFWwindow* window, const char* glsl_version) {
-		// Setup Dear ImGui context
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-		// Setup Dear ImGui style
-		ImGui::StyleColorsDark();
-		//ImGui::StyleColorsClassic();
-
-		// Setup Platform/Renderer backends
-		ImGui_ImplGlfw_InitForOpenGL(window, true);
-		ImGui_ImplOpenGL3_Init(glsl_version);
-	}
-
-	void imGuiWrapperRender() {
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	}
-
-	void imGuiWrapperCleanUp() {
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
-	}
 }
 
 
 namespace ImGuiCameras
 {
-	void imGuiWrapperDisplayImGui(size_t& cameraIndex, std::vector<Camera*> cameras, float* clearColor, bool& renderMesh) {
+	void imGuiWrapperDisplayImGui(size_t& cameraIndex, std::vector<Camera*> cameras, float* clearColor) {
 		// Start the Dear ImGui frame
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
+		//ImGui_ImplOpenGL3_NewFrame();
+		//ImGui_ImplGlfw_NewFrame();
 
-		ImGui::NewFrame();
+		//ImGui::NewFrame();
 
 		ImGui::Begin("Camera parameters");
 		{
@@ -189,34 +195,6 @@ namespace ImGuiCameras
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
-
-	void imGuiWrapperInitializeImGui(GLFWwindow* window, const char* glsl_version) {
-		// Setup Dear ImGui context
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-		// Setup Dear ImGui style
-		ImGui::StyleColorsDark();
-		//ImGui::StyleColorsClassic();
-
-		// Setup Platform/Renderer backends
-		ImGui_ImplGlfw_InitForOpenGL(window, true);
-		ImGui_ImplOpenGL3_Init(glsl_version);
-	}
-
-	void imGuiWrapperRender() {
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	}
-
-	void imGuiWrapperCleanUp() {
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
-	}
 }
 
 
@@ -267,7 +245,7 @@ int main()
 
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader defaultShader("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -320,7 +298,7 @@ int main()
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
-	std::string parentDir = "D:/Developments/OpenGL/clean_configuration_cmake1";
+	std::string parentDir = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1";
 
 	std::string modelName1 = "bunny";
 	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	
@@ -397,7 +375,7 @@ int main()
 	bool useImGui = true;
 
 	if (useImGui) {
-		ImGuiModels::imGuiWrapperInitializeImGui(window, glsl_version);
+		ImGuiGeneral::imGuiWrapperInitializeImGui(window, glsl_version);
 	}
 
 	
@@ -406,7 +384,9 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		if (useImGui) {
+			ImGuiGeneral::imGuiStartNewFrame();
 			ImGuiModels::imGuiWrapperDisplayImGui(modelIndex, models, clearColor, renderMesh);
+			ImGuiCameras::imGuiWrapperDisplayImGui(cameraIndex, cameras, clearColor);
 		}
 
 
@@ -438,7 +418,7 @@ int main()
 				
 
 		if (useImGui) {
-			ImGuiModels::imGuiWrapperRender();
+			ImGuiGeneral::imGuiWrapperRender();
 		}	
 
 		// Swap the back buffer with the front buffer
@@ -453,7 +433,7 @@ int main()
 	defaultShader.Delete();
 
 	if (useImGui) {
-		ImGuiModels::imGuiWrapperCleanUp();
+		ImGuiGeneral::imGuiWrapperCleanUp();
 	}
 
 	// Delete window before ending the program
