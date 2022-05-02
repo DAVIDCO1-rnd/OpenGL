@@ -10,6 +10,7 @@
 #include <chrono>
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 namespace GL3 {
 
