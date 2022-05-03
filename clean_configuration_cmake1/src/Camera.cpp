@@ -39,7 +39,9 @@ void Camera::Matrix(Shader& shader)
 
 void Camera::updateViewMatrixByUserParameters()
 {
-	this->viewMatrix = glm::lookAt(position, position + orientation, up);
+	glm::vec3 at = position + orientation;
+	this->viewMatrix = glm::lookAt(position, at, up);
+	glm::vec3 angles = this->mathUseful.getRotationAngles(this->viewMatrix);
 	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(params.angleX), glm::vec3(1.0, 0.0, 0.0));
 	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(params.angleY), glm::vec3(0.0, 1.0, 0.0));
 	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(params.angleZ), glm::vec3(0.0, 0.0, 1.0));

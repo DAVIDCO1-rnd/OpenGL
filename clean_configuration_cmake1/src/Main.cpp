@@ -245,7 +245,7 @@ int main()
 
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader defaultShader("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -268,23 +268,23 @@ int main()
 
 	// Creates camera object
 
-	glm::vec3 cameraPosition1 = glm::vec3(0.0f, 0.0f, 2.0f);
+	glm::vec3 cameraPosition1 = glm::vec3(0.0f, 0.0f, 0.0f);
 	float fov1 = 45.0f;
 	float nearZ1 = 0.1f;
 	float farZ1 = 1000.0f;
 	std::string cameraName1 = "camera1";
 	Camera camera1(width, height, cameraPosition1, fov1, nearZ1, farZ1, cameraName1);
 
-	glm::vec3 cameraPosition2 = glm::vec3(0.0f, 0.0f, 2.0f);
-	float fov2 = 45.0f;
-	float nearZ2 = 0.1f;
-	float farZ2 = 1000.0f;
-	std::string cameraName2 = "camera2";
-	Camera camera2(width, height, cameraPosition2, fov2, nearZ2, farZ2, cameraName2);
+	//glm::vec3 cameraPosition2 = glm::vec3(0.0f, 0.0f, 2.0f);
+	//float fov2 = 45.0f;
+	//float nearZ2 = 0.1f;
+	//float farZ2 = 1000.0f;
+	//std::string cameraName2 = "camera2";
+	//Camera camera2(width, height, cameraPosition2, fov2, nearZ2, farZ2, cameraName2);
 
 	std::vector<Camera*> cameras;
 	cameras.push_back(&camera1);
-	cameras.push_back(&camera2);
+	//cameras.push_back(&camera2);
 
 	size_t cameraIndex = 0;
 
@@ -298,7 +298,7 @@ int main()
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
-	std::string parentDir = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1";
+	std::string parentDir = "D:/Developments/OpenGL/clean_configuration_cmake1";
 
 	std::string modelName1 = "bunny";
 	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	

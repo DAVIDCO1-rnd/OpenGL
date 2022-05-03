@@ -18,9 +18,9 @@ Model::Model(const char* file, std::string modelName)
 void Model::updateModelMatrixByUserParameters()
 {
 	glm::mat4 identityMatrix = glm::mat4(1.0f);
-	this->modelMatrix = glm::rotate(identityMatrix, glm::radians(params.angleX), glm::vec3(1.0, 0.0, 0.0));
+	this->modelMatrix = glm::rotate(identityMatrix, glm::radians(params.angleZ), glm::vec3(0.0, 0.0, 1.0));
 	this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(params.angleY), glm::vec3(0.0, 1.0, 0.0));
-	this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(params.angleZ), glm::vec3(0.0, 0.0, 1.0));
+	this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(params.angleX), glm::vec3(1.0, 0.0, 0.0));
 	this->modelMatrix = glm::translate(this->modelMatrix, glm::vec3(params.translateX, params.translateY, params.translateZ));
 	this->modelMatrix = glm::scale(this->modelMatrix, glm::vec3(params.scaleX, params.scaleY, params.scaleZ));
 	this->modelMatrix = glm::scale(this->modelMatrix, glm::vec3(params.scaleUniform, params.scaleUniform, params.scaleUniform));

@@ -264,7 +264,7 @@ int main(int, char**)
     cameras.push_back(&camera1);
     //cameras.push_back(&camera2);
     size_t circleIndex = 0;
-    string modelsFolder = "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/Data/"; 
+    string modelsFolder = "D:/Developments/OpenGL/clean_configuration_cmake/Data/"; 
 
     string modelName1 = "circle";
     string filePath1 = modelsFolder + modelName1 + ".obj";
@@ -363,9 +363,9 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    Shader shaderWithoutFilters("/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.fs");
-	Shader shaderRed("/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.fs");
-	Shader shaderBlue("/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.vs", "/home/davidco1/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.fs");
+    Shader shaderWithoutFilters("D:/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.vs", "D:/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderWithoutFilters.fs");
+	Shader shaderRed("D:/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.vs", "D:/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderRed.fs");
+	Shader shaderBlue("D:/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.vs", "D:/Developments/OpenGL/clean_configuration_cmake/src/shaders/shaderBlue.fs");
 
     glEnable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

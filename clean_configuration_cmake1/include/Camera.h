@@ -11,6 +11,7 @@
 
 #include <string>
 #include"shaderClass.h"
+#include "MathUseful.h"
 
 class CameraParameters {
 public:
@@ -46,6 +47,10 @@ private:
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	std::string cameraName;
 	CameraParameters params;
+	float angleDegX;
+	float angleDegY;
+	float angleDegZ;
+	MathUseful mathUseful;
 
 public:
 	glm::vec3 position;
