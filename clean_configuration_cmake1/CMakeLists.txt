@@ -131,6 +131,14 @@ function(create_project_from_sources)
         set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin")
         set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin")
     endif(WIN32)
+
+    
+    if(WIN32)
+        # copy opencv dll to build directory
+        set(OPENCV_DLL ${CMAKE_SOURCE_DIR}/Third_party/opencv_4.5.5/build/x64/vc15/bin/opencv_world455d.dll)
+        add_custom_command(TARGET ${NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${OPENCV_DLL} $<TARGET_FILE_DIR:${NAME}>)
+    endif(WIN32)
+
     # copy shader files to build directory
     file(GLOB SHADERS
              "src/shaders/*.vs"

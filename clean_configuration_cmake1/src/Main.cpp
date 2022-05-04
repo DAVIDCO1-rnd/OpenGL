@@ -245,7 +245,7 @@ int main()
 
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader defaultShader("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -268,27 +268,27 @@ int main()
 
 	// Creates camera object
 
-	glm::vec3 cameraPosition1 = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 cameraPosition1 = glm::vec3(0.0f, 0.0f, 2.5f);
 	float fov1 = 45.0f;
 	float nearZ1 = 0.1f;
 	float farZ1 = 1000.0f;
 	std::string cameraName1 = "camera1";
 	Camera camera1(width, height, cameraPosition1, fov1, nearZ1, farZ1, cameraName1);
 
-	//glm::vec3 cameraPosition2 = glm::vec3(0.0f, 0.0f, 2.0f);
-	//float fov2 = 45.0f;
-	//float nearZ2 = 0.1f;
-	//float farZ2 = 1000.0f;
-	//std::string cameraName2 = "camera2";
-	//Camera camera2(width, height, cameraPosition2, fov2, nearZ2, farZ2, cameraName2);
+	glm::vec3 cameraPosition2 = glm::vec3(0.0f, 0.0f, 2.0f);
+	float fov2 = 45.0f;
+	float nearZ2 = 0.1f;
+	float farZ2 = 1000.0f;
+	std::string cameraName2 = "camera2";
+	Camera camera2(width, height, cameraPosition2, fov2, nearZ2, farZ2, cameraName2);
 
 	std::vector<Camera*> cameras;
 	cameras.push_back(&camera1);
-	//cameras.push_back(&camera2);
+	cameras.push_back(&camera2);
 
 	size_t cameraIndex = 0;
-
-	Camera* activeCamera = cameras[cameraIndex];
+	Camera* activeCamera;
+	
 
 
 	/*
@@ -298,7 +298,7 @@ int main()
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
-	std::string parentDir = "D:/Developments/OpenGL/clean_configuration_cmake1";
+	std::string parentDir = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1";
 
 	std::string modelName1 = "bunny";
 	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	
@@ -313,8 +313,7 @@ int main()
 	std::string modelName3 = "grindstone";
 	std::string modelPath3 = "/Resources/models/" + modelName3 + "/scene.gltf";
 
-	std::string modelName4 = "toy_freddy";
-	std::string modelPath4 = "/Resources/models/" + modelName4 + "/scene.gltf";	
+	
 
 
 	
@@ -327,8 +326,9 @@ int main()
 	// Load in a model
 	Model model1((parentDir + modelPath1).c_str(), modelName1);
 	ModelParameters params1;
-	params1.angleX = 119.0f;
-	params1.angleY = -72.0f;
+	params1.angleX = -92.0f;
+	params1.angleY = 153.0f;
+	params1.angleZ = 67.0f;
 	params1.scaleUniform = 2.83f;
 	model1.setParams(params1);
 
@@ -343,25 +343,23 @@ int main()
 	Model model3((parentDir + modelPath3).c_str(), modelName3);
 	ModelParameters params3;
 	params3.angleX = 68.0f;
-	params3.angleY = 126.0f;
+	params3.angleY = 0.0f;
 	params3.angleZ = 17.0f;
 	params3.translateX = 0.2f;
 	params3.translateY = 0.0f;
-	params3.translateZ = -0.4f;
+	params3.translateZ = -0.7f;
 	params3.scaleUniform = 0.5f;
 	model3.setParams(params3);
 
 
 
-	//Model model4((parentDir + modelPath4).c_str(), modelName4);
-	//ModelParameters params4;
-	//model4.setParams(params4);	
+	
 
 	std::vector<Model*> models;
 	models.push_back(&model1);
-	 models.push_back(&model2);
-	 models.push_back(&model3);
-	//models.push_back(&model4);
+	models.push_back(&model2);
+	models.push_back(&model3);
+
 	size_t modelIndex = 0;
 	
 	bool renderMesh = true;
@@ -388,7 +386,7 @@ int main()
 			ImGuiModels::imGuiWrapperDisplayImGui(modelIndex, models, clearColor, renderMesh);
 			ImGuiCameras::imGuiWrapperDisplayImGui(cameraIndex, cameras, clearColor);
 		}
-
+		activeCamera = cameras[cameraIndex];
 
 		// Specify the color of the background
 		glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);

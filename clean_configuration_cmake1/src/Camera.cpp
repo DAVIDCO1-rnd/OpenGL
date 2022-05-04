@@ -23,6 +23,13 @@ void Camera::updateMatrix()
 
 	// Makes camera look in the right direction from the right position
 	this->viewMatrix = glm::lookAt(position, position + orientation, up);
+	glm::vec3 angles = this->mathUseful.getRotationAngles(this->viewMatrix);
+	params.angleX = angles.x;
+	params.angleY = angles.y;
+	params.angleZ = angles.z;
+	params.translateX = position.x;
+	params.translateY = position.y;
+	params.translateZ = position.z;
 	// Adds perspective to the scene
 	this->projectionMatrix = glm::perspective(glm::radians(fovDeg), (float)width / height, nearPlane, farPlane);
 
@@ -39,13 +46,11 @@ void Camera::Matrix(Shader& shader)
 
 void Camera::updateViewMatrixByUserParameters()
 {
-	glm::vec3 at = position + orientation;
-	this->viewMatrix = glm::lookAt(position, at, up);
-	glm::vec3 angles = this->mathUseful.getRotationAngles(this->viewMatrix);
-	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(params.angleX), glm::vec3(1.0, 0.0, 0.0));
-	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(params.angleY), glm::vec3(0.0, 1.0, 0.0));
-	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(params.angleZ), glm::vec3(0.0, 0.0, 1.0));
-	this->viewMatrix = glm::translate(this->viewMatrix, glm::vec3(params.translateX, params.translateY, params.translateZ));
+	glm::mat4 identityMatrix = glm::mat4(1.0f);
+	this->viewMatrix = glm::translate(identityMatrix, glm::vec3(-params.translateX, -params.translateY, -params.translateZ));
+	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(-params.angleX), glm::vec3(1.0, 0.0, 0.0));
+	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(-params.angleY), glm::vec3(0.0, 1.0, 0.0));
+	this->viewMatrix = glm::rotate(this->viewMatrix, glm::radians(-params.angleZ), glm::vec3(0.0, 0.0, 1.0));	
 }
 
 void Camera::updateProjectionMatrixByUserParameters() {
