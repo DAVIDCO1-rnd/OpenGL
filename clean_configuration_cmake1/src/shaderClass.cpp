@@ -1,4 +1,5 @@
-#include"shaderClass.h"
+#include "shaderClass.h"
+#include "OpenGLErrors.h"
 
 
 // Reads a text file and outputs a string with everything in the text file
@@ -29,12 +30,49 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile)
 	const char* vertexSource = vertexCode.c_str();
 	const char* fragmentSource = fragmentCode.c_str();
 
+	GLenum err013 = glGetError();
+	if (err013 != GL_NO_ERROR)
+	{
+		std::cout << "err013" << std::endl;
+		printOpenGLError(err013);
+	}
+
 	// Create Vertex Shader Object and get its reference
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+	GLenum err014 = glGetError();
+	if (err014 != GL_NO_ERROR)
+	{
+		std::cout << "err014" << std::endl;
+		printOpenGLError(err014);
+	}
+
 	// Attach Vertex Shader source to the Vertex Shader Object
 	glShaderSource(vertexShader, 1, &vertexSource, NULL);
+
+
+	GLenum err015 = glGetError();
+	if (err015 != GL_NO_ERROR)
+	{
+		std::cout << "err015" << std::endl;
+		printOpenGLError(err015);
+	}
+
 	// Compile the Vertex Shader into machine code
 	glCompileShader(vertexShader);
+
+
+
+
+	GLenum err016 = glGetError();
+	if (err016 != GL_NO_ERROR)
+	{
+		std::cout << "err016" << std::endl;
+		printOpenGLError(err016);
+	}
+
+
+
 	// Checks if Shader compiled succesfully
 	compileErrors(vertexShader, "VERTEX");
 
@@ -42,24 +80,141 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile)
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	// Attach Fragment Shader source to the Fragment Shader Object
 	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+
+
+
+
+	err016 = glGetError();
+	if (err016 != GL_NO_ERROR)
+	{
+		std::cout << "err016" << std::endl;
+		printOpenGLError(err016);
+	}
+
+
+
 	// Compile the Vertex Shader into machine code
 	glCompileShader(fragmentShader);
+
+
+
+
+	err016 = glGetError();
+	if (err016 != GL_NO_ERROR)
+	{
+		std::cout << "err016" << std::endl;
+		printOpenGLError(err016);
+	}
+
+
+
 	// Checks if Shader compiled succesfully
 	compileErrors(fragmentShader, "FRAGMENT");
 
 	// Create Shader Program Object and get its reference
 	ID = glCreateProgram();
+
+
+
+
+	err016 = glGetError();
+	if (err016 != GL_NO_ERROR)
+	{
+		std::cout << "err016" << std::endl;
+		printOpenGLError(err016);
+	}
+
+
+
 	// Attach the Vertex and Fragment Shaders to the Shader Program
 	glAttachShader(ID, vertexShader);
+
+
+
+
+	err016 = glGetError();
+	if (err016 != GL_NO_ERROR)
+	{
+		std::cout << "err016" << std::endl;
+		printOpenGLError(err016);
+	}
+
+
+
 	glAttachShader(ID, fragmentShader);
+
+
+
+
+	err016 = glGetError();
+	if (err016 != GL_NO_ERROR)
+	{
+		std::cout << "err016" << std::endl;
+		printOpenGLError(err016);
+	}
+
+
+
 	// Wrap-up/Link all the shaders together into the Shader Program
 	glLinkProgram(ID);
+
+
+
+
+	err016 = glGetError();
+	if (err016 != GL_NO_ERROR)
+	{
+		std::cout << "err016" << std::endl;
+		printOpenGLError(err016);
+	}
+
+
+
 	// Checks if Shaders linked succesfully
 	compileErrors(ID, "PROGRAM");
 
+
+
+
+	err016 = glGetError();
+	if (err016 != GL_NO_ERROR)
+	{
+		std::cout << "err016" << std::endl;
+		printOpenGLError(err016);
+	}
+
+
+
+
 	// Delete the now useless Vertex and Fragment Shader objects
 	glDeleteShader(vertexShader);
+
+
+
+
+	err016 = glGetError();
+	if (err016 != GL_NO_ERROR)
+	{
+		std::cout << "err016" << std::endl;
+		printOpenGLError(err016);
+	}
+
+
+
 	glDeleteShader(fragmentShader);
+
+
+
+
+	err016 = glGetError();
+	if (err016 != GL_NO_ERROR)
+	{
+		std::cout << "err016" << std::endl;
+		printOpenGLError(err016);
+	}
+
+
+
 
 }
 
@@ -84,10 +239,49 @@ void Shader::compileErrors(unsigned int shader, const char* type)
 	char infoLog[1024];
 	if (type != "PROGRAM")
 	{
+
+
+
+
+		GLenum err016 = glGetError();
+		if (err016 != GL_NO_ERROR)
+		{
+			std::cout << "err016" << std::endl;
+			printOpenGLError(err016);
+		}
+
+
+
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &hasCompiled);
+
+
+
+
+		err016 = glGetError();
+		if (err016 != GL_NO_ERROR)
+		{
+			std::cout << "err016" << std::endl;
+			printOpenGLError(err016);
+		}
+
+
+
 		if (hasCompiled == GL_FALSE)
 		{
 			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+
+
+
+
+			err016 = glGetError();
+			if (err016 != GL_NO_ERROR)
+			{
+				std::cout << "err016" << std::endl;
+				printOpenGLError(err016);
+			}
+
+
+
 			std::cout << "SHADER_COMPILATION_ERROR for:" << type << "\n" << infoLog << std::endl;
 		}
 	}

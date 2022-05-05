@@ -19,6 +19,9 @@
 #include <IMGUI/backends/imgui_impl_glfw.h>
 #include <IMGUI/backends/imgui_impl_opengl3.h>
 
+#include "CircleMesh.h"
+
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 
@@ -77,7 +80,7 @@ namespace ImGuiModels
 			for (size_t i = 0; i < models.size(); i++)
 			{
 				items.push_back(models[i]->getModelName());
-			}
+			}			
 			//string items[] = { meshes[0].getModelName(), meshes[1].getModelName()};
 
 			if (ImGui::BeginListBox("models"))
@@ -95,22 +98,24 @@ namespace ImGuiModels
 				ImGui::EndListBox();
 			}
 
-			{
-				ModelParameters modelParams = models[modelIndex]->getParams();
+			{				
+				Model* activeModel = models[modelIndex];
 
-				modelParams.angleX = models[modelIndex]->getParams().angleX;
-				modelParams.angleY = models[modelIndex]->getParams().angleY;
-				modelParams.angleZ = models[modelIndex]->getParams().angleZ;
+				ModelParameters modelParams = activeModel->getParams();
 
-				modelParams.translateX = models[modelIndex]->getParams().translateX;
-				modelParams.translateY = models[modelIndex]->getParams().translateY;
-				modelParams.translateZ = models[modelIndex]->getParams().translateZ;
+				modelParams.angleX = activeModel->getParams().angleX;
+				modelParams.angleY = activeModel->getParams().angleY;
+				modelParams.angleZ = activeModel->getParams().angleZ;
 
-				modelParams.scaleX = models[modelIndex]->getParams().scaleX;
-				modelParams.scaleY = models[modelIndex]->getParams().scaleY;
-				modelParams.scaleZ = models[modelIndex]->getParams().scaleZ;
+				modelParams.translateX = activeModel->getParams().translateX;
+				modelParams.translateY = activeModel->getParams().translateY;
+				modelParams.translateZ = activeModel->getParams().translateZ;
 
-				modelParams.scaleUniform = models[modelIndex]->getParams().scaleUniform;
+				modelParams.scaleX = activeModel->getParams().scaleX;
+				modelParams.scaleY = activeModel->getParams().scaleY;
+				modelParams.scaleZ = activeModel->getParams().scaleZ;
+
+				modelParams.scaleUniform = activeModel->getParams().scaleUniform;
 
 				ImGui::InputFloat("rotate X", &modelParams.angleX, 1.0f, 1.0f);
 				ImGui::InputFloat("rotate Y", &modelParams.angleY, 1.0f, 1.0f);
@@ -126,7 +131,7 @@ namespace ImGuiModels
 				ImGui::InputFloat("uniform scale", &modelParams.scaleUniform, 0.01f, 1.0f);
 				ImGui::Checkbox("render mesh", &renderMesh);
 
-				models[modelIndex]->setParams(modelParams);
+				activeModel->setParams(modelParams);
 			}
 		}
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -240,12 +245,25 @@ int main()
 	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
 	glViewport(0, 0, width, height);
 
-
-
-
+	GLenum err011 = glGetError();
+	if (err011 != GL_NO_ERROR)
+	{
+		std::cout << "err011" << std::endl;
+		printOpenGLError(err011);
+	}
 
 	// Generates Shader object using shaders default.vert and default.frag
 	Shader defaultShader("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+
+
+	GLenum err012 = glGetError();
+	if (err012 != GL_NO_ERROR)
+	{
+		std::cout << "err012" << std::endl;
+		printOpenGLError(err012);
+	}
+
+	Shader shaderBlue("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -270,14 +288,14 @@ int main()
 
 	glm::vec3 cameraPosition1 = glm::vec3(0.0f, 0.0f, 2.5f);
 	float fov1 = 45.0f;
-	float nearZ1 = 0.1f;
+	float nearZ1 = 0.01f;
 	float farZ1 = 1000.0f;
 	std::string cameraName1 = "camera1";
 	Camera camera1(width, height, cameraPosition1, fov1, nearZ1, farZ1, cameraName1);
 
 	glm::vec3 cameraPosition2 = glm::vec3(0.0f, 0.0f, 2.0f);
 	float fov2 = 45.0f;
-	float nearZ2 = 0.1f;
+	float nearZ2 = 0.01f;
 	float farZ2 = 1000.0f;
 	std::string cameraName2 = "camera2";
 	Camera camera2(width, height, cameraPosition2, fov2, nearZ2, farZ2, cameraName2);
@@ -303,6 +321,9 @@ int main()
 	std::string modelName1 = "bunny";
 	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	
 
+	//std::string modelName1 = "box_blender";
+	//std::string modelPath1 = "/Resources/models/box_blender/box_blender.gltf";
+
 	std::string modelName2 = "map";
 	std::string modelPath2 = "/Resources/models/" + modelName2 + "/scene.gltf";
 
@@ -314,7 +335,16 @@ int main()
 	std::string modelPath3 = "/Resources/models/" + modelName3 + "/scene.gltf";
 
 	
-
+	string modelName = "circle";
+	ModelParameters params;
+	int numOfAngles = 36;
+	int numOfRadiuses = 2;
+	float radius = 0.5f;
+	float minRadius = 0.1f;        
+	float circleCenterX = 0.0f;
+	float circleCenterY = 0.0f;
+	float zVal = -0.4f;  
+	CircleMesh* circleMesh = new CircleMesh(modelName, params, numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
 
 	
 
@@ -376,11 +406,13 @@ int main()
 		ImGuiGeneral::imGuiWrapperInitializeImGui(window, glsl_version);
 	}
 
-	
+	circleMesh->generateBuffers();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
+		circleMesh->saveBuffersForRedneringPolygones();
 		if (useImGui) {
 			ImGuiGeneral::imGuiStartNewFrame();
 			ImGuiModels::imGuiWrapperDisplayImGui(modelIndex, models, clearColor, renderMesh);
@@ -400,7 +432,8 @@ int main()
 
         for (size_t i = 0 ; i < models.size() ; i++) {
             models[i]->updateModelMatrixByUserParameters();
-        } 		
+        }
+		circleMesh->updateModelMatrixByUserParameters();
 
 		activeCamera->updateViewMatrixByUserParameters();
 		activeCamera->updateProjectionMatrixByUserParameters();
@@ -408,10 +441,15 @@ int main()
 		
 
 		defaultShader.Activate();
-		for (size_t modelIndex = 0 ; modelIndex < models.size() ; modelIndex++) {
-			sendTransformationToVertexShader(defaultShader, models[modelIndex]->getModelMatrix(), activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix());
-			models[modelIndex]->Draw(defaultShader, *activeCamera);
+		for (size_t i = 0 ; i < models.size() ; i++) {
+			sendTransformationToVertexShader(defaultShader, models[i]->getModelMatrix(), activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix());
+			models[i]->Draw(defaultShader, *activeCamera);
 		}
+
+		glLineWidth(1.0);
+		shaderBlue.Activate();
+		sendTransformationToVertexShader(shaderBlue, circleMesh->getModelMatrix(), activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix());
+		circleMesh->renderPolygones();
 
 				
 

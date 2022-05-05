@@ -4,7 +4,7 @@ clc;
 
 angle_delta = 10;
 radius = 100;
-radius_delta = 10;
+radius_delta = 20;
 circle_center = [0, 0];
 
 angles = 0 : angle_delta : 360;

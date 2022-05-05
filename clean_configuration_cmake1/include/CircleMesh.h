@@ -1,49 +1,69 @@
-#include "Mesh.h"
+#include <vector>
+#include <string>
+#include "ModelParameters.h"
+#include <glad/glad.h>
+#include <iostream>
+#include "OpenGLErrors.h"
+#include "opencv2/core/core.hpp"
+#include "opencv2/core/core_c.h"
+
+//#include<glm/glm.hpp>
+//#include<glm/gtc/matrix_transform.hpp>
+//#include<glm/gtc/type_ptr.hpp>
+//#include<glm/gtx/rotate_vector.hpp>
+//#include<glm/gtx/vector_angle.hpp>
+
+
+using namespace std;
+
 
 # define PI           3.14159265358979323846  /* pi */
 
-class CircleMesh : public Mesh {
+class CircleMesh {
 private:
-    vector<unsigned int> _indicesWithLos;
-    vector<unsigned int> _indicesWithoutLos;
+    vector<float> _verticesInModelCoordinates;
+    cv::Mat1d _verticesOpenCVInModelCoordinates;
+    vector<unsigned int> _indices;
+    cv::Mat1i _indicesOpenCV;
+    string _modelName;
+    ModelParameters _params;
+    glm::mat4 _modelMatrix;
 
 public:
-    unsigned int VAO_WITH_LOS, VAO_WITHOUT_LOS; //are public to let opengl change them
-    unsigned int EBO_WITH_LOS, EBO_WITHOUT_LOS; //are public to let opengl change them
-    //unsigned int VBO_WITH_LOS, VBO_WITHOUT_LOS; //are public to let opengl change them
-    enum PolygonsType {PolygonsWithLos, PolygonsWithoutLos};
+    unsigned int VAO, VBO, EBO; //are public to let opengl change them
 
-    CircleMesh(string modelName, string fileName, ModelParameters params) : Mesh(modelName, fileName, params) {
-        int numOfAngles = 36;
-        int numOfRadiuses = 2;
-        float radius = 100.0f;
-        float minRadius = 50.0f;        
-        float circleCenterX = 0.0f;
-        float circleCenterY = 0.0f;
-        float zVal = 200.0f;        
+    ////CircleMesh(string modelName, ModelParameters params) {
+    ////    int numOfAngles = 36;
+    ////    int numOfRadiuses = 2;
+    ////    float radius = 100.0f;
+    ////    float minRadius = 50.0f;        
+    ////    float circleCenterX = 0.0f;
+    ////    float circleCenterY = 0.0f;
+    ////    float zVal = 200.0f;        
+    ////    createMesh(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
+    ////}
+
+    CircleMesh(string modelName, ModelParameters params, int numOfAngles, float radius, float minRadius, int numOfRadiuses, float circleCenterX, float circleCenterY, float zVal) {
+        this->_modelName = modelName;
+        this->_params = params;
         createMesh(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
     }
 
-    //CircleMesh(int numOfAngles, float radius, float minRadius, int numOfRadiuses, float circleCenterX, float circleCenterY, float zVal) {
-
 
     void generateBuffers() {
-		glGenVertexArrays(1, &(this->VAO_WITH_LOS));
+		glGenVertexArrays(1, &(this->VAO));
 		glGenBuffers(1, &(this->VBO));
-		glGenBuffers(1, &(this->EBO_WITH_LOS)); 
-
-		glGenVertexArrays(1, &(this->VAO_WITHOUT_LOS));
-		glGenBuffers(1, &(this->EBO_WITHOUT_LOS));               
+		glGenBuffers(1, &(this->EBO));             
     }
 
 
-	void saveBuffersForRedneringPolygonesWithLOS()
+	void saveBuffersForRedneringPolygones()
 	{
-		glBindVertexArray(this->VAO_WITH_LOS);
+		glBindVertexArray(this->VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-		glBufferData(GL_ARRAY_BUFFER, this->verticesInModelCoordinates.size() * sizeof(float), &(this->verticesInModelCoordinates)[0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO_WITH_LOS);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indicesWithLos.size() * sizeof(unsigned int), &(_indicesWithLos)[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, this->_verticesInModelCoordinates.size() * sizeof(float), &(this->_verticesInModelCoordinates)[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(unsigned int), &(_indices)[0], GL_STATIC_DRAW);
 	
 		// position attribute
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -51,21 +71,8 @@ public:
 		glEnableVertexAttribArray(0);
 	} 
 
-	void saveBuffersForRedneringPolygonesWithoutLOS()
-	{
-		glBindVertexArray(this->VAO_WITHOUT_LOS);
-		glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-		glBufferData(GL_ARRAY_BUFFER, this->verticesInModelCoordinates.size() * sizeof(float), &(this->verticesInModelCoordinates)[0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO_WITHOUT_LOS);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indicesWithoutLos.size() * sizeof(unsigned int), &(_indicesWithoutLos)[0], GL_STATIC_DRAW);
-	
-		// position attribute
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glEnableVertexAttribArray(0);
-	}     
 
-	void renderPolygones(PolygonsType polygonsType)
+	void renderPolygones()
 	{
 		GLenum err011 = glGetError();
 		if (err011 != GL_NO_ERROR)
@@ -73,14 +80,7 @@ public:
 			std::cout << "err011" << std::endl;
 			printOpenGLError(err011);
 		}
-        if (polygonsType == PolygonsWithLos)
-        {
-            glBindVertexArray(this->VAO_WITH_LOS);
-        }
-        else
-        {
-            glBindVertexArray(this->VAO_WITHOUT_LOS);
-        }
+        glBindVertexArray(this->VAO);
 		
 		GLenum err012 = glGetError();
 		if (err012 != GL_NO_ERROR)
@@ -89,13 +89,7 @@ public:
 			printOpenGLError(err012);
 		}
 
-        if (polygonsType == PolygonsWithLos)
-        {
-            glDrawElements(GL_TRIANGLES, (GLsizei)_indicesWithLos.size(), GL_UNSIGNED_INT, 0);
-        }
-        else {
-            glDrawElements(GL_TRIANGLES, (GLsizei)_indicesWithoutLos.size(), GL_UNSIGNED_INT, 0);
-        }
+        glDrawElements(GL_TRIANGLES, (GLsizei)_indices.size(), GL_UNSIGNED_INT, 0);
 		    
 		GLenum err013 = glGetError();
 		if (err013 != GL_NO_ERROR)
@@ -204,56 +198,65 @@ public:
     }
 
     void convertVerticesToMat1d() {
-        int numOfVertices = this->verticesInModelCoordinates.size() / 3;
+        int numOfVertices = this->_verticesInModelCoordinates.size() / 3;
         double vertexData[3];
         this->_verticesOpenCVInModelCoordinates.release();
         for (int i=0 ; i < numOfVertices ; i++)
         {            
-            vertexData[0] = this->verticesInModelCoordinates[3*i + 0];
-            vertexData[1] = this->verticesInModelCoordinates[3*i + 1];
-            vertexData[2] = this->verticesInModelCoordinates[3*i + 2];
+            vertexData[0] = this->_verticesInModelCoordinates[3*i + 0];
+            vertexData[1] = this->_verticesInModelCoordinates[3*i + 1];
+            vertexData[2] = this->_verticesInModelCoordinates[3*i + 2];
             cv::Mat1d vertex = cv::Mat1d(1, 3, vertexData);
             this->_verticesOpenCVInModelCoordinates.push_back(vertex);            
         }
     }
 
     void convertIndicesToMat1i() {
-        int numOfTriangles = this->indices.size() / 3;
+        int numOfTriangles = this->_indices.size() / 3;
         int faceData[3];
-        this->indicesOpenCV.release();
+        this->_indicesOpenCV.release();
         for (int i=0 ; i < numOfTriangles ; i++)
         {
-            faceData[0] = this->indices[3*i + 0];
-            faceData[1] = this->indices[3*i + 1];
-            faceData[2] = this->indices[3*i + 2];
+            faceData[0] = this->_indices[3*i + 0];
+            faceData[1] = this->_indices[3*i + 1];
+            faceData[2] = this->_indices[3*i + 2];
             cv::Mat1i face = cv::Mat1i(1, 3, faceData);
-            this->indicesOpenCV.push_back(face);            
+            this->_indicesOpenCV.push_back(face);            
         }
     }    
 
     void createMesh(int numOfAngles, float radius, float minRadius, int numOfRadiuses, float circleCenterX, float circleCenterY, float zVal) {
-        this->verticesInModelCoordinates = BuildVerticesForCircleTriangulation(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
-        this->indices = BuildTrianglesIndicesForCircleTriangulation(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
+        this->_verticesInModelCoordinates = BuildVerticesForCircleTriangulation(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
+        this->_indices = BuildTrianglesIndicesForCircleTriangulation(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
         convertVerticesToMat1d();
         convertIndicesToMat1i();        
     }
 
-
-    vector<unsigned int> indicesWithLos() const {
-        return this->_indicesWithLos;
-    }    
-
-    vector<unsigned int> indicesWithoutLos() const {
-        return this->_indicesWithoutLos;
+    void updateModelMatrixByUserParameters()
+    {
+        glm::mat4 identityMatrix = glm::mat4(1.0f);
+        this->_modelMatrix = glm::rotate(identityMatrix, glm::radians(this->_params.angleZ), glm::vec3(0.0, 0.0, 1.0));
+        this->_modelMatrix = glm::rotate(this->_modelMatrix, glm::radians(this->_params.angleY), glm::vec3(0.0, 1.0, 0.0));
+        this->_modelMatrix = glm::rotate(this->_modelMatrix, glm::radians(this->_params.angleX), glm::vec3(1.0, 0.0, 0.0));
+        this->_modelMatrix = glm::translate(this->_modelMatrix, glm::vec3(this->_params.translateX, this->_params.translateY, this->_params.translateZ));
+        this->_modelMatrix = glm::scale(this->_modelMatrix, glm::vec3(this->_params.scaleX, this->_params.scaleY, this->_params.scaleZ));
+        this->_modelMatrix = glm::scale(this->_modelMatrix, glm::vec3(this->_params.scaleUniform, this->_params.scaleUniform, this->_params.scaleUniform));
     }
 
+    glm::mat4 getModelMatrix()
+    {
+        return _modelMatrix;
+    }
 
-    void indicesWithLos(vector<unsigned int> indicesWithLos) {
-        this->_indicesWithLos = indicesWithLos;
-    }    
+    vector<unsigned int> indices() const {
+        return this->_indices;
+    }
 
-    void indicesWithoutLos(vector<unsigned int> indicesWithoutLos) {
-        this->_indicesWithoutLos = indicesWithoutLos;
-    }        
+    void indicesWithLos(vector<unsigned int> indices) {
+        this->_indices = indices;
+    }  
 
+    std::string getModelName() {
+        return _modelName;
+    }
 };
