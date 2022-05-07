@@ -1,6 +1,8 @@
 #ifndef MODEL_PARAMETERS_H
 #define MODEL_PARAMETERS_H
 
+#include <glad/glad.h>
+
 class ModelParameters {
 public:
 	GLfloat angleX;

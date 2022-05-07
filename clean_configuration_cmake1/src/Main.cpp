@@ -8,6 +8,8 @@
 #include <string>
 
 #include"Model.h"
+#include "CircleModel.h"
+#include "Model_GLTF.h"
 #include "ModelParameters.h"
 
 #include <IMGUI/imgui.h>
@@ -19,11 +21,12 @@
 #include <IMGUI/backends/imgui_impl_glfw.h>
 #include <IMGUI/backends/imgui_impl_opengl3.h>
 
-#include "CircleMesh.h"
+
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
+/*reads the pixels in the framebuffer and write them as BMP image to filename*/
+void saveScreenShot(string filename, int WindowWidth, int windowHeight);
 
 
 const unsigned int width = 1280;
@@ -68,7 +71,7 @@ namespace ImGuiGeneral
 
 namespace ImGuiModels
 {
-	void imGuiWrapperDisplayImGui(size_t& modelIndex, std::vector<Model*> models, float* clearColor, bool& renderMesh) {
+	void imGuiWrapperDisplayImGui(size_t& modelIndex, std::vector<Model*> models, float* clearColor, bool& renderMesh, CircleModel* circleModel) {
 		// Start the Dear ImGui frame
 
 
@@ -80,7 +83,8 @@ namespace ImGuiModels
 			for (size_t i = 0; i < models.size(); i++)
 			{
 				items.push_back(models[i]->getModelName());
-			}			
+			}
+			items.push_back(circleModel->getModelName());
 			//string items[] = { meshes[0].getModelName(), meshes[1].getModelName()};
 
 			if (ImGui::BeginListBox("models"))
@@ -98,8 +102,17 @@ namespace ImGuiModels
 				ImGui::EndListBox();
 			}
 
-			{				
-				Model* activeModel = models[modelIndex];
+			{
+				Model* activeModel;
+				if (modelIndex < models.size())
+				{
+					activeModel = models[modelIndex];
+				}
+				else
+				{
+					activeModel = circleModel;
+				}
+				
 
 				ModelParameters modelParams = activeModel->getParams();
 
@@ -197,19 +210,281 @@ namespace ImGuiCameras
 				cameras[cameraIndex]->setParams(cameraParams);
 			}
 		}
+		if (ImGui::Button("Save framebuffer to file"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+		{
+			saveScreenShot("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+		}
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
 }
 
+unsigned char* convertRgbToBinaryImageRGB(unsigned char* rgbImage, int width, int height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal) {
+	int nSize = 3 * width * height;
+	unsigned char* binaryImage = new unsigned char[nSize];
+	if (!binaryImage)
+		return NULL;
 
-void sendTransformationToVertexShader(Shader shader, glm::mat4 model, glm::mat4 view, glm::mat4 projection)
-{
-	shader.setMat4("model", model);
-	shader.setMat4("view", view);
-	shader.setMat4("projection", projection);
+	for (size_t i = 0; i < height; i++)
+	{
+		for (size_t j = 0; j < 3 * width; j+= 3) {
+			size_t redIndex =	i * 3 * width + j + 0;
+			size_t greenIndex =	i * 3 * width + j + 1;
+			size_t blueIndex =	i * 3 * width + j + 2;
+
+			unsigned char redVal =	rgbImage[redIndex];
+			unsigned char greenVal =	rgbImage[greenIndex];
+			unsigned char blueVal =	rgbImage[blueIndex];
+
+			//size_t binaryIndex = i * height + j;
+			if (redVal == redCircleVal && greenVal == greenCircleVal && blueVal == blueCircleVal) {
+				binaryImage[redIndex] = 255;
+				binaryImage[greenIndex] = 255;
+				binaryImage[blueIndex] = 255;
+			}
+			else
+			{
+				binaryImage[redIndex] = 0;
+				binaryImage[greenIndex] = 0;
+				binaryImage[blueIndex] = 0;
+			}
+		}
+	}
+	return binaryImage;
 }
 
+unsigned char* convertRgbToBinaryImage(unsigned char* rgbImage, int width, int height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal) {
+	int binaryImageSize = width * height;
+	unsigned char* binaryImage = new unsigned char[binaryImageSize];
+	if (!binaryImage)
+		return NULL;
+
+	size_t binaryIndex = 0;
+	for (size_t i = 0; i < height; i++)
+	{
+		for (size_t j = 0; j < 3 * width; j+=3) {
+			size_t redIndex =	i * 3 * width + j + 0;
+			size_t greenIndex =	i * 3 * width + j + 1;
+			size_t blueIndex =	i * 3 * width + j + 2;
+
+			unsigned char redVal =	rgbImage[redIndex];
+			unsigned char greenVal =	rgbImage[greenIndex];
+			unsigned char blueVal =	rgbImage[blueIndex];
+
+			if (redVal == redCircleVal && greenVal == greenCircleVal && blueVal == blueCircleVal) {
+				binaryImage[binaryIndex] = 255;
+			}
+			else {
+				binaryImage[binaryIndex] = 0;
+			}
+			binaryIndex++;
+		}
+	}
+	return binaryImage;
+}
+
+
+struct Point2D {
+	int X;
+	int Y;
+};
+
+/*
+* Description - Get the continuous boundary points
+* Parameters
+* InputImage    - Input image
+* Width_i        - Width of the image
+* Height_i        - Height of Image
+* BoundaryPoints - Vector of boundary points (output)
+*/
+void GetContinousBoundaryPoints(unsigned char* InputImage, int Width_i, int Height_i, std::vector<Point2D>& BoundaryPoints)
+{
+	int nImageSize = Width_i * Height_i;
+	if (NULL != InputImage)
+	{
+		int Offset[8][2] = {
+								{ -1, -1 },       //  +----------+----------+----------+
+								{ 0, -1 },        //  |          |          |          |
+								{ 1, -1 },        //  |(x-1,y-1) | (x,y-1)  |(x+1,y-1) |
+								{ 1, 0 },         //  +----------+----------+----------+
+								{ 1, 1 },         //  |(x-1,y)   |  (x,y)   |(x+1,y)   |
+								{ 0, 1 },         //  |          |          |          |
+								{ -1, 1 },        //  +----------+----------+----------+
+								{ -1, 0 }         //  |          | (x,y+1)  |(x+1,y+1) |
+		};                    //  |(x-1,y+1) |          |          |
+							  //  +----------+----------+----------+
+		const int NEIGHBOR_COUNT = 8;
+		Point2D BoundaryPixelToSave; //david
+		Point2D BoundaryPixelCord;
+		Point2D BoundaryStartingPixelCord;
+		Point2D BacktrackedPixelCord;
+		int BackTrackedPixelOffset[1][2] = { {0,0} };
+		bool bIsBoundaryFound = false;
+		bool bIsStartingBoundaryPixelFound = false;
+		for (int Idx = 0; Idx < nImageSize; ++Idx) // getting the starting pixel of boundary
+		{
+			if (0 != InputImage[Idx])
+			{
+				BoundaryPixelCord.X = Idx % Width_i;
+				BoundaryPixelCord.Y = Idx / Width_i;
+				BoundaryStartingPixelCord = BoundaryPixelCord;
+				BacktrackedPixelCord.X = (Idx - 1) % Width_i;
+				BacktrackedPixelCord.Y = (Idx - 1) / Width_i;
+				BackTrackedPixelOffset[0][0] = BacktrackedPixelCord.X - BoundaryPixelCord.X;
+				BackTrackedPixelOffset[0][1] = BacktrackedPixelCord.Y - BoundaryPixelCord.Y;
+				BoundaryPixelToSave.Y = BoundaryPixelCord.X;
+				BoundaryPixelToSave.X = Height_i - BoundaryPixelCord.Y;
+				BoundaryPoints.push_back(BoundaryPixelToSave);
+				bIsStartingBoundaryPixelFound = true;
+				break;
+			}
+		}
+		Point2D CurrentBoundaryCheckingPixelCord;
+		Point2D PrevBoundaryCheckingPixxelCord;
+		if (!bIsStartingBoundaryPixelFound)
+		{
+			BoundaryPoints.pop_back();
+		}
+		while (true && bIsStartingBoundaryPixelFound)
+		{
+			int CurrentBackTrackedPixelOffsetInd = -1;
+			for (int Ind = 0; Ind < NEIGHBOR_COUNT; ++Ind)
+			{
+				if (BackTrackedPixelOffset[0][0] == Offset[Ind][0] &&
+					BackTrackedPixelOffset[0][1] == Offset[Ind][1])
+				{
+					CurrentBackTrackedPixelOffsetInd = Ind;// Finding the bracktracked 
+														   // pixel's offset index
+					break;
+				}
+			}
+			int Loop = 0;
+			while (Loop < (NEIGHBOR_COUNT - 1) && CurrentBackTrackedPixelOffsetInd != -1)
+			{
+				int OffsetIndex = (CurrentBackTrackedPixelOffsetInd + 1) % NEIGHBOR_COUNT;
+				CurrentBoundaryCheckingPixelCord.X = BoundaryPixelCord.X + Offset[OffsetIndex][0];
+				CurrentBoundaryCheckingPixelCord.Y = BoundaryPixelCord.Y + Offset[OffsetIndex][1];
+				int ImageIndex = CurrentBoundaryCheckingPixelCord.Y * Width_i +
+					CurrentBoundaryCheckingPixelCord.X;
+				if (0 != InputImage[ImageIndex])// finding the next boundary pixel
+				{
+					BoundaryPixelCord = CurrentBoundaryCheckingPixelCord;
+					BacktrackedPixelCord = PrevBoundaryCheckingPixxelCord;
+					BackTrackedPixelOffset[0][0] = BacktrackedPixelCord.X - BoundaryPixelCord.X;
+					BackTrackedPixelOffset[0][1] = BacktrackedPixelCord.Y - BoundaryPixelCord.Y;
+					BoundaryPixelToSave.Y = BoundaryPixelCord.X;
+					BoundaryPixelToSave.X = Height_i - BoundaryPixelCord.Y;
+					BoundaryPoints.push_back(BoundaryPixelToSave);
+					break;
+				}
+				PrevBoundaryCheckingPixxelCord = CurrentBoundaryCheckingPixelCord;
+				CurrentBackTrackedPixelOffsetInd += 1;
+				Loop++;
+			}
+			if (BoundaryPixelCord.X == BoundaryStartingPixelCord.X &&
+				BoundaryPixelCord.Y == BoundaryStartingPixelCord.Y) // if the current pixel = 
+																	 // starting pixel
+			{
+				BoundaryPoints.pop_back();
+				bIsBoundaryFound = true;
+				break;
+			}
+		}
+		if (!bIsBoundaryFound) // If there is no connected boundary clear the list
+		{
+			BoundaryPoints.clear();
+		}
+	}
+}
+
+std::vector<Point2D> calcPolygons(int width, int height) {
+	std::vector<Point2D> BoundaryPoints;
+	int nSize = width * height * 3;
+	unsigned char* rgbImage = new unsigned char[nSize];
+	if (!rgbImage)
+		return BoundaryPoints;
+
+	glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, rgbImage);
+
+	unsigned char redCircleVal = 255;
+	unsigned char greenCircleVal = 0;
+	unsigned char blueCircleVal = 0;
+	
+	unsigned char* binaryImage = convertRgbToBinaryImage(rgbImage, width, height, redCircleVal, greenCircleVal, blueCircleVal);
+	
+	GetContinousBoundaryPoints(binaryImage, width, height, BoundaryPoints);
+
+	delete[] rgbImage;
+	delete[] binaryImage;
+
+	return BoundaryPoints;
+}
+
+
+/*reads the pixels in the framebuffer and write them as BMP image to filename*/
+void saveScreenShot(string filename, int WindowWidth, int windowHeight)
+{
+	int nSize = WindowWidth * windowHeight * 3;
+	unsigned char* rgbImage = new unsigned char[nSize];
+	if (!rgbImage)
+		return;
+
+	glReadPixels(0, 0, WindowWidth, windowHeight, GL_BGR, GL_UNSIGNED_BYTE, rgbImage);
+
+	unsigned char redCircleVal = 255;
+	unsigned char greenCircleVal = 0;
+	unsigned char blueCircleVal = 0;
+	unsigned char* binaryImageRGB = convertRgbToBinaryImageRGB(rgbImage, WindowWidth, windowHeight, redCircleVal, greenCircleVal, blueCircleVal);	
+	
+	delete[] rgbImage;
+
+	FILE* Out = fopen(filename.c_str(), "wb");
+	if (!Out)
+	{
+		cout << "Couldn't open " << filename << endl;
+		return;
+	}
+		
+	BITMAPFILEHEADER bitmapFileHeader;
+	BITMAPINFOHEADER bitmapInfoHeader;
+
+	bitmapFileHeader.bfType = 0x4D42;
+	bitmapFileHeader.bfSize = nSize;
+	bitmapFileHeader.bfReserved1 = 0;
+	bitmapFileHeader.bfReserved2 = 0;
+	bitmapFileHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+
+	bitmapInfoHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bitmapInfoHeader.biWidth = WindowWidth;
+	bitmapInfoHeader.biHeight = windowHeight;
+	bitmapInfoHeader.biPlanes = 1;
+	bitmapInfoHeader.biBitCount = 24;
+	bitmapInfoHeader.biCompression = BI_RGB;
+	bitmapInfoHeader.biSizeImage = 0;
+	bitmapInfoHeader.biXPelsPerMeter = 0; // ?
+	bitmapInfoHeader.biYPelsPerMeter = 0; // ?
+	bitmapInfoHeader.biClrUsed = 0;
+	bitmapInfoHeader.biClrImportant = 0;
+
+	fwrite(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, Out);
+	fwrite(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, Out);
+	fwrite(binaryImageRGB, nSize, 1, Out);
+	fclose(Out);
+
+	delete[] binaryImageRGB;
+
+	std::vector<Point2D> boundaryPoints = calcPolygons(width, height);
+	ofstream myfile;
+	myfile.open("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/david.csv");
+	for (int i = 0; i < boundaryPoints.size(); i++)
+	{
+		int xVal = boundaryPoints[i].X;
+		int yVal = boundaryPoints[i].Y;
+		myfile << xVal << ", " << yVal << endl;
+	}
+	myfile.close();
+	MessageBox(0, "Framebuffer was saved in saved_images folder  ", "Los algorithm", MB_OK);
+}
 
 int main()
 {
@@ -264,6 +539,7 @@ int main()
 	}
 
 	Shader shaderBlue("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
+	Shader shaderRed("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -337,14 +613,14 @@ int main()
 	
 	string modelName = "circle";
 	ModelParameters params;
-	int numOfAngles = 36;
+	int numOfAngles = 72;
 	int numOfRadiuses = 2;
-	float radius = 0.5f;
+	float radius = 0.8f;
 	float minRadius = 0.1f;        
 	float circleCenterX = 0.0f;
 	float circleCenterY = 0.0f;
 	float zVal = -0.4f;  
-	CircleMesh* circleMesh = new CircleMesh(modelName, params, numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
+	CircleModel* circleModel = new CircleModel(modelName, params, numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
 
 	
 
@@ -354,23 +630,25 @@ int main()
 	//std::string modelPath = "/Resources/models/ToyCar/glTF/ToyCar.gltf";
 
 	// Load in a model
-	Model model1((parentDir + modelPath1).c_str(), modelName1);
+	
 	ModelParameters params1;
 	params1.angleX = -92.0f;
 	params1.angleY = 153.0f;
 	params1.angleZ = 67.0f;
 	params1.scaleUniform = 2.83f;
-	model1.setParams(params1);
+	Model_GLTF model1((parentDir + modelPath1).c_str(), modelName1, params1);
 
-	Model model2((parentDir + modelPath2).c_str(), modelName2);
+
+	
 	ModelParameters params2;	
 	params2.angleY = -62.0f;
 	params2.translateX = 1.0f;
 	params2.translateY = -0.1f;
 	params2.scaleUniform = 0.04f;
-	model2.setParams(params2);
+	Model_GLTF model2((parentDir + modelPath2).c_str(), modelName2, params2);
 
-	Model model3((parentDir + modelPath3).c_str(), modelName3);
+
+	
 	ModelParameters params3;
 	params3.angleX = 68.0f;
 	params3.angleY = 0.0f;
@@ -379,7 +657,7 @@ int main()
 	params3.translateY = 0.0f;
 	params3.translateZ = -0.7f;
 	params3.scaleUniform = 0.5f;
-	model3.setParams(params3);
+	Model_GLTF model3((parentDir + modelPath3).c_str(), modelName3, params3);
 
 
 
@@ -406,16 +684,16 @@ int main()
 		ImGuiGeneral::imGuiWrapperInitializeImGui(window, glsl_version);
 	}
 
-	circleMesh->generateBuffers();
+	circleModel->generateBuffers();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
-		circleMesh->saveBuffersForRedneringPolygones();
+		circleModel->saveBuffersForRedneringPolygones();
 		if (useImGui) {
 			ImGuiGeneral::imGuiStartNewFrame();
-			ImGuiModels::imGuiWrapperDisplayImGui(modelIndex, models, clearColor, renderMesh);
+			ImGuiModels::imGuiWrapperDisplayImGui(modelIndex, models, clearColor, renderMesh, circleModel);
 			ImGuiCameras::imGuiWrapperDisplayImGui(cameraIndex, cameras, clearColor);
 		}
 		activeCamera = cameras[cameraIndex];
@@ -433,23 +711,29 @@ int main()
         for (size_t i = 0 ; i < models.size() ; i++) {
             models[i]->updateModelMatrixByUserParameters();
         }
-		circleMesh->updateModelMatrixByUserParameters();
+		circleModel->updateModelMatrixByUserParameters();
 
 		activeCamera->updateViewMatrixByUserParameters();
 		activeCamera->updateProjectionMatrixByUserParameters();
 		
 		
 
-		defaultShader.Activate();
-		for (size_t i = 0 ; i < models.size() ; i++) {
-			sendTransformationToVertexShader(defaultShader, models[i]->getModelMatrix(), activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix());
-			models[i]->Draw(defaultShader, *activeCamera);
+		//defaultShader.Activate();
+		//for (size_t i = 0 ; i < models.size() ; i++) {
+		//	models[i]->sendTransformationToVertexShader(defaultShader, activeCamera);
+		//	models[i]->Draw(defaultShader, *activeCamera);
+		//}
+
+		shaderRed.Activate();
+		for (size_t i = 0; i < models.size(); i++) {
+			models[i]->sendTransformationToVertexShader(shaderRed, activeCamera);
+			models[i]->Draw(shaderRed, *activeCamera);
 		}
 
 		glLineWidth(1.0);
 		shaderBlue.Activate();
-		sendTransformationToVertexShader(shaderBlue, circleMesh->getModelMatrix(), activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix());
-		circleMesh->renderPolygones();
+		circleModel->sendTransformationToVertexShader(shaderBlue, activeCamera);
+		circleModel->Draw(shaderBlue, *activeCamera);
 
 				
 
