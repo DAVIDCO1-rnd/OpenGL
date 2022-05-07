@@ -1,4 +1,0 @@
-function image_labels = my_bwlabel( binary_image, connectivity )
-    [image_labels_, list_identical_labels] = bwlabel_first_scan(binary_image);
-    [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image);
-end
