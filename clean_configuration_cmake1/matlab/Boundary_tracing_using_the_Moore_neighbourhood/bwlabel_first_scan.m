@@ -94,21 +94,25 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                             identical_labels = [unique_sorted_neighbors(2), dest_val];                        
                             is_in_list = check_if_pair_in_list(identical_labels, list_identical_labels);
                             if (is_in_list == false)
-                                list_identical_labels = [list_identical_labels ; identical_labels];
+                                list_identical_labels = insert_to_list(list_identical_labels, identical_labels);
+%                                 list_identical_labels = [list_identical_labels ; identical_labels];
                             end
                             
                             identical_labels = [unique_sorted_neighbors(1), dest_val];                        
                             is_in_list = check_if_pair_in_list(identical_labels, list_identical_labels);
                             if (is_in_list == false)
-                                list_identical_labels = [list_identical_labels ; identical_labels];
+                                list_identical_labels = insert_to_list(list_identical_labels, identical_labels);
+%                                 list_identical_labels = [list_identical_labels ; identical_labels];
                             end                            
                         else
                             [is_single_value_in_list, dest_val] = check_if_single_value_in_first_column(unique_sorted_neighbors(2), list_identical_labels);
                             if (is_single_value_in_list == true)
                                 identical_labels = [unique_sorted_neighbors(1), dest_val];
-                                list_identical_labels = [list_identical_labels ; identical_labels];
+                                list_identical_labels = insert_to_list(list_identical_labels, identical_labels);
+%                                 list_identical_labels = [list_identical_labels ; identical_labels];
                             else
-                                list_identical_labels = [list_identical_labels ; identical_labels];
+                                list_identical_labels = insert_to_list(list_identical_labels, identical_labels);
+%                                 list_identical_labels = [list_identical_labels ; identical_labels];
                             end                            
                         end
                          
@@ -123,22 +127,26 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                                 identical_labels = [unique_sorted_neighbors(3), dest_val];                            
                                 is_in_list = check_if_pair_in_list(identical_labels, list_identical_labels);
                                 if (is_in_list == false)
-                                    list_identical_labels = [list_identical_labels ; identical_labels];
+                                    list_identical_labels = insert_to_list(list_identical_labels, identical_labels);
+%                                     list_identical_labels = [list_identical_labels ; identical_labels];
                                 end
                                 
                                 identical_labels = [unique_sorted_neighbors(2), dest_val];                            
                                 is_in_list = check_if_pair_in_list(identical_labels, list_identical_labels);
                                 if (is_in_list == false)
-                                    list_identical_labels = [list_identical_labels ; identical_labels];
+                                    list_identical_labels = insert_to_list(list_identical_labels, identical_labels);
+%                                     list_identical_labels = [list_identical_labels ; identical_labels];
                                 end                                
                             end
                         else
                             [is_single_value_in_list, dest_val] = check_if_single_value_in_first_column(unique_sorted_neighbors(3), list_identical_labels);
                             if (is_single_value_in_list == true)
                                 identical_labels = [unique_sorted_neighbors(2), dest_val];
-                                list_identical_labels = [list_identical_labels ; identical_labels];
-                            else                            
-                                list_identical_labels = [list_identical_labels ; identical_labels];
+                                list_identical_labels = insert_to_list(list_identical_labels, identical_labels);
+%                                 list_identical_labels = [list_identical_labels ; identical_labels];
+                            else
+                                list_identical_labels = insert_to_list(list_identical_labels, identical_labels);
+%                                 list_identical_labels = [list_identical_labels ; identical_labels];
                             end
                         end
                     end

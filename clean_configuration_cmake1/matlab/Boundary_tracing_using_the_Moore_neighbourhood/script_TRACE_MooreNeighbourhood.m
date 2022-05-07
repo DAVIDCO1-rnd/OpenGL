@@ -29,11 +29,8 @@ binary_image = imageR == circle_color(1) & imageG == circle_color(2) & imageB ==
 
 image_labels = my_bwlabel( binary_image, 8);
 unique_labels = unique(image_labels(:));
-image_labels1 = image_labels;
-image_labels1(image_labels1==188) = 2;
-unique_labels = unique(image_labels1(:))
 figure;
-imagesc(image_labels1);
+imagesc(image_labels);
 CC = bwconncomp1 (binary_image, 8);
 % [labeledImage, numberOfObject] = bwlabel(binary_image);
 labeledImage = bwlabel1(binary_image);
