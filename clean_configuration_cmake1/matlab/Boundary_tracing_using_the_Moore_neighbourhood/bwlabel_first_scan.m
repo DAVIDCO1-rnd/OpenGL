@@ -1,4 +1,4 @@
-function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image)
+function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image, connectivity)
     %pixels are 0 (background) or 1 (foreground)
     [rows, cols] = size(binary_image);
     image_labels = zeros(rows, cols);
@@ -8,10 +8,7 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
     label_counter = 0;
     for i=1:rows
         fprintf('row %d out of %d\n',i,rows);
-        for j=1:cols            
-            if (j==735 && i==343)
-                david = 6;
-            end             
+        for j=1:cols             
             pixel_val = binary_image(i,j);
             if (pixel_val == 0) %background
                 continue;
@@ -29,9 +26,6 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                 else
                     label_counter = label_counter + 1;
                     image_labels(i,j) = label_counter;                    
-                end
-                if (j==735 && i==343)
-                    david = 6;
                 end                 
             end
             
@@ -40,14 +34,7 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                 if (neighbor1 > 0)
                     image_labels(i,j) = neighbor1;
                 else
-                    label_counter = label_counter + 1;
-                    if (label_counter == 188)
-                        david = 5;
-                    end 
-                    
-                    if (j==735 && i==343)
-                        david = 6;
-                    end                    
+                    label_counter = label_counter + 1;                                       
                     image_labels(i,j) = label_counter;                     
                 end
             end
@@ -55,13 +42,15 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
             if (i>1 && j>1)
                 neighbor1 = image_labels(i , j-1);
                 neighbor2 = image_labels(i-1 , j);
-                neighbor3 = image_labels(i-1 , j-1);
-                
-                if (j==735 && i==343)
-                    david = 6;
+                if (connectivity == 8)
+                    neighbor3 = image_labels(i-1 , j-1);
                 end
                 
-                neighbors = [neighbor1, neighbor2, neighbor3];
+                if (connectivity == 8)
+                    neighbors = [neighbor1, neighbor2, neighbor3];
+                else
+                    neighbors = [neighbor1, neighbor2];
+                end
                 [sorted_neighbours_vals, sorted_neighbors_indexes] = sort(neighbors);
                 unique_neigbors = unique(neighbors);
                 unique_sorted_neighbors = sort(unique_neigbors);
@@ -73,21 +62,15 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                     
                 %if (neighbor1 == 0 && neighbor2 == 0 && neighbor3 == 0)
                 if (length_unique_sorted_neighbors == 0) %all neighbors are background
-                    label_counter = label_counter + 1;
-                    if (label_counter == 189)
-                        david = 5;
-                    end                    
+                    label_counter = label_counter + 1;                    
                     image_labels(i,j) = label_counter;                    
                 elseif (length_unique_sorted_neighbors==1)
                         image_labels(i,j) = unique_sorted_neighbors(1);
                 else %there are two labels that are identical (to fix in next scan)
-                    if (label_counter == 189)
-                        david = 5;
-                    end
                     image_labels(i,j) = unique_sorted_neighbors(1);
                     identical_labels = [unique_sorted_neighbors(2), unique_sorted_neighbors(1)];
                     list_identical_labels = insert_to_list(list_identical_labels, identical_labels, 0);
-                    if (length_unique_sorted_neighbors == 3)
+                    if (length_unique_sorted_neighbors == 3 && connectivity == 8)
                         identical_labels = [unique_sorted_neighbors(3), unique_sorted_neighbors(2)];
                         list_identical_labels = insert_to_list(list_identical_labels, identical_labels, 0);
                     end

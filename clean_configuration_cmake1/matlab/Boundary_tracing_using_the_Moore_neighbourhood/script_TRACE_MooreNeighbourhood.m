@@ -24,11 +24,11 @@ binary_image = imageR == circle_color(1) & imageG == circle_color(2) & imageB ==
 % binary_image(2:4,2:4) = 1;
 % binary_image(5:6, 5:6) = 1;
 % binary_image(8:13, 5:6) = 1;
-
 % imshow(binary_image);
 
 tic
-image_labels = my_bwlabel( binary_image, 8);
+connectivity = 4;
+image_labels = my_bwlabel( binary_image, connectivity);
 david_time = toc;
 
 
@@ -40,8 +40,8 @@ unique_labels = unique(image_labels(:));
 % tic
 % labeledImage = bwlabel1(binary_image);
 % internet_time = toc;
-% 
-% fprintf('david_times = %f\n',david_time);
+
+fprintf('david_times = %f\n',david_time);
 % fprintf('internet_time = %f\n',internet_time);
 
 
@@ -53,11 +53,11 @@ subplot(1,2,1);
 imagesc(image_labels);
 axis equal;
 
-boundary1 = csvread('david.csv');
-boundary2 = boundary1;
-yvals = boundary1(:,2);
-min_y = min(yvals)
-max_y = max(yvals)
+% boundary1 = csvread('david.csv');
+% boundary2 = boundary1;
+% yvals = boundary1(:,2);
+% min_y = min(yvals)
+% max_y = max(yvals)
 % boundary2(:,2) = height - boundary1(:,2);
 
 subplot(1,2,2);
@@ -70,4 +70,3 @@ for i=1:numberOfObject
     plot(boundary(:,2), boundary(:,1), 'w', 'LineWidth', 3, 'Color', [0, 1, 0]);
 end
 
-david = 5;

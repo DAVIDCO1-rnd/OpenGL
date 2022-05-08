@@ -2,6 +2,10 @@ function image_labels = bwlabel_second_scan(image_labels_first_scan, list_identi
     [rows, cols] = size(image_labels_first_scan);
     num_of_pairs = size(list_identical_labels, 1);
     image_labels = image_labels_first_scan;
+    if (num_of_pairs == 0)
+        %no second scan is needed. image_labels_first_scan is what we need.
+        return;
+    end
     
     unique_values_column_2 = unique(list_identical_labels(:,2));
     sequence_indexes = 1:length(unique_values_column_2);
