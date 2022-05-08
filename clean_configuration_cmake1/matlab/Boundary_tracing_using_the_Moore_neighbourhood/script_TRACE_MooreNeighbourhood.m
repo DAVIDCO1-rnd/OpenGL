@@ -46,7 +46,8 @@ fprintf('david_times = %f\n',david_time);
 
 
 unique_labeledImage = unique(image_labels(:));
-numberOfObject = length(unique_labeledImage) - 1;
+unique_labeledImage(1)=[]; %remove zero (background)
+numberOfObject = length(unique_labeledImage);
 % labeledImage1  = detect(binary_image)
 figure('units','normalized','outerposition',[0 0 1 1]);
 subplot(1,2,1);
@@ -64,6 +65,8 @@ subplot(1,2,2);
 imshow(binary_image);
 hold on;
 for i=1:numberOfObject
+%     current_val = unique_labeledImage(i);
+%     [tempR,tempC] = find(image_labels==current_val);
     [tempR,tempC] = find(image_labels==i);
     pixelFIRST = [tempR(1);tempC(1)];
     [boundary,varargout] = TRACE_MooreNeighbourhood(binary_image, pixelFIRST);
