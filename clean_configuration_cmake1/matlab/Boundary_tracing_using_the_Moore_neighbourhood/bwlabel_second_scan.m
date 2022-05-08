@@ -40,7 +40,7 @@ function image_labels = bwlabel_second_scan(image_labels_first_scan, list_identi
     num_of_unique_values = length(sorted_unique_values);
     
     for k=1:num_of_unique_values
-        fprintf('third(?) scan:  pair %d out of %d\n',k,num_of_pairs);
+        fprintf('third(?) scan:  pair %d out of %d\n',k,num_of_unique_values);
         source_val = sorted_unique_values(k);
         dest_val = sequence_indexes(k);
         for i=1:rows
