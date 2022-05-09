@@ -212,7 +212,7 @@ namespace ImGuiCameras
 		}
 		if (ImGui::Button("Save framebuffer to file"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 		{
-			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+			saveScreenShot("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
 		}
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
@@ -479,7 +479,7 @@ void saveScreenShot(string filename, int WindowWidth, int windowHeight)
 	delete[] binaryImageRGB;
 	std::vector<Polygons::Point2D> boundaryPoints = Polygons::calcPolygons(width, height);
 	ofstream myfile;
-	myfile.open("D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/david.csv");
+	myfile.open("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/david.csv");
 	for (int i = 0; i < boundaryPoints.size(); i++)
 	{
 		int xVal = boundaryPoints[i].X;
@@ -532,7 +532,7 @@ int main()
 	}
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader defaultShader("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 
 	GLenum err012 = glGetError();
@@ -542,8 +542,8 @@ int main()
 		printOpenGLError(err012);
 	}
 
-	Shader shaderBlue("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
-	Shader shaderRed("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
+	Shader shaderBlue("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
+	Shader shaderRed("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -600,7 +600,7 @@ int main()
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
-	std::string parentDir = "D:/Developments/OpenGL/clean_configuration_cmake1";
+	std::string parentDir = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1";
 
 	std::string modelName1 = "bunny";
 	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	

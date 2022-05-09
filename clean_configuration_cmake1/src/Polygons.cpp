@@ -561,7 +561,7 @@ namespace Polygons {
 		}
 		unsigned char* labelsImage = convertBinaryImageToLabelsImage(binaryImage, width, height);
 
-		std::string labelsImageCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImage.csv";
+		std::string labelsImageCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImage.csv";
 		writeMatrixToFile(labelsImage, width, height, labelsImageCsvFullPath);
 
 
