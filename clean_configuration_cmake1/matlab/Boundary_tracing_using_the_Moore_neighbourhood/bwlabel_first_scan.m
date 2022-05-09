@@ -8,7 +8,10 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
     label_counter = 0;
     for i=1:rows
         fprintf('row %d out of %d\n',i,rows);
-        for j=1:cols             
+        for j=1:cols   
+            if (i == 122 && j == 635)
+                david = 5;
+            end
             pixel_val = binary_image(i,j);
             if (pixel_val == 0) %background
                 continue;

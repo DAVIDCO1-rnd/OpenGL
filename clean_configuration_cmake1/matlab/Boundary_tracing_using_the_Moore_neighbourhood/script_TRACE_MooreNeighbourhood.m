@@ -18,21 +18,22 @@ imageG = image(:,:,2);
 imageB = image(:,:,3);
 
 binary_image = imageR == circle_color(1) & imageG == circle_color(2) & imageB == circle_color(3);
-riceImage = imread('rice.png');
+% riceImage = imread('rice.png');
+% 
+% threshold = 150;
+% riceImage(riceImage>threshold)=255;
+% riceImage(riceImage<=threshold)=0;
+% % imshow(riceImage);
+% 
+% binary_image = riceImage;
 
-threshold = 150;
-riceImage(riceImage>threshold)=255;
-riceImage(riceImage<=threshold)=0;
-% imshow(riceImage);
-
-binary_image = riceImage;
-
-width = 10;
-height = 10;
-binary_image = zeros(width, height);
-binary_image(2:4,2:4) = 1;
-binary_image(5:6, 5:6) = 1;
-imshow(binary_image);
+% width = 10;
+% height = 10;
+% binary_image = zeros(width, height);
+% binary_image(2:2,2:4) = 1;
+% binary_image(2:2,7:9) = 1;
+% binary_image(3:3, :) = 1;
+% imshow(binary_image);
 
 tic
 connectivity = 4;
