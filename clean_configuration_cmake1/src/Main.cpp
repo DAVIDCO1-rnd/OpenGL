@@ -397,6 +397,10 @@ void GetContinousBoundaryPoints(unsigned char* InputImage, int Width_i, int Heig
 	}
 }
 
+//unsigned char* convertBinaryImageToLabelsImage(unsigned char* rgbImage, int width, int height) {
+//	std::vector<
+//}
+
 std::vector<Point2D> calcPolygons(int width, int height) {
 	std::vector<Point2D> BoundaryPoints;
 	int nSize = width * height * 3;
@@ -411,6 +415,7 @@ std::vector<Point2D> calcPolygons(int width, int height) {
 	unsigned char blueCircleVal = 0;
 	
 	unsigned char* binaryImage = convertRgbToBinaryImage(rgbImage, width, height, redCircleVal, greenCircleVal, blueCircleVal);
+	//unsigned char* labelsImage = convertBinaryImageToLabelsImage(binaryImage, width, height);
 	
 	GetContinousBoundaryPoints(binaryImage, width, height, BoundaryPoints);
 
