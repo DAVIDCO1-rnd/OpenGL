@@ -10,6 +10,7 @@ circle_color = [255, 255, 255];
 models_color = [255, 0, 0];
 
 image = imread(image_full_path);
+imshow(image);
 [height, width, ~] = size(image);
 
 imageR = image(:,:,1);
@@ -17,6 +18,14 @@ imageG = image(:,:,2);
 imageB = image(:,:,3);
 
 binary_image = imageR == circle_color(1) & imageG == circle_color(2) & imageB == circle_color(3);
+riceImage = imread('rice.png');
+
+threshold = 150;
+riceImage(riceImage>threshold)=255;
+riceImage(riceImage<=threshold)=0;
+% imshow(riceImage);
+
+binary_image = riceImage;
 
 % width = 100;
 % height = 100;
