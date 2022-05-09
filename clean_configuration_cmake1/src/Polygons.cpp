@@ -5,8 +5,8 @@
 #include <fstream>
 
 namespace Polygons {
-	unsigned char* convertRgbToBinaryImage(unsigned char* rgbImage, int width, int height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal) {
-		int binaryImageSize = width * height;
+	unsigned char* convertRgbToBinaryImage(unsigned char* rgbImage, size_t width, size_t height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal) {
+		size_t binaryImageSize = width * height;
 		unsigned char* binaryImage = new unsigned char[binaryImageSize];
 		if (!binaryImage)
 			return NULL;
@@ -144,16 +144,16 @@ namespace Polygons {
 		}
 	}
 
-	void fill_image_with_zeros(unsigned char*& image, int width, int height) {
-		int numOfBytes = width * height;
-		for (int i = 0; i < numOfBytes; i++)
+	void fill_image_with_zeros(unsigned char*& image, size_t width, size_t height) {
+		size_t numOfBytes = width * height;
+		for (size_t i = 0; i < numOfBytes; i++)
 		{
 			image[i] = 0;
 		}
 	}
 
 	bool checkIfPairInList(std::vector<std::vector<unsigned char>> listPairs, std::vector<unsigned char> pairLabels) {
-		size_t numOfPairs = pairLabels.size();
+		size_t numOfPairs = listPairs.size();
 
 		for (int i = 0; i < numOfPairs; i++) {
 			unsigned char value1 = listPairs[i][0];
@@ -179,7 +179,7 @@ namespace Polygons {
 		}
 
 		for (int i = 0; i < numOfPairs; i++) {
-			unsigned char currentVal = listPairs[i][0];
+			unsigned char currentVal = listPairs[i][columnIndex];
 			if (sourceValue == currentVal) {
 				isSingleValueInList = true;
 				destValue = listPairs[i][destIndex];
@@ -220,13 +220,16 @@ namespace Polygons {
 		unsigned char maxValue;
 
 		std::vector<unsigned char> currentPair;
-		currentPair.reserve(2);
+		currentPair.push_back(0);
+		currentPair.push_back(0);
 
 		std::vector<unsigned char> newPairLabels1;
-		newPairLabels1.reserve(2);
+		newPairLabels1.push_back(0);
+		newPairLabels1.push_back(0);
 
 		std::vector<unsigned char> newPairLabels2;
-		newPairLabels2.reserve(2);
+		newPairLabels2.push_back(0);
+		newPairLabels2.push_back(0);
 
 		if (value1 < value2) {
 			minValue = value1;
@@ -361,17 +364,24 @@ namespace Polygons {
 		
 	}
 
-	void bwLabelsFirstScan(unsigned char* binaryImage, int width, int height, int connectivity, std::vector<std::vector<unsigned char>>& listIdenticalLabels, unsigned char*& imageLabels) {
+	void bwLabelsFirstScan(unsigned char* binaryImage, size_t width, size_t height, int connectivity, std::vector<std::vector<unsigned char>>& listIdenticalLabels, unsigned char*& imageLabels) {
 		size_t imageSize = width * height;
 		imageLabels = new unsigned char[imageSize];
 		fill_image_with_zeros(imageLabels, width, height);
 
 		unsigned char labelCounter = 0;
-		for (int i = 0; i < height; i++)
+		for (size_t i = 0; i < height; i++)
 		{
-			std::cout << "Row " << i + 1 << " out of " << height << std::endl;
-			for (int j = 0; j < width; j++)
+			std::cout << "Row " << i << " out of " << height << std::endl;
+			for (size_t j = 0; j < width; j++)
 			{
+				//std::cout << "Row " << i << "/" << height << ", Col " << j << "/" << width << std::endl;
+
+				if (i == 121 && j == 634)
+				{
+					int david = 5;
+				}
+
 				size_t currentIndex = i * width + j;
 				size_t indexFormerJ = i * width + (j - 1);
 				size_t indexFormerI = (i - 1) * width + j;
@@ -467,17 +477,17 @@ namespace Polygons {
 		}
 	}
 
-	void copyArrays(unsigned char* imageLabelsFirstScan, unsigned char* & imageLabels, int width, int height) {
-		int numOfBytes = width * height;
-		for (int i = 0; i < numOfBytes; i++) {
+	void copyArrays(unsigned char* imageLabelsFirstScan, unsigned char* & imageLabels, size_t width, size_t height) {
+		size_t numOfBytes = width * height;
+		for (size_t i = 0; i < numOfBytes; i++) {
 			imageLabels[i] = imageLabelsFirstScan[i];
 		}
 	}
 
 
-	unsigned char* bwLabelsSecondScan(unsigned char* imageLabelsFirstScan, int width, int height, std::vector<std::vector<unsigned char>> listIdenticalLabels) {
+	unsigned char* bwLabelsSecondScan(unsigned char* imageLabelsFirstScan, size_t width, size_t height, std::vector<std::vector<unsigned char>> listIdenticalLabels) {
 		size_t numOfPairs = listIdenticalLabels.size();
-		int nSize = width * height;
+		size_t nSize = width * height;
 		unsigned char* imageLabels = new unsigned char[nSize];
 		copyArrays(imageLabelsFirstScan, imageLabels, width, height);
 		if (numOfPairs == 0) {
@@ -501,35 +511,46 @@ namespace Polygons {
 		}
 		return imageLabels;
 	}
-	
 
-	unsigned char* convertBinaryImageToLabelsImage(unsigned char* binaryImage, int width, int height) {
-		std::vector<std::vector<unsigned char>> listIdenticalLabels;
-		int connectivity = 8;
-		unsigned char* imageLabelsFirstScan;
-		bwLabelsFirstScan(binaryImage, width, height, connectivity, listIdenticalLabels, imageLabelsFirstScan);
-		unsigned char* imageLabels = bwLabelsSecondScan(imageLabelsFirstScan, width, height, listIdenticalLabels);
-		return imageLabels;
-	}
-
-	void writeMatrixToFile(unsigned char* image, int width, int height, std::string fileFullPath) {
+	void writeMatrixToFile(unsigned char* image, size_t width, size_t height, std::string fileFullPath) {
 		std::ofstream myfile;
 		myfile.open(fileFullPath);
-		for (int i = 0; i < height; i++)
+		for (size_t i = 0; i < height; i++)
 		{
-			for (int j = 0; j < width; j++) {
+			for (size_t j = 0; j < width; j++) {
 				size_t currentIndex = i * width + j;
 				unsigned char currentVal = image[currentIndex];
-				myfile << currentVal << ", ";
+				if (j < width - 1)
+				{
+					myfile << (int)currentVal << ", ";
+				}
+				else
+				{
+					myfile << (int)currentVal;
+				}
 			}
 			myfile << std::endl;
 		}
 		myfile.close();
 	}
+	
 
-	std::vector<Point2D> calcPolygons(int width, int height) {
+	unsigned char* convertBinaryImageToLabelsImage(unsigned char* binaryImage, size_t width, size_t height) {
+		std::vector<std::vector<unsigned char>> listIdenticalLabels;
+		int connectivity = 4;
+		unsigned char* imageLabelsFirstScan;
+		bwLabelsFirstScan(binaryImage, width, height, connectivity, listIdenticalLabels, imageLabelsFirstScan);
+		std::string labelsImageFirstScanCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImageFirstScan.csv";
+		writeMatrixToFile(imageLabelsFirstScan, width, height, labelsImageFirstScanCsvFullPath);
+		unsigned char* imageLabels = bwLabelsSecondScan(imageLabelsFirstScan, width, height, listIdenticalLabels);
+		return imageLabels;
+	}
+
+
+
+	std::vector<Point2D> calcPolygons(size_t width, size_t height) {
 		std::vector<Point2D> BoundaryPoints;
-		int nSize = width * height * 3;
+		size_t nSize = width * height * 3;
 		unsigned char* rgbImage = new unsigned char[nSize];
 		if (!rgbImage)
 			return BoundaryPoints;
@@ -540,25 +561,28 @@ namespace Polygons {
 		unsigned char greenCircleVal = 0;
 		unsigned char blueCircleVal = 0;
 
-		//unsigned char* binaryImage = convertRgbToBinaryImage(rgbImage, width, height, redCircleVal, greenCircleVal, blueCircleVal);
+		unsigned char* binaryImage = convertRgbToBinaryImage(rgbImage, width, height, redCircleVal, greenCircleVal, blueCircleVal);
 
-		width = 10;
-		height = 10;
-		unsigned char* binaryImage = new unsigned char(width * height);
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				size_t currentIndex = i * width + j;
-				if (i >= 1 && i <= 3 && j >= 1 && j <= 3) {
-					binaryImage[currentIndex] = 1;
-				}
-				else if (i >= 4 && i <= 5 && j >= 4 && j <= 5) {
-					binaryImage[currentIndex] = 1;
-				}
-				else {
-					binaryImage[currentIndex] = 0;
-				}
-			}
-		}
+		//width = 10;
+		//height = 10;
+		//unsigned char* binaryImage = new unsigned char[width * height];
+		//for (size_t i = 0; i < height; i++) {
+		//	for (size_t j = 0; j < width; j++) {
+		//		size_t currentIndex = i * width + j;
+		//		if (i >= 1 && i <= 1 && j >= 1 && j <= 3) {
+		//			binaryImage[currentIndex] = 1;
+		//		}
+		//		else if (i >= 1 && i <= 1 && j >= 6 && j <= 8) {
+		//			binaryImage[currentIndex] = (unsigned char)1;
+		//		}
+		//		else if (i >= 2 && i <= 2 && j >= 0 && j <= width-1) {
+		//			binaryImage[currentIndex] = (unsigned char)1;
+		//		}
+		//		else {
+		//			binaryImage[currentIndex] = (unsigned char)0;
+		//		}
+		//	}
+		//}
 		unsigned char* labelsImage = convertBinaryImageToLabelsImage(binaryImage, width, height);
 
 		std::string labelsImageCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImage.csv";

@@ -11,10 +11,10 @@ namespace Polygons {
 		int Y;
 	};
 
-	unsigned char* convertRgbToBinaryImage(unsigned char* rgbImage, int width, int height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal);
+	unsigned char* convertRgbToBinaryImage(unsigned char* rgbImage, size_t width, size_t height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal);
 	void GetContinousBoundaryPoints(unsigned char* InputImage, int Width_i, int Height_i, std::vector<Point2D>& BoundaryPoints);
-	std::vector<Point2D> calcPolygons(int width, int height);
-	unsigned char* convertBinaryImageToLabelsImage(unsigned char* binaryImage, int width, int height);
+	std::vector<Point2D> calcPolygons(size_t width, size_t height);
+	unsigned char* convertBinaryImageToLabelsImage(unsigned char* binaryImage, size_t width, size_t height);
 }
 
 #endif
