@@ -27,13 +27,12 @@ riceImage(riceImage<=threshold)=0;
 
 binary_image = riceImage;
 
-% width = 100;
-% height = 100;
-% binary_image = zeros(width, height);
-% binary_image(2:4,2:4) = 1;
-% binary_image(5:6, 5:6) = 1;
-% binary_image(8:13, 5:6) = 1;
-% imshow(binary_image);
+width = 10;
+height = 10;
+binary_image = zeros(width, height);
+binary_image(2:4,2:4) = 1;
+binary_image(5:6, 5:6) = 1;
+imshow(binary_image);
 
 tic
 connectivity = 4;
