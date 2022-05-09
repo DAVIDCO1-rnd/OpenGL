@@ -551,6 +551,10 @@ int main()
 	glUniform4f(glGetUniformLocation(defaultShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(defaultShader.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
+	shaderRed.Activate();
+	glUniform4f(glGetUniformLocation(shaderRed.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(shaderRed.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+
 
 
 
@@ -751,6 +755,8 @@ int main()
 
 	// Delete all the objects we've created
 	defaultShader.Delete();
+	shaderRed.Delete();
+	shaderBlue.Delete();
 
 	if (useImGui) {
 		ImGuiGeneral::imGuiWrapperCleanUp();
