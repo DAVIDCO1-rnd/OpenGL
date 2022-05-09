@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm> //for std::sort
 #include <cstring>
+#include <fstream>
 
 namespace Polygons {
 	unsigned char* convertRgbToBinaryImage(unsigned char* rgbImage, int width, int height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal) {
@@ -511,6 +512,21 @@ namespace Polygons {
 		return imageLabels;
 	}
 
+	void writeMatrixToFile(unsigned char* image, int width, int height, std::string fileFullPath) {
+		std::ofstream myfile;
+		myfile.open(fileFullPath);
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++) {
+				size_t currentIndex = i * width + j;
+				unsigned char currentVal = image[currentIndex];
+				myfile << currentVal << ", ";
+			}
+			myfile << std::endl;
+		}
+		myfile.close();
+	}
+
 	std::vector<Point2D> calcPolygons(int width, int height) {
 		std::vector<Point2D> BoundaryPoints;
 		int nSize = width * height * 3;
@@ -524,8 +540,31 @@ namespace Polygons {
 		unsigned char greenCircleVal = 0;
 		unsigned char blueCircleVal = 0;
 
-		unsigned char* binaryImage = convertRgbToBinaryImage(rgbImage, width, height, redCircleVal, greenCircleVal, blueCircleVal);
+		//unsigned char* binaryImage = convertRgbToBinaryImage(rgbImage, width, height, redCircleVal, greenCircleVal, blueCircleVal);
+
+		width = 10;
+		height = 10;
+		unsigned char* binaryImage = new unsigned char(width * height);
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				size_t currentIndex = i * width + j;
+				if (i >= 1 && i <= 3 && j >= 1 && j <= 3) {
+					binaryImage[currentIndex] = 1;
+				}
+				else if (i >= 4 && i <= 5 && j >= 4 && j <= 5) {
+					binaryImage[currentIndex] = 1;
+				}
+				else {
+					binaryImage[currentIndex] = 0;
+				}
+			}
+		}
 		unsigned char* labelsImage = convertBinaryImageToLabelsImage(binaryImage, width, height);
+
+		std::string labelsImageCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImage.csv";
+		writeMatrixToFile(labelsImage, width, height, labelsImageCsvFullPath);
+
+
 
 		GetContinousBoundaryPoints(binaryImage, width, height, BoundaryPoints);
 
