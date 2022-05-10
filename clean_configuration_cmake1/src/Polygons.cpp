@@ -371,10 +371,10 @@ namespace Polygons {
 		fill_image_with_zeros(imageLabels, width, height);
 
 		unsigned char labelCounter = 0;
-		for (size_t i = 0; i < height; i++)
+		for (size_t i = 0; i < width; i++)
 		{
-			std::cout << "Row " << i << " out of " << height << std::endl;
-			for (size_t j = 0; j < width; j++)
+			std::cout << "Col " << i << " out of " << width << std::endl;
+			for (size_t j = 0; j < height; j++)
 			{
 				//std::cout << "Row " << i << "/" << height << ", Col " << j << "/" << width << std::endl;
 
@@ -383,10 +383,10 @@ namespace Polygons {
 					int david = 5;
 				}
 
-				size_t currentIndex = i * width + j;
-				size_t indexFormerJ = i * width + (j - 1);
-				size_t indexFormerI = (i - 1) * width + j;
-				size_t indexFormerIJ = (i - 1) * width + (j - 1);
+				size_t currentIndex = i * height + j;
+				size_t indexFormerJ = i * height + (j - 1);
+				size_t indexFormerI = (i - 1) * height + j;
+				size_t indexFormerIJ = (i - 1) * height + (j - 1);
 
 				unsigned char neighbor1;
 				unsigned char neighbor2;
