@@ -6,9 +6,9 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
 
     list_identical_labels = [];
     label_counter = 0;
-    for i=1:rows
-        fprintf('row %d out of %d\n',i,rows);
-        for j=1:cols   
+    for j=1:cols
+        fprintf('col %d out of %d\n',j,cols);
+        for i=1:rows
             if (i == 122 && j == 635)
                 david = 5;
             end
@@ -20,6 +20,7 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
             if (i==1 && j==1)
                 label_counter = label_counter + 1;
                 image_labels(i,j) = label_counter;
+                continue;
             end
             
             if (i==1 && j>1)
@@ -29,7 +30,8 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                 else
                     label_counter = label_counter + 1;
                     image_labels(i,j) = label_counter;                    
-                end                 
+                end 
+                continue;
             end
             
             if (i>1 && j==1)
@@ -40,6 +42,7 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                     label_counter = label_counter + 1;                                       
                     image_labels(i,j) = label_counter;                     
                 end
+                continue;
             end
             
             if (i>1 && j>1)

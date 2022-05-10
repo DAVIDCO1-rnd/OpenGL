@@ -404,6 +404,7 @@ namespace Polygons {
 				{
 					labelCounter++;
 					imageLabels[currentIndex] = labelCounter;
+					continue;
 				}
 
 				if (i == 0 && j > 0) {
@@ -415,6 +416,7 @@ namespace Polygons {
 						labelCounter++;
 						imageLabels[currentIndex] = labelCounter;
 					}
+					continue;
 				}
 
 				if (i > 0 && j == 0) {
@@ -426,6 +428,7 @@ namespace Polygons {
 						labelCounter++;
 						imageLabels[currentIndex] = labelCounter;
 					}
+					continue;
 				}
 
 				if (i > 0 && j > 0) {
@@ -573,11 +576,11 @@ namespace Polygons {
 		unsigned char* imageLabelsFirstScan;
 		bwLabelsFirstScan(binaryImage, width, height, connectivity, listIdenticalLabels, imageLabelsFirstScan);
 
-		std::string pairsCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/pairs.csv";
+		std::string pairsCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/pairs.csv";
 		writePairsToFile(listIdenticalLabels, pairsCsvFullPath);
 
-		std::string labelsImageFirstScanCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImageFirstScan.csv";
-		writeMatrixToFile(imageLabelsFirstScan, width, height, labelsImageFirstScanCsvFullPath);
+		std::string labelsImageFirstScanCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImageFirstScan.csv";
+		writeMatrixToFileAsSingleColumn(imageLabelsFirstScan, width, height, labelsImageFirstScanCsvFullPath);
 		unsigned char* imageLabels = bwLabelsSecondScan(imageLabelsFirstScan, width, height, listIdenticalLabels);
 		return imageLabels;
 	}
@@ -605,34 +608,26 @@ namespace Polygons {
 		//// Flips the image so it appears right side up
 		//stbi_set_flip_vertically_on_load(true);
 		//// Reads the image from a file and stores it in bytes
-		//std::string imagePath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/small_image.bmp";
+		//std::string imagePath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/small_image.bmp";
 		//unsigned char* binaryImage1 = stbi_load(imagePath.c_str(), &widthImg, &heightImg, &numColCh, 0);
 
 
+
+
 		int counter = 0;
-		for (int i = 0; i < height; i++)
+		for (int i = 0; i < width; i++)
 		{
-			for (int j = 0; j < width; j++)
+			for (int j = 0; j < height; j++)
 			{
-				size_t new_index = height * (width - j - 1) + i;
+				size_t new_index = width * (height - j - 1) + i;
 				binaryImage1[counter] = binaryImage[new_index];
 				counter++;
 			}
 		}
 
-		//for (int i = 0; i < height; i++)
-		//{
-		//	for (int j = 0; j < width; j++)
-		//	{
-		//		size_t currentIndex = i * width + j;
-		//		unsigned char val1 = binaryImage1[currentIndex];
-		//		unsigned char val2 = binaryImage[currentIndex];
-		//		bool isSame = val1 == val2;
-		//		if (isSame == false) {
-		//			int david = 6;
-		//		}
-		//	}
-		//}
+
+
+
 
 
 		//width = 10;
@@ -656,11 +651,10 @@ namespace Polygons {
 		//	}
 		//}
 
-		std::string binaryImageCsvFullPath1 = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/binaryImage1.csv";
+		std::string binaryImageCsvFullPath1 = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/binaryImage1.csv";
 		writeMatrixToFileAsSingleColumn(binaryImage1, width, height, binaryImageCsvFullPath1);
 
-		std::string binaryImageCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/binaryImage.csv";
-		writeMatrixToFileAsSingleColumn(binaryImage, width, height, binaryImageCsvFullPath);
+
 
 		//stbi_image_free(binaryImage1);
 
@@ -668,8 +662,8 @@ namespace Polygons {
 
 
 
-		std::string labelsImageCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImage.csv";
-		writeMatrixToFile(labelsImage, width, height, labelsImageCsvFullPath);
+		std::string labelsImageCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImage.csv";
+		writeMatrixToFileAsSingleColumn(labelsImage, width, height, labelsImageCsvFullPath);
 
 
 

@@ -18,58 +18,18 @@ imageG = image(:,:,2);
 imageB = image(:,:,3);
 
 binary_image = imageR == circle_color(1) & imageG == circle_color(2) & imageB == circle_color(3);
-binary_image_single_column = binary_image(:);
-binary_image_reshape_back = reshape(binary_image_single_column, [height, width]);
-
-difff = sum(abs(binary_image_reshape_back(:) - binary_image(:)))
-
-binary_image_from_file = csvread('binaryImage.csv');
+binary_image_from_file = csvread('binaryImage1.csv');
 binary_image_from_file_image = reshape(binary_image_from_file, [height, width]);
 
-width = 3;
-height = 4;
-
-binary_image_from_file = [1:width*height]';
-
-
-binary_image_from_file_transposed = reshape(binary_image_from_file, [height, width]);
-binary_image_from_file1 = binary_image_from_file_transposed';
-binary_image_from_file2 = binary_image_from_file1(end:-1:1 , :);
-
-binary_image_from_file1_col = binary_image_from_file1(:);
-binary_image_from_file2_col = binary_image_from_file2(:);
-
-num_of_vals = length(binary_image_from_file1_col);
-binary_image_from_file1_col1 = zeros(num_of_vals, 1);
-
-counter = 0;
-for i=1:height
-    for j=1:width
-        counter = counter + 1;
-        new_index = height * (width - j) + i;
-        binary_image_from_file1_col1(counter) = binary_image_from_file(new_index);
-    end
-end
-
-diff1 = sum(abs(binary_image_from_file1_col1 - binary_image_from_file2_col));
-
-david = 5;
+% figure;
+% subplot(1,2,1);
+% imshow(binary_image);
+% title('image from matlab');
+% subplot(1,2,2);
+% imshow(binary_image_from_file_image);
+% title('image from c++');
 
 
-diff_images = binary_image_from_file - binary_image_single_column;
-abs_diff_images = abs(diff_images);
-sum_abs_diff_images = sum(abs_diff_images);
-fprintf('sum_abs_diff_images = %d\n',sum_abs_diff_images);
-
-figure;
-subplot(1,2,1);
-imshow(binary_image);
-title('image from matlab');
-subplot(1,2,2);
-imshow(binary_image_from_file_image);
-title('image from c++');
-
-david = 5;
 
 % riceImage = imread('rice.png');
 % 
