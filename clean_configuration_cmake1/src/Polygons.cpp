@@ -3,6 +3,7 @@
 #include <algorithm> //for std::sort
 #include <cstring>
 #include <fstream>
+#include<stb/stb_image.h>
 
 namespace Polygons {
 	unsigned char* convertRgbToBinaryImage(unsigned char* rgbImage, size_t width, size_t height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal) {
@@ -377,7 +378,7 @@ namespace Polygons {
 			{
 				//std::cout << "Row " << i << "/" << height << ", Col " << j << "/" << width << std::endl;
 
-				if (i == 121 && j == 634)
+				if (i == 124 && j == 601)
 				{
 					int david = 5;
 				}
@@ -477,10 +478,10 @@ namespace Polygons {
 		}
 	}
 
-	void copyArrays(unsigned char* imageLabelsFirstScan, unsigned char* & imageLabels, size_t width, size_t height) {
+	void copyArrays(unsigned char* sourceArray, unsigned char* & destArray, size_t width, size_t height) {
 		size_t numOfBytes = width * height;
 		for (size_t i = 0; i < numOfBytes; i++) {
-			imageLabels[i] = imageLabelsFirstScan[i];
+			destArray[i] = sourceArray[i];
 		}
 	}
 
@@ -533,6 +534,37 @@ namespace Polygons {
 		}
 		myfile.close();
 	}
+
+	void writeMatrixToFileAsSingleColumn(unsigned char* image, size_t width, size_t height, std::string fileFullPath) {
+		std::ofstream myfile;
+		myfile.open(fileFullPath);
+		size_t numOfBytes = width * height;
+		for (size_t i = 0; i < numOfBytes; i++)
+		{
+			unsigned char currentVal = image[i];
+			if (i < numOfBytes - 1)
+			{
+				myfile << (int)currentVal << ", ";
+			}
+			else
+			{
+				myfile << (int)currentVal;
+			}
+		}
+		myfile << std::endl;
+		myfile.close();
+	}
+
+	void writePairsToFile(std::vector<std::vector<unsigned char>> listIdenticalLabels, std::string fileFullPath) {
+		size_t numOfPairs = listIdenticalLabels.size();
+		std::ofstream myfile;
+		myfile.open(fileFullPath);
+		for (size_t i = 0; i < numOfPairs; i++)
+		{
+			myfile << (int)listIdenticalLabels[i][0] << ", " << (int)listIdenticalLabels[i][1] << std::endl;
+		}
+		myfile.close();
+	}
 	
 
 	unsigned char* convertBinaryImageToLabelsImage(unsigned char* binaryImage, size_t width, size_t height) {
@@ -540,7 +572,11 @@ namespace Polygons {
 		int connectivity = 4;
 		unsigned char* imageLabelsFirstScan;
 		bwLabelsFirstScan(binaryImage, width, height, connectivity, listIdenticalLabels, imageLabelsFirstScan);
-		std::string labelsImageFirstScanCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImageFirstScan.csv";
+
+		std::string pairsCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/pairs.csv";
+		writePairsToFile(listIdenticalLabels, pairsCsvFullPath);
+
+		std::string labelsImageFirstScanCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImageFirstScan.csv";
 		writeMatrixToFile(imageLabelsFirstScan, width, height, labelsImageFirstScanCsvFullPath);
 		unsigned char* imageLabels = bwLabelsSecondScan(imageLabelsFirstScan, width, height, listIdenticalLabels);
 		return imageLabels;
@@ -562,6 +598,42 @@ namespace Polygons {
 		unsigned char blueCircleVal = 0;
 
 		unsigned char* binaryImage = convertRgbToBinaryImage(rgbImage, width, height, redCircleVal, greenCircleVal, blueCircleVal);
+		unsigned char* binaryImage1 = new unsigned char[width * height];
+		//copyArrays(binaryImage, binaryImage1, width, height);
+
+		//int widthImg, heightImg, numColCh;
+		//// Flips the image so it appears right side up
+		//stbi_set_flip_vertically_on_load(true);
+		//// Reads the image from a file and stores it in bytes
+		//std::string imagePath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/small_image.bmp";
+		//unsigned char* binaryImage1 = stbi_load(imagePath.c_str(), &widthImg, &heightImg, &numColCh, 0);
+
+
+		int counter = 0;
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+				size_t new_index = height * (width - j - 1) + i;
+				binaryImage1[counter] = binaryImage[new_index];
+				counter++;
+			}
+		}
+
+		//for (int i = 0; i < height; i++)
+		//{
+		//	for (int j = 0; j < width; j++)
+		//	{
+		//		size_t currentIndex = i * width + j;
+		//		unsigned char val1 = binaryImage1[currentIndex];
+		//		unsigned char val2 = binaryImage[currentIndex];
+		//		bool isSame = val1 == val2;
+		//		if (isSame == false) {
+		//			int david = 6;
+		//		}
+		//	}
+		//}
+
 
 		//width = 10;
 		//height = 10;
@@ -583,17 +655,29 @@ namespace Polygons {
 		//		}
 		//	}
 		//}
-		unsigned char* labelsImage = convertBinaryImageToLabelsImage(binaryImage, width, height);
 
-		std::string labelsImageCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImage.csv";
+		std::string binaryImageCsvFullPath1 = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/binaryImage1.csv";
+		writeMatrixToFileAsSingleColumn(binaryImage1, width, height, binaryImageCsvFullPath1);
+
+		std::string binaryImageCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/binaryImage.csv";
+		writeMatrixToFileAsSingleColumn(binaryImage, width, height, binaryImageCsvFullPath);
+
+		//stbi_image_free(binaryImage1);
+
+		unsigned char* labelsImage = convertBinaryImageToLabelsImage(binaryImage1, width, height);
+
+
+
+		std::string labelsImageCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImage.csv";
 		writeMatrixToFile(labelsImage, width, height, labelsImageCsvFullPath);
 
 
 
-		GetContinousBoundaryPoints(binaryImage, width, height, BoundaryPoints);
+		GetContinousBoundaryPoints(binaryImage1, width, height, BoundaryPoints);
 
 		delete[] rgbImage;
 		delete[] binaryImage;
+		delete[] binaryImage1;
 		delete[] labelsImage;
 
 		return BoundaryPoints;

@@ -1,6 +1,10 @@
 function image_labels = my_bwlabel( binary_image, connectivity )
     [image_labels_first_scan, list_identical_labels] = bwlabel_first_scan(binary_image, connectivity);    
     
+    
+    list_identical_labels_from_file = csvread('pairs.csv');
+    
+    
     image_labels_first_scan_from_file = csvread('labelsImageFirstScan.csv');
 %     image_labels_first_scan_from_file_upside_down = image_labels_first_scan_from_file(end:-1:1,:);
 %     unique_vals = unique(list_identical_labels(:,2))
