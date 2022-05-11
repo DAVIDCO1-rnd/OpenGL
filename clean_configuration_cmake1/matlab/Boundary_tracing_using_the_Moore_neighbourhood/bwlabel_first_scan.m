@@ -7,7 +7,7 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
     list_identical_labels = [];
     label_counter = 0;
     
-    temp = cell(rows*cols, 1);
+    temp = zeros(rows*cols, 1200);
     counter = 0;
     for j=1:cols
         fprintf('col %d out of %d\n',j,cols);
@@ -99,7 +99,32 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                 end
             end
             
-            [temp, counter] = update_temp(temp, list_identical_labels, i, j, counter);
+            [temp, counter] = update_temp(temp, list_identical_labels, i, j, counter);            
         end
     end
+    fprintf('reading temp.csv\n');
+    tic
+    temp_from_file = csvread('temp.csv');
+    toc
+    fprintf('finished reading temp.csv\n');
+    
+    num_of_pixels_from_file = size(temp_from_file, 1);
+    
+    for i=1:num_of_pixels_from_file
+        val_matlab = temp(i,:);
+        val_from_file = temp_from_file(i,:);
+        diff_vals = val_matlab - val_from_file;
+        sum_abs_diff_vals = sum(abs(diff_vals(:)));
+        if (sum_abs_diff_vals > 0)
+            fprintf('i = %d\n',i);
+            val_matlab
+            val_from_file
+            david = 5;
+        end
+    end
+    
+    %temp1 = temp(1:20, :);
+    diff_temps = temp_from_file - temp;
+    sum_abs_diff_temps = sum(abs(diff_temps(:)));
+    fprintf('sum_abs_diff_temps = %f\n',sum_abs_diff_temps);
 end

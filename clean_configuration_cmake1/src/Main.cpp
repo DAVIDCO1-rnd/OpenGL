@@ -214,11 +214,11 @@ namespace ImGuiCameras
 		}
 		if (ImGui::Button("Save framebuffer to file")) // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 		{
-			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+			saveScreenShot("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
 		}
 		if (ImGui::Button("Calculate LOS polygons")) // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 		{
-			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+			saveScreenShot("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
 			calculatePolygons(width, height);
 		}
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -260,6 +260,8 @@ unsigned char* convertRgbToBinaryImageRGB(unsigned char* rgbImage, int width, in
 	return binaryImage;
 }
 
+
+
 void calculatePolygons(size_t width, size_t height) {
 	auto startTime = chrono::steady_clock::now();
 	std::vector<std::vector<Polygons::Point2D>> boundaryPoints = Polygons::calcPolygons(width, height);
@@ -279,7 +281,7 @@ void calculatePolygons(size_t width, size_t height) {
 		}
 		counter++;
 		ofstream currentFile;
-		std::string filePath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/polygons_folder/polygon" + std::to_string(counter) + ".csv";
+		std::string filePath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/polygons_folder/polygon" + std::to_string(counter) + ".csv";
 		currentFile.open(filePath);
 		for (size_t i = 0; i < currentPolygonPoints.size(); i++)
 		{
@@ -345,7 +347,7 @@ void saveScreenShot(string filename, int WindowWidth, int windowHeight)
 	fclose(Out);
 
 	delete[] binaryImageRGB;
-	MessageBox(0, "Framebuffer was saved in saved_images folder  ", "Los algorithm", MB_OK);
+	//MessageBox(0, "Framebuffer was saved in saved_images folder  ", "Los algorithm", MB_OK);
 }
 
 int main()
@@ -390,7 +392,7 @@ int main()
 	}
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader defaultShader("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 
 	GLenum err012 = glGetError();
@@ -400,8 +402,8 @@ int main()
 		printOpenGLError(err012);
 	}
 
-	Shader shaderBlue("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
-	Shader shaderRed("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
+	Shader shaderBlue("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
+	Shader shaderRed("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -458,7 +460,7 @@ int main()
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
-	std::string parentDir = "D:/Developments/OpenGL/clean_configuration_cmake1";
+	std::string parentDir = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1";
 
 	std::string modelName1 = "bunny";
 	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	

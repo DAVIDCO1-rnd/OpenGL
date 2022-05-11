@@ -5,7 +5,9 @@ function image_labels = my_bwlabel( binary_image, connectivity )
     
     list_identical_labels_from_file = csvread('pairs.csv');
     
-    num_of_labels = length(list_identical_labels);
+    num_of_labels1 = size(list_identical_labels, 1);
+    num_of_labels2 = size(list_identical_labels_from_file, 1);
+    num_of_labels = min(num_of_labels1, num_of_labels2);
     for i=1:num_of_labels
         label_matlab = list_identical_labels(i, :);
         label_from_file = list_identical_labels_from_file(i, :);
@@ -17,11 +19,11 @@ function image_labels = my_bwlabel( binary_image, connectivity )
         end
     end
 
-    diff_pairs = list_identical_labels - list_identical_labels_from_file;
-    sum_abs_diff_pairs = sum(abs(diff_pairs(:)));
-    if (sum_abs_diff_pairs > 0)
-        error('pairs are wrong');
-    end
+%     diff_pairs = list_identical_labels - list_identical_labels_from_file;
+%     sum_abs_diff_pairs = sum(abs(diff_pairs(:)));
+%     if (sum_abs_diff_pairs > 0)
+%         error('pairs are wrong');
+%     end
     
     
     image_labels_first_scan_from_file = csvread('labelsImageFirstScan.csv');
