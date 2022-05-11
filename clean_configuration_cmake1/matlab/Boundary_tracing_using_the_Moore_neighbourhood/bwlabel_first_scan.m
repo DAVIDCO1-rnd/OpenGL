@@ -6,6 +6,9 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
 
     list_identical_labels = [];
     label_counter = 0;
+    
+    temp = cell(rows*cols, 1);
+    counter = 0;
     for j=1:cols
         fprintf('col %d out of %d\n',j,cols);
         for i=1:rows
@@ -14,12 +17,14 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
             end
             pixel_val = binary_image(i,j);
             if (pixel_val == 0) %background
-                continue;
+                [temp, counter] = update_temp(temp, list_identical_labels, i, j, counter);
+                continue;                
             end
             
             if (i==1 && j==1)
                 label_counter = label_counter + 1;
                 image_labels(i,j) = label_counter;
+                [temp, counter] = update_temp(temp, list_identical_labels, i, j, counter);
                 continue;
             end
             
@@ -30,7 +35,8 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                 else
                     label_counter = label_counter + 1;
                     image_labels(i,j) = label_counter;                    
-                end 
+                end
+                [temp, counter] = update_temp(temp, list_identical_labels, i, j, counter);
                 continue;
             end
             
@@ -42,6 +48,7 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                     label_counter = label_counter + 1;                                       
                     image_labels(i,j) = label_counter;                     
                 end
+                [temp, counter] = update_temp(temp, list_identical_labels, i, j, counter);
                 continue;
             end
             
@@ -75,22 +82,24 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                 else %there are two labels that are identical (to fix in next scan)
                     image_labels(i,j) = unique_sorted_neighbors(1);
                     identical_labels = [unique_sorted_neighbors(2), unique_sorted_neighbors(1)];
-                    if (length(list_identical_labels) == 115)
-                        david = 5;
-                    end
-                    size_before = size(list_identical_labels, 1);
-                    list_identical_labels = insert_to_list(list_identical_labels, identical_labels, 0);
-                    size_after = size(list_identical_labels, 1);
-                    diff_sizes = size_after - size_before;
-                    if (diff_sizes >= 2)                    
+                    
+                    if (i==493 && j==731)
                         david = 4;
-                    end                    
+                    end
+                    list_identical_labels = insert_to_list(list_identical_labels, identical_labels, 0);
+                    if (length(list_identical_labels) == 64)
+                        i
+                        j
+                        david = 5;
+                    end                   
                     if (length_unique_sorted_neighbors == 3 && connectivity == 8)
                         identical_labels = [unique_sorted_neighbors(3), unique_sorted_neighbors(2)];
                         list_identical_labels = insert_to_list(list_identical_labels, identical_labels, 0);
                     end
                 end
-            end            
+            end
+            
+            [temp, counter] = update_temp(temp, list_identical_labels, i, j, counter);
         end
     end
 end

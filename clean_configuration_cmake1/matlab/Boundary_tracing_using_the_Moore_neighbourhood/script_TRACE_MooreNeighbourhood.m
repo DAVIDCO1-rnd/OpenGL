@@ -86,12 +86,20 @@ for i=1:num_of_polygons
     current_file = files_full_paths_in_folder{i};
     boundary1 = csvread(current_file);
     
-% %     current_val = unique_labeledImage(i);
-% %     [tempR,tempC] = find(image_labels==current_val);
-%     [tempR,tempC] = find(image_labels==i);
-%     pixelFIRST = [tempR(1);tempC(1)];
-%     [boundary,varargout] = TRACE_MooreNeighbourhood(binary_image, pixelFIRST);
+%     current_val = unique_labeledImage(i);
+%     [tempR,tempC] = find(image_labels==current_val);
+    [tempR,tempC] = find(image_labels==i);
+    pixelFIRST = [tempR(1);tempC(1)];
+    [boundary,varargout] = TRACE_MooreNeighbourhood(binary_image, pixelFIRST);
     plot(boundary1(:,2), boundary1(:,1), 'w', 'LineWidth', 3, 'Color', [0, 1, 0]);    
+end
+
+
+for i=1:numberOfObject
+    [tempR,tempC] = find(image_labels==i);
+    pixelFIRST = [tempR(1);tempC(1)];
+    [boundary,varargout] = TRACE_MooreNeighbourhood(binary_image, pixelFIRST);
+    plot(boundary(:,2), boundary(:,1), 'w', 'LineWidth', 3, 'Color', [0, 1, 0]);    
 end
 
 

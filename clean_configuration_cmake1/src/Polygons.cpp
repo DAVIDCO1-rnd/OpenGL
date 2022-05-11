@@ -192,10 +192,17 @@ namespace Polygons {
 	}
 
 	void replaceMaxValueWithMinValueInSecondColumn(std::vector<std::vector<unsigned char>>& listIdenticalLabels, unsigned char newMinValue, unsigned char maxValue) {
+		if (maxValue == 66 && newMinValue == 1) {
+			int david = 4;
+		}
 		size_t numOfPairs = listIdenticalLabels.size();
-		for (size_t i = 0; i < numOfPairs; i++) {
+		for (size_t i = 0; i < numOfPairs; i++) {				
 			unsigned char currentValColumn2 = listIdenticalLabels[i][1];
 			if (currentValColumn2 == maxValue) {
+				if (i == 63)
+				{
+					int david = 4;
+				}
 				listIdenticalLabels[i][1] = newMinValue;
 			}
 		}
@@ -380,11 +387,6 @@ namespace Polygons {
 			{
 				//std::cout << "Row " << i << "/" << height << ", Col " << j << "/" << width << std::endl;
 
-				if (i == 124 && j == 601)
-				{
-					int david = 5;
-				}
-
 				size_t currentIndex = i * height + j;
 				size_t indexFormerJ = i * height + (j - 1);
 				size_t indexFormerI = (i - 1) * height + j;
@@ -470,17 +472,11 @@ namespace Polygons {
 						imageLabels[currentIndex] = neighbors[0];
 						identicalLabels.push_back(neighbors[1]);
 						identicalLabels.push_back(neighbors[0]);
-						if (i == 586 && j == 224) {
-							int david = 3;
+
+						if (j == 492 && i == 730) {
+							int david = 5;
 						}
-						size_t size_before = listIdenticalLabels.size();
 						insertToList(listIdenticalLabels, identicalLabels);
-						size_t size_after = listIdenticalLabels.size();
-						size_t diff_sizes = size_after - size_before;
-						if (diff_sizes >= 2)
-						{
-							int david = 4;
-						}
 						if (numOfLabeledNeighbors == 3 && connectivity == 8) {
 							identicalLabels[0] = neighbors[2];
 							identicalLabels[1] = neighbors[1];

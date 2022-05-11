@@ -28,6 +28,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 /*reads the pixels in the framebuffer and write them as BMP image to filename*/
 void saveScreenShot(string filename, int WindowWidth, int windowHeight);
+void calculatePolygons(size_t width, size_t height);
 
 
 const unsigned int width = 1280;
@@ -211,9 +212,14 @@ namespace ImGuiCameras
 				cameras[cameraIndex]->setParams(cameraParams);
 			}
 		}
-		if (ImGui::Button("Save framebuffer to file"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+		if (ImGui::Button("Save framebuffer to file")) // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 		{
 			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+		}
+		if (ImGui::Button("Calculate LOS polygons")) // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+		{
+			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+			calculatePolygons(width, height);
 		}
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
@@ -253,178 +259,39 @@ unsigned char* convertRgbToBinaryImageRGB(unsigned char* rgbImage, int width, in
 	}
 	return binaryImage;
 }
-//
-//unsigned char* convertRgbToBinaryImage(unsigned char* rgbImage, int width, int height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal) {
-//	int binaryImageSize = width * height;
-//	unsigned char* binaryImage = new unsigned char[binaryImageSize];
-//	if (!binaryImage)
-//		return NULL;
-//
-//	size_t binaryIndex = 0;
-//	for (size_t i = 0; i < height; i++)
-//	{
-//		for (size_t j = 0; j < 3 * width; j+=3) {
-//			size_t redIndex =	i * 3 * width + j + 0;
-//			size_t greenIndex =	i * 3 * width + j + 1;
-//			size_t blueIndex =	i * 3 * width + j + 2;
-//
-//			unsigned char redVal =	rgbImage[redIndex];
-//			unsigned char greenVal =	rgbImage[greenIndex];
-//			unsigned char blueVal =	rgbImage[blueIndex];
-//
-//			if (redVal == redCircleVal && greenVal == greenCircleVal && blueVal == blueCircleVal) {
-//				binaryImage[binaryIndex] = 255;
-//			}
-//			else {
-//				binaryImage[binaryIndex] = 0;
-//			}
-//			binaryIndex++;
-//		}
-//	}
-//	return binaryImage;
-//}
-//
-//
-//struct Point2D {
-//	int X;
-//	int Y;
-//};
-//
-///*
-//* Description - Get the continuous boundary points
-//* Parameters
-//* InputImage    - Input image
-//* Width_i        - Width of the image
-//* Height_i        - Height of Image
-//* BoundaryPoints - Vector of boundary points (output)
-//*/
-//void GetContinousBoundaryPoints(unsigned char* InputImage, int Width_i, int Height_i, std::vector<Point2D>& BoundaryPoints)
-//{
-//	int nImageSize = Width_i * Height_i;
-//	if (NULL != InputImage)
-//	{
-//		int Offset[8][2] = {
-//								{ -1, -1 },       //  +----------+----------+----------+
-//								{ 0, -1 },        //  |          |          |          |
-//								{ 1, -1 },        //  |(x-1,y-1) | (x,y-1)  |(x+1,y-1) |
-//								{ 1, 0 },         //  +----------+----------+----------+
-//								{ 1, 1 },         //  |(x-1,y)   |  (x,y)   |(x+1,y)   |
-//								{ 0, 1 },         //  |          |          |          |
-//								{ -1, 1 },        //  +----------+----------+----------+
-//								{ -1, 0 }         //  |          | (x,y+1)  |(x+1,y+1) |
-//		};                    //  |(x-1,y+1) |          |          |
-//							  //  +----------+----------+----------+
-//		const int NEIGHBOR_COUNT = 8;
-//		Point2D BoundaryPixelToSave; //david
-//		Point2D BoundaryPixelCord;
-//		Point2D BoundaryStartingPixelCord;
-//		Point2D BacktrackedPixelCord;
-//		int BackTrackedPixelOffset[1][2] = { {0,0} };
-//		bool bIsBoundaryFound = false;
-//		bool bIsStartingBoundaryPixelFound = false;
-//		for (int Idx = 0; Idx < nImageSize; ++Idx) // getting the starting pixel of boundary
-//		{
-//			if (0 != InputImage[Idx])
-//			{
-//				BoundaryPixelCord.X = Idx % Width_i;
-//				BoundaryPixelCord.Y = Idx / Width_i;
-//				BoundaryStartingPixelCord = BoundaryPixelCord;
-//				BacktrackedPixelCord.X = (Idx - 1) % Width_i;
-//				BacktrackedPixelCord.Y = (Idx - 1) / Width_i;
-//				BackTrackedPixelOffset[0][0] = BacktrackedPixelCord.X - BoundaryPixelCord.X;
-//				BackTrackedPixelOffset[0][1] = BacktrackedPixelCord.Y - BoundaryPixelCord.Y;
-//				BoundaryPixelToSave.Y = BoundaryPixelCord.X;
-//				BoundaryPixelToSave.X = Height_i - BoundaryPixelCord.Y;
-//				BoundaryPoints.push_back(BoundaryPixelToSave);
-//				bIsStartingBoundaryPixelFound = true;
-//				break;
-//			}
-//		}
-//		Point2D CurrentBoundaryCheckingPixelCord;
-//		Point2D PrevBoundaryCheckingPixxelCord;
-//		if (!bIsStartingBoundaryPixelFound)
-//		{
-//			BoundaryPoints.pop_back();
-//		}
-//		while (true && bIsStartingBoundaryPixelFound)
-//		{
-//			int CurrentBackTrackedPixelOffsetInd = -1;
-//			for (int Ind = 0; Ind < NEIGHBOR_COUNT; ++Ind)
-//			{
-//				if (BackTrackedPixelOffset[0][0] == Offset[Ind][0] &&
-//					BackTrackedPixelOffset[0][1] == Offset[Ind][1])
-//				{
-//					CurrentBackTrackedPixelOffsetInd = Ind;// Finding the bracktracked 
-//														   // pixel's offset index
-//					break;
-//				}
-//			}
-//			int Loop = 0;
-//			while (Loop < (NEIGHBOR_COUNT - 1) && CurrentBackTrackedPixelOffsetInd != -1)
-//			{
-//				int OffsetIndex = (CurrentBackTrackedPixelOffsetInd + 1) % NEIGHBOR_COUNT;
-//				CurrentBoundaryCheckingPixelCord.X = BoundaryPixelCord.X + Offset[OffsetIndex][0];
-//				CurrentBoundaryCheckingPixelCord.Y = BoundaryPixelCord.Y + Offset[OffsetIndex][1];
-//				int ImageIndex = CurrentBoundaryCheckingPixelCord.Y * Width_i +
-//					CurrentBoundaryCheckingPixelCord.X;
-//				if (0 != InputImage[ImageIndex])// finding the next boundary pixel
-//				{
-//					BoundaryPixelCord = CurrentBoundaryCheckingPixelCord;
-//					BacktrackedPixelCord = PrevBoundaryCheckingPixxelCord;
-//					BackTrackedPixelOffset[0][0] = BacktrackedPixelCord.X - BoundaryPixelCord.X;
-//					BackTrackedPixelOffset[0][1] = BacktrackedPixelCord.Y - BoundaryPixelCord.Y;
-//					BoundaryPixelToSave.Y = BoundaryPixelCord.X;
-//					BoundaryPixelToSave.X = Height_i - BoundaryPixelCord.Y;
-//					BoundaryPoints.push_back(BoundaryPixelToSave);
-//					break;
-//				}
-//				PrevBoundaryCheckingPixxelCord = CurrentBoundaryCheckingPixelCord;
-//				CurrentBackTrackedPixelOffsetInd += 1;
-//				Loop++;
-//			}
-//			if (BoundaryPixelCord.X == BoundaryStartingPixelCord.X &&
-//				BoundaryPixelCord.Y == BoundaryStartingPixelCord.Y) // if the current pixel = 
-//																	 // starting pixel
-//			{
-//				BoundaryPoints.pop_back();
-//				bIsBoundaryFound = true;
-//				break;
-//			}
-//		}
-//		if (!bIsBoundaryFound) // If there is no connected boundary clear the list
-//		{
-//			BoundaryPoints.clear();
-//		}
-//	}
-//}
 
-//unsigned char* convertBinaryImageToLabelsImage(unsigned char* rgbImage, int width, int height) {
-//	std::vector<
-//}
-//
-//std::vector<Point2D> calcPolygons(int width, int height) {
-//	std::vector<Point2D> BoundaryPoints;
-//	int nSize = width * height * 3;
-//	unsigned char* rgbImage = new unsigned char[nSize];
-//	if (!rgbImage)
-//		return BoundaryPoints;
-//
-//	glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, rgbImage);
-//
-//	unsigned char redCircleVal = 255;
-//	unsigned char greenCircleVal = 0;
-//	unsigned char blueCircleVal = 0;
-//	
-//	unsigned char* binaryImage = convertRgbToBinaryImage(rgbImage, width, height, redCircleVal, greenCircleVal, blueCircleVal);
-//	//unsigned char* labelsImage = convertBinaryImageToLabelsImage(binaryImage, width, height);
-//	
-//	GetContinousBoundaryPoints(binaryImage, width, height, BoundaryPoints);
-//
-//	delete[] rgbImage;
-//	delete[] binaryImage;
-//
-//	return BoundaryPoints;
-//}
+void calculatePolygons(size_t width, size_t height) {
+	auto startTime = chrono::steady_clock::now();
+	std::vector<std::vector<Polygons::Point2D>> boundaryPoints = Polygons::calcPolygons(width, height);
+	auto endTime = chrono::steady_clock::now();
+	auto durationCaculatePolygons = endTime - startTime;
+	auto durationCaculatePolygonsMilliseconds = chrono::duration_cast<chrono::milliseconds>(durationCaculatePolygons).count();
+	std::cout << "duration calculating polygons = " << durationCaculatePolygonsMilliseconds << " milliseconds" << std::endl;
+
+	size_t numOfPolygons = boundaryPoints.size();
+	int counter = 0;
+	for (size_t polygonIndex = 0; polygonIndex < numOfPolygons; polygonIndex++)
+	{
+		std::vector<Polygons::Point2D> currentPolygonPoints = boundaryPoints[polygonIndex];
+		if (currentPolygonPoints.size() == 0) {
+			//I think it can only happen when the foreground pixels are only one line or one column (and therefore no polygon to surround them)
+			continue;
+		}
+		counter++;
+		ofstream currentFile;
+		std::string filePath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/polygons_folder/polygon" + std::to_string(counter) + ".csv";
+		currentFile.open(filePath);
+		for (size_t i = 0; i < currentPolygonPoints.size(); i++)
+		{
+			int xVal = currentPolygonPoints[i].X;
+			int yVal = currentPolygonPoints[i].Y;
+			currentFile << xVal << ", " << yVal << endl;
+		}
+		currentFile.close();
+	}
+
+	MessageBox(0, "Finished calculating LOS polygons  ", "Los algorithm", MB_OK);
+}
 
 
 /*reads the pixels in the framebuffer and write them as BMP image to filename*/
@@ -478,30 +345,6 @@ void saveScreenShot(string filename, int WindowWidth, int windowHeight)
 	fclose(Out);
 
 	delete[] binaryImageRGB;
-
-	auto startTime = chrono::steady_clock::now();
-	std::vector<std::vector<Polygons::Point2D>> boundaryPoints = Polygons::calcPolygons(width, height);
-	auto endTime = chrono::steady_clock::now();
-	auto durationCaculatePolygons = endTime - startTime;
-	auto durationCaculatePolygonsMilliseconds = chrono::duration_cast<chrono::milliseconds>(durationCaculatePolygons).count();
-	std::cout << "duration calculating polygons = " << durationCaculatePolygonsMilliseconds << " milliseconds" << std::endl;
-
-	size_t numOfPolygons = boundaryPoints.size();
-	for (size_t polygonIndex = 0; polygonIndex < numOfPolygons; polygonIndex++)
-	{
-		std::vector<Polygons::Point2D> currentPolygonPoints = boundaryPoints[polygonIndex];
-		ofstream currentFile;
-		std::string filePath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/polygons_folder/polygon" + std::to_string(polygonIndex+1) + ".csv";
-		currentFile.open(filePath);
-		for (size_t i = 0; i < currentPolygonPoints.size(); i++)
-		{
-			int xVal = currentPolygonPoints[i].X;
-			int yVal = currentPolygonPoints[i].Y;
-			currentFile << xVal << ", " << yVal << endl;
-		}
-		currentFile.close();
-	}
-
 	MessageBox(0, "Framebuffer was saved in saved_images folder  ", "Los algorithm", MB_OK);
 }
 
@@ -664,7 +507,12 @@ int main()
 
 	
 	ModelParameters params2;	
-	params2.angleY = -62.0f;
+	//params2.angleY = -62.0f;
+
+	params2.angleX = -17.0f;
+	params2.angleY = -100.0f;
+	params2.angleZ = 0.0f;
+
 	params2.translateX = 1.0f;
 	params2.translateY = -0.1f;
 	params2.scaleUniform = 0.04f;
@@ -673,9 +521,13 @@ int main()
 
 	
 	ModelParameters params3;
-	params3.angleX = 68.0f;
-	params3.angleY = 0.0f;
+	//params3.angleX = 68.0f;
+	//params3.angleY = 0.0f;
+	//params3.angleZ = 17.0f;
+	params3.angleX = 60.0f;
+	params3.angleY = 16.0f;
 	params3.angleZ = 17.0f;
+
 	params3.translateX = 0.2f;
 	params3.translateY = 0.0f;
 	params3.translateZ = -0.7f;
