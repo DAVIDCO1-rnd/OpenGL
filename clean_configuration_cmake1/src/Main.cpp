@@ -502,7 +502,7 @@ void saveScreenShot(string filename, int WindowWidth, int windowHeight)
 		currentFile.close();
 	}
 
-	//MessageBox(0, "Framebuffer was saved in saved_images folder  ", "Los algorithm", MB_OK);
+	MessageBox(0, "Framebuffer was saved in saved_images folder  ", "Los algorithm", MB_OK);
 }
 
 int main()

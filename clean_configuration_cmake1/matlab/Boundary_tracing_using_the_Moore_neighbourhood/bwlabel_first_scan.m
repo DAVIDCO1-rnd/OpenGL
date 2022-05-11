@@ -75,7 +75,16 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                 else %there are two labels that are identical (to fix in next scan)
                     image_labels(i,j) = unique_sorted_neighbors(1);
                     identical_labels = [unique_sorted_neighbors(2), unique_sorted_neighbors(1)];
+                    if (length(list_identical_labels) == 115)
+                        david = 5;
+                    end
+                    size_before = size(list_identical_labels, 1);
                     list_identical_labels = insert_to_list(list_identical_labels, identical_labels, 0);
+                    size_after = size(list_identical_labels, 1);
+                    diff_sizes = size_after - size_before;
+                    if (diff_sizes >= 2)                    
+                        david = 4;
+                    end                    
                     if (length_unique_sorted_neighbors == 3 && connectivity == 8)
                         identical_labels = [unique_sorted_neighbors(3), unique_sorted_neighbors(2)];
                         list_identical_labels = insert_to_list(list_identical_labels, identical_labels, 0);

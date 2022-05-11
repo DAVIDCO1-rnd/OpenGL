@@ -278,6 +278,7 @@ namespace Polygons {
 			currentPair[0] = maxValue;
 			currentPair[1] = minValue;
 			listIdenticalLabels.push_back(currentPair);
+			return;
 		}
 
 		columnIndex = 0;
@@ -374,7 +375,7 @@ namespace Polygons {
 		unsigned char labelCounter = 0;
 		for (size_t i = 0; i < width; i++)
 		{
-			//std::cout << "Col " << i << " out of " << width << std::endl;
+			std::cout << "Col " << i << " out of " << width << std::endl;
 			for (size_t j = 0; j < height; j++)
 			{
 				//std::cout << "Row " << i << "/" << height << ", Col " << j << "/" << width << std::endl;
@@ -419,7 +420,6 @@ namespace Polygons {
 					}
 					continue;
 				}
-
 				if (i > 0 && j == 0) {
 					neighbor1 = imageLabels[indexFormerI];
 					if (neighbor1 > 0) {
@@ -470,7 +470,17 @@ namespace Polygons {
 						imageLabels[currentIndex] = neighbors[0];
 						identicalLabels.push_back(neighbors[1]);
 						identicalLabels.push_back(neighbors[0]);
+						if (i == 586 && j == 224) {
+							int david = 3;
+						}
+						size_t size_before = listIdenticalLabels.size();
 						insertToList(listIdenticalLabels, identicalLabels);
+						size_t size_after = listIdenticalLabels.size();
+						size_t diff_sizes = size_after - size_before;
+						if (diff_sizes >= 2)
+						{
+							int david = 4;
+						}
 						if (numOfLabeledNeighbors == 3 && connectivity == 8) {
 							identicalLabels[0] = neighbors[2];
 							identicalLabels[1] = neighbors[1];
@@ -501,7 +511,7 @@ namespace Polygons {
 		}
 
 		for (int k = 0; k < numOfPairs; k++) {
-			//std::cout << "second scan: pair " << k + 1 << " out of " << numOfPairs << "." << std::endl;
+			std::cout << "second scan: pair " << k + 1 << " out of " << numOfPairs << "." << std::endl;
 			unsigned char sourceVal = listIdenticalLabels[k][0];
 			unsigned char destVal = listIdenticalLabels[k][1];
 			for (int i = 0; i < height; i++) {

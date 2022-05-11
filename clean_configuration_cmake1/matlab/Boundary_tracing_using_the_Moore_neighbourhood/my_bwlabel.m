@@ -5,6 +5,13 @@ function image_labels = my_bwlabel( binary_image, connectivity )
     
     list_identical_labels_from_file = csvread('pairs.csv');
     
+
+    diff_pairs = list_identical_labels - list_identical_labels_from_file;
+    sum_abs_diff_pairs = sum(abs(diff_pairs(:)));
+    if (sum_abs_diff_pairs > 0)
+        error('pairs are wrong');
+    end
+    
     
     image_labels_first_scan_from_file = csvread('labelsImageFirstScan.csv');
     image_labels_first_scan_from_file = reshape(image_labels_first_scan_from_file, [height, width]);
