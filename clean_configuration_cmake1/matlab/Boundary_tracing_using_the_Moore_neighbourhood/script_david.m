@@ -5,7 +5,17 @@ clc;
 height = 720;
 width = 1280;
 binary_image_from_file = csvread('binaryImage1.csv');
+
+height = 3;
+width = 4;
+binary_image_from_file = [1:width*height]';
+
+binary_image_from_file1 = manipulate_vector_to_get_new_vector(binary_image_from_file, height, width)
+binary_image_from_file2 = reverse_manipulate_vector_to_get_new_vector(binary_image_from_file1, height, width)
+
 image = reshape(binary_image_from_file, [height, width]);
+
+
 
 figure;
 imshow(image);

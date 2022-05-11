@@ -4,6 +4,7 @@
 #include <cstring>
 #include <fstream>
 #include<stb/stb_image.h>
+#include <unordered_set>
 
 namespace Polygons {
 	unsigned char* convertRgbToBinaryImage(unsigned char* rgbImage, size_t width, size_t height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal) {
@@ -373,7 +374,7 @@ namespace Polygons {
 		unsigned char labelCounter = 0;
 		for (size_t i = 0; i < width; i++)
 		{
-			std::cout << "Col " << i << " out of " << width << std::endl;
+			//std::cout << "Col " << i << " out of " << width << std::endl;
 			for (size_t j = 0; j < height; j++)
 			{
 				//std::cout << "Row " << i << "/" << height << ", Col " << j << "/" << width << std::endl;
@@ -500,7 +501,7 @@ namespace Polygons {
 		}
 
 		for (int k = 0; k < numOfPairs; k++) {
-			std::cout << "second scan: pair " << k + 1 << " out of " << numOfPairs << "." << std::endl;
+			//std::cout << "second scan: pair " << k + 1 << " out of " << numOfPairs << "." << std::endl;
 			unsigned char sourceVal = listIdenticalLabels[k][0];
 			unsigned char destVal = listIdenticalLabels[k][1];
 			for (int i = 0; i < height; i++) {
@@ -576,19 +577,69 @@ namespace Polygons {
 		unsigned char* imageLabelsFirstScan;
 		bwLabelsFirstScan(binaryImage, width, height, connectivity, listIdenticalLabels, imageLabelsFirstScan);
 
-		std::string pairsCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/pairs.csv";
+		std::string pairsCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/pairs.csv";
 		writePairsToFile(listIdenticalLabels, pairsCsvFullPath);
 
-		std::string labelsImageFirstScanCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImageFirstScan.csv";
+		std::string labelsImageFirstScanCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImageFirstScan.csv";
 		writeMatrixToFileAsSingleColumn(imageLabelsFirstScan, width, height, labelsImageFirstScanCsvFullPath);
 		unsigned char* imageLabels = bwLabelsSecondScan(imageLabelsFirstScan, width, height, listIdenticalLabels);
 		return imageLabels;
 	}
 
 
+	unsigned char* changeOrderOfBytes(unsigned char* originalArr, size_t width, size_t height) {
+		unsigned char* destArr = new unsigned char[width * height];
+		int counter = 0;
+		for (int i = 0; i < width; i++)
+		{
+			for (int j = 0; j < height; j++)
+			{
+				size_t new_index = width * (height - j - 1) + i;
+				destArr[counter] = originalArr[new_index];
+				counter++;
+			}
+		}
+		return destArr;
+	}
 
-	std::vector<Point2D> calcPolygons(size_t width, size_t height) {
-		std::vector<Point2D> BoundaryPoints;
+	unsigned char* reverseChangeOrderOfBytes(unsigned char* originalArr, size_t width, size_t height) {
+		unsigned char* destArr = new unsigned char[width * height];
+		int counter = 0;
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+				size_t new_index = height * (j + 1) - i - 1;
+				destArr[counter] = originalArr[new_index];
+				counter++;
+			}
+		}
+		return destArr;
+	}
+
+	std::unordered_set<unsigned char> getUniqueLabels(unsigned char* labelsImage, size_t width, size_t height) {
+		size_t numOfPixels = width * height;
+		std::unordered_set<unsigned char> uniqueVals(labelsImage, labelsImage + numOfPixels);
+		auto backgroundIterator = uniqueVals.find(0);
+		uniqueVals.erase(backgroundIterator);
+		return uniqueVals;
+	}
+
+	void buildBinaryImageWithCurrentLabel(unsigned char*& binaryImage, unsigned char* labelsImage, unsigned char label, size_t width, size_t height) {
+		size_t numOfPixels = width * height;
+		for (int i = 0; i < numOfPixels; i++) {
+			if (labelsImage[i] == label) {
+				binaryImage[i] = 1;
+			}
+			else
+			{
+				binaryImage[i] = 0;
+			}
+		}
+	}
+
+	std::vector<std::vector<Point2D>> calcPolygons(size_t width, size_t height) {
+		std::vector<std::vector<Point2D>> BoundaryPoints;
 		size_t nSize = width * height * 3;
 		unsigned char* rgbImage = new unsigned char[nSize];
 		if (!rgbImage)
@@ -601,29 +652,21 @@ namespace Polygons {
 		unsigned char blueCircleVal = 0;
 
 		unsigned char* binaryImage = convertRgbToBinaryImage(rgbImage, width, height, redCircleVal, greenCircleVal, blueCircleVal);
-		unsigned char* binaryImage1 = new unsigned char[width * height];
+		
 		//copyArrays(binaryImage, binaryImage1, width, height);
 
 		//int widthImg, heightImg, numColCh;
 		//// Flips the image so it appears right side up
 		//stbi_set_flip_vertically_on_load(true);
 		//// Reads the image from a file and stores it in bytes
-		//std::string imagePath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/small_image.bmp";
+		//std::string imagePath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/small_image.bmp";
 		//unsigned char* binaryImage1 = stbi_load(imagePath.c_str(), &widthImg, &heightImg, &numColCh, 0);
 
 
 
 
-		int counter = 0;
-		for (int i = 0; i < width; i++)
-		{
-			for (int j = 0; j < height; j++)
-			{
-				size_t new_index = width * (height - j - 1) + i;
-				binaryImage1[counter] = binaryImage[new_index];
-				counter++;
-			}
-		}
+		unsigned char* binaryImage1 = changeOrderOfBytes(binaryImage, width, height);
+		unsigned char* binaryImage2 = reverseChangeOrderOfBytes(binaryImage1, width, height);
 
 
 
@@ -651,7 +694,7 @@ namespace Polygons {
 		//	}
 		//}
 
-		std::string binaryImageCsvFullPath1 = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/binaryImage1.csv";
+		std::string binaryImageCsvFullPath1 = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/binaryImage1.csv";
 		writeMatrixToFileAsSingleColumn(binaryImage1, width, height, binaryImageCsvFullPath1);
 
 
@@ -659,20 +702,30 @@ namespace Polygons {
 		//stbi_image_free(binaryImage1);
 
 		unsigned char* labelsImage = convertBinaryImageToLabelsImage(binaryImage1, width, height);
+		unsigned char* labelsImage2 = reverseChangeOrderOfBytes(labelsImage, width, height);
 
 
-
-		std::string labelsImageCsvFullPath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImage.csv";
+		std::string labelsImageCsvFullPath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/labelsImage.csv";
 		writeMatrixToFileAsSingleColumn(labelsImage, width, height, labelsImageCsvFullPath);
 
+		std::unordered_set<unsigned char> uniqueLabels = getUniqueLabels(labelsImage2, width, height);
+		size_t numOfLabels = uniqueLabels.size();
 
-
-		GetContinousBoundaryPoints(binaryImage1, width, height, BoundaryPoints);
+		for (auto it = uniqueLabels.begin(); it != uniqueLabels.end(); it++) {
+			std::vector<Point2D> BoundaryPointsForCurrentLabel;
+			unsigned char currentLabel = *it;
+			buildBinaryImageWithCurrentLabel(binaryImage, labelsImage2, currentLabel, width, height);
+			GetContinousBoundaryPoints(binaryImage, width, height, BoundaryPointsForCurrentLabel);
+			BoundaryPoints.push_back(BoundaryPointsForCurrentLabel);
+		}
+		
 
 		delete[] rgbImage;
 		delete[] binaryImage;
 		delete[] binaryImage1;
+		delete[] binaryImage2;
 		delete[] labelsImage;
+		delete[] labelsImage2;
 
 		return BoundaryPoints;
 	}

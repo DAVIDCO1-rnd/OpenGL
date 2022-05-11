@@ -76,22 +76,25 @@ subplot(1,2,1);
 imagesc(image_labels);
 axis equal;
 
-% boundary1 = csvread('david.csv');
-% boundary2 = boundary1;
-% yvals = boundary1(:,2);
-% min_y = min(yvals)
-% max_y = max(yvals)
-% boundary2(:,2) = height - boundary1(:,2);
-
 subplot(1,2,2);
 imshow(binary_image);
 hold on;
-for i=1:numberOfObject
-%     current_val = unique_labeledImage(i);
-%     [tempR,tempC] = find(image_labels==current_val);
-    [tempR,tempC] = find(image_labels==i);
-    pixelFIRST = [tempR(1);tempC(1)];
-    [boundary,varargout] = TRACE_MooreNeighbourhood(binary_image, pixelFIRST);
-    plot(boundary(:,2), boundary(:,1), 'w', 'LineWidth', 3, 'Color', [0, 1, 0]);
+polygons_folder = './polygons_folder';
+files_full_paths_in_folder = get_folder_files_names(polygons_folder);
+num_of_polygons = length(files_full_paths_in_folder);
+for i=1:num_of_polygons
+    current_file = files_full_paths_in_folder{i};
+    boundary1 = csvread(current_file);
+    
+% %     current_val = unique_labeledImage(i);
+% %     [tempR,tempC] = find(image_labels==current_val);
+%     [tempR,tempC] = find(image_labels==i);
+%     pixelFIRST = [tempR(1);tempC(1)];
+%     [boundary,varargout] = TRACE_MooreNeighbourhood(binary_image, pixelFIRST);
+    plot(boundary1(:,2), boundary1(:,1), 'w', 'LineWidth', 3, 'Color', [0, 1, 0]);    
 end
+
+
+
+
 
