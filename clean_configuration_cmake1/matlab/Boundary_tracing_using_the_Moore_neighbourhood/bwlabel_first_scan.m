@@ -12,9 +12,6 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
     for j=1:cols
         fprintf('col %d out of %d\n',j,cols);
         for i=1:rows
-            if (i == 122 && j == 635)
-                david = 5;
-            end
             pixel_val = binary_image(i,j);
             if (pixel_val == 0) %background
                 [temp, counter] = update_temp(temp, list_identical_labels, i, j, counter);
@@ -81,17 +78,8 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
                         image_labels(i,j) = unique_sorted_neighbors(1);
                 else %there are two labels that are identical (to fix in next scan)
                     image_labels(i,j) = unique_sorted_neighbors(1);
-                    identical_labels = [unique_sorted_neighbors(2), unique_sorted_neighbors(1)];
-                    
-                    if (i==493 && j==731)
-                        david = 4;
-                    end
-                    list_identical_labels = insert_to_list(list_identical_labels, identical_labels, 0);
-                    if (length(list_identical_labels) == 64)
-                        i
-                        j
-                        david = 5;
-                    end                   
+                    identical_labels = [unique_sorted_neighbors(2), unique_sorted_neighbors(1)];                    
+                    list_identical_labels = insert_to_list(list_identical_labels, identical_labels, 0);                  
                     if (length_unique_sorted_neighbors == 3 && connectivity == 8)
                         identical_labels = [unique_sorted_neighbors(3), unique_sorted_neighbors(2)];
                         list_identical_labels = insert_to_list(list_identical_labels, identical_labels, 0);
@@ -102,29 +90,29 @@ function [image_labels, list_identical_labels] = bwlabel_first_scan(binary_image
             [temp, counter] = update_temp(temp, list_identical_labels, i, j, counter);            
         end
     end
-    fprintf('reading temp.csv\n');
-    tic
-    temp_from_file = csvread('temp.csv');
-    toc
-    fprintf('finished reading temp.csv\n');
-    
-    num_of_pixels_from_file = size(temp_from_file, 1);
-    
-    for i=1:num_of_pixels_from_file
-        val_matlab = temp(i,:);
-        val_from_file = temp_from_file(i,:);
-        diff_vals = val_matlab - val_from_file;
-        sum_abs_diff_vals = sum(abs(diff_vals(:)));
-        if (sum_abs_diff_vals > 0)
-            fprintf('i = %d\n',i);
-            val_matlab
-            val_from_file
-            david = 5;
-        end
-    end
-    
-    %temp1 = temp(1:20, :);
-    diff_temps = temp_from_file - temp;
-    sum_abs_diff_temps = sum(abs(diff_temps(:)));
-    fprintf('sum_abs_diff_temps = %f\n',sum_abs_diff_temps);
+%     fprintf('reading temp.csv\n');
+%     tic
+%     temp_from_file = csvread('temp.csv');
+%     toc
+%     fprintf('finished reading temp.csv\n');
+%     
+%     num_of_pixels_from_file = size(temp_from_file, 1);
+%     
+%     for i=1:num_of_pixels_from_file
+%         val_matlab = temp(i,:);
+%         val_from_file = temp_from_file(i,:);
+%         diff_vals = val_matlab - val_from_file;
+%         sum_abs_diff_vals = sum(abs(diff_vals(:)));
+%         if (sum_abs_diff_vals > 0)
+%             fprintf('i = %d\n',i);
+%             val_matlab
+%             val_from_file
+%             david = 5;
+%         end
+%     end
+%     
+%     %temp1 = temp(1:20, :);
+%     diff_temps = temp_from_file - temp;
+%     sum_abs_diff_temps = sum(abs(diff_temps(:)));
+%     fprintf('sum_abs_diff_temps = %f\n',sum_abs_diff_temps);
 end

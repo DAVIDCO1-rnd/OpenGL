@@ -22,8 +22,6 @@ imshow(image);
 title('image');
 
 
-david = 5;
-
 % 
 % 
 % 
@@ -62,4 +60,3 @@ david = 5;
 % 
 % diff1 = sum(abs(binary_image_from_file_order_changed - binary_image_from_file2_col))
 % 
-% david = 5;
