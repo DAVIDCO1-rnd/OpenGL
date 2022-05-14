@@ -15,22 +15,22 @@
 #include<glm/gtx/vector_angle.hpp>
 
 
-using namespace std;
+
 
 
 # define PI           3.14159265358979323846  /* pi */
 
 class CircleModel : public Model {
 private:
-    vector<float> _verticesInModelCoordinates;
+    std::vector<float> _verticesInModelCoordinates;
     cv::Mat1d _verticesOpenCVInModelCoordinates;
-    vector<unsigned int> _indices;
+    std::vector<unsigned int> _indices;
     cv::Mat1i _indicesOpenCV;
 
 public:
     unsigned int VAO, VBO, EBO; //are public to let opengl change them
 
-    CircleModel(string modelName, ModelParameters params, int numOfAngles, float radius, float minRadius, int numOfRadiuses, float circleCenterX, float circleCenterY, float zVal);
+    CircleModel(std::string modelName, ModelParameters params, int numOfAngles, float radius, float minRadius, int numOfRadiuses, float circleCenterX, float circleCenterY, float zVal);
     void generateBuffers();
     void saveBuffersForRedneringPolygones();
     void Draw(Shader& shader, Camera& camera);
@@ -39,6 +39,6 @@ public:
     void convertVerticesToMat1d();
     void convertIndicesToMat1i();
     void createMesh(int numOfAngles, float radius, float minRadius, int numOfRadiuses, float circleCenterX, float circleCenterY, float zVal);
-    vector<unsigned int> indices() const;
-    void indicesWithLos(vector<unsigned int> indices);
+    std::vector<unsigned int> indices() const;
+    void indicesWithLos(std::vector<unsigned int> indices);
 };

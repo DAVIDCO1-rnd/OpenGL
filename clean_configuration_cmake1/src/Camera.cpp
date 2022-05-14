@@ -86,6 +86,36 @@ void Camera::setParams(CameraParameters params) {
 	this->params = params;
 }
 
+std::vector<std::vector<glm::vec3>> Camera::convert2dPixelsTo3dWorldCoordinates(std::vector<std::vector<cv::Point>> pixels) {
+	std::vector<std::vector<glm::vec3>> worldCoordsPolygons;
+	size_t numOfPolygons = pixels.size();
+	for (size_t i = 0; i < numOfPolygons; i++) {
+		std::vector<cv::Point> polygon = pixels[i];
+		size_t numOfPointsInPolygon = polygon.size();
+		std::vector<glm::vec3> currentPolygonWorldCoords;
+		for (size_t j = 0; j < numOfPointsInPolygon; j++) {
+			cv::Point pixel = polygon[j];
+			int x = pixel.x;
+			int y = pixel.y;
+
+			float xNdc = ((2.0f * (float)x) / ((float)width - 1.0f)) - 1.0f;
+			float yNdc = ((2.0f * ((float)height - 1.0f - y)) / ((float)height - 1.0f)) - 1.0f;
+			float zNdc = 1; //it's not correct but for now we assume the plate is in the same height
+
+			glm::vec4 ndc = glm::vec4(xNdc, yNdc, zNdc, 1.0f);
+			
+			glm::mat4 vpMatrix = projectionMatrix * viewMatrix;
+			glm::mat4 inverseVpMatrix = glm::inverse(vpMatrix);
+
+			glm::vec4 temp = inverseVpMatrix * ndc;
+			glm::vec3 worldCoords = glm::vec3(temp.x / temp.w, temp.y / temp.w, temp.z / temp.w);
+			currentPolygonWorldCoords.push_back(worldCoords);			
+		}
+		worldCoordsPolygons.push_back(currentPolygonWorldCoords);
+	}
+	return worldCoordsPolygons;
+}
+
 
 void Camera::Inputs(GLFWwindow* window)
 {

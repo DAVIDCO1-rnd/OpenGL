@@ -12,10 +12,10 @@ bool MathUseful::checkIfNumbersAreEqual(double num1, double num2)
 	return isEqual;
 }
 
-bool MathUseful::checkIfPointsAreEqual(Vec3d point1, Vec3d point2)
+bool MathUseful::checkIfPointsAreEqual(cv::Vec3d point1, cv::Vec3d point2)
 {
 	bool areEqual = false;
-	Vec3d diffPoints = point2 - point1;
+	cv::Vec3d diffPoints = point2 - point1;
 	double normDiffPoints = norm(diffPoints);
 	if (normDiffPoints < std::numeric_limits<double>::epsilon())
 	{
@@ -25,9 +25,9 @@ bool MathUseful::checkIfPointsAreEqual(Vec3d point1, Vec3d point2)
 	return areEqual;
 }
 
-void MathUseful::calcNullSpace(Vec3d unitVec, Vec3d& unitU, Vec3d& unitW)
+void MathUseful::calcNullSpace(cv::Vec3d unitVec, cv::Vec3d& unitU, cv::Vec3d& unitW)
 {
-    bool areVectorsEqual = checkIfPointsAreEqual(unitVec, Vec3d{ 0,0,1 });
+    bool areVectorsEqual = checkIfPointsAreEqual(unitVec, cv::Vec3d{ 0,0,1 });
     if (areVectorsEqual)
     {
         unitU[0] = 1;
@@ -40,10 +40,10 @@ void MathUseful::calcNullSpace(Vec3d unitVec, Vec3d& unitU, Vec3d& unitW)
     }
     else
     {
-        Vec3d u = Vec3d(unitVec[1], -unitVec[0], 0.0);
+		cv::Vec3d u = cv::Vec3d(unitVec[1], -unitVec[0], 0.0);
         unitU = normalizeVec(u);
 
-        Vec3d w = unitVec.cross(unitU);
+		cv::Vec3d w = unitVec.cross(unitU);
         unitW = normalizeVec(w);
     }
 }
@@ -77,7 +77,7 @@ cv::Mat MathUseful::calcRotation(cv::Vec3d unitVec)
 
     if (checkIfNumbersAreEqual(det, -1))
     {
-        Mat rotation1;
+		cv::Mat rotation1;
         vconcat(-u, w, rotation1);
         vconcat(rotation1, v, rotation1);
         return rotation1;
@@ -86,10 +86,10 @@ cv::Mat MathUseful::calcRotation(cv::Vec3d unitVec)
     return rotation;
 }
 
-Vec3d MathUseful::normalizeVec(Vec3d vec)
+cv::Vec3d MathUseful::normalizeVec(cv::Vec3d vec)
 {
 	double normVec = norm(vec);
-	Vec3d unitVec;
+	cv::Vec3d unitVec;
 	unitVec[0] = vec[0] / normVec;
 	unitVec[1] = vec[1] / normVec;
 	unitVec[2] = vec[2] / normVec;

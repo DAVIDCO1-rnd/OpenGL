@@ -24,15 +24,23 @@
 #include "Polygons.h"
 #include <chrono>
 
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+#include <iostream>
+
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 /*reads the pixels in the framebuffer and write them as BMP image to filename*/
-void saveScreenShot(string filename, int WindowWidth, int windowHeight);
-void calculatePolygons(size_t width, size_t height);
+void saveScreenShot(std::string filename, int WindowWidth, int windowHeight);
+std::vector<std::vector<cv::Point>> calculatePolygons(size_t width, size_t height);
+void drawBoundaryPoints(std::vector<std::vector<cv::Point>> contours);
 
 
 const unsigned int width = 1280;
 const unsigned int height = 720;
+Camera* activeCamera;
 
 namespace ImGuiGeneral
 {
@@ -214,16 +222,31 @@ namespace ImGuiCameras
 		}
 		if (ImGui::Button("Save framebuffer to file")) // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 		{
-			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+			saveScreenShot("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
 		}
 		if (ImGui::Button("Calculate LOS polygons")) // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 		{
-			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
-			calculatePolygons(width, height);
+			saveScreenShot("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+			std::vector<std::vector<cv::Point>> boundaryPoints = calculatePolygons(width, height);
+			drawBoundaryPoints(boundaryPoints);
+			std::vector<std::vector<glm::vec3>> worldCoords = activeCamera->convert2dPixelsTo3dWorldCoordinates(boundaryPoints);
 		}
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
+}
+
+void drawBoundaryPoints(std::vector<std::vector<cv::Point>> contours) {
+	//size_t numOfPolygons = contours.size();
+	//for (size_t i = 0; i < numOfPolygons; i++) {
+	//	std::vector<cv::Point> currentPolygon;
+	//	size_t numOfPoints = currentPolygon.size();
+	//	for (size_t j = 0; j < numOfPoints; j++) {
+	//		cv::Point currentPoint = currentPolygon[j];
+	//		int x = currentPoint.x;
+	//		int y = currentPoint.y;
+	//	}
+	//}
 }
 
 unsigned char* convertRgbToBinaryImageRGB(unsigned char* rgbImage, int width, int height, unsigned char redCircleVal, unsigned char greenCircleVal, unsigned char blueCircleVal) {
@@ -262,42 +285,43 @@ unsigned char* convertRgbToBinaryImageRGB(unsigned char* rgbImage, int width, in
 
 
 
-void calculatePolygons(size_t width, size_t height) {
-	auto startTime = chrono::steady_clock::now();
-	std::vector<std::vector<Polygons::Point2D>> boundaryPoints = Polygons::calcPolygons(width, height);
-	auto endTime = chrono::steady_clock::now();
+std::vector<std::vector<cv::Point>> calculatePolygons(size_t width, size_t height) {
+	auto startTime = std::chrono::steady_clock::now();
+	std::vector<std::vector<cv::Point>> boundaryPoints = Polygons::calcPolygons(width, height);
+	auto endTime = std::chrono::steady_clock::now();
 	auto durationCaculatePolygons = endTime - startTime;
-	auto durationCaculatePolygonsMilliseconds = chrono::duration_cast<chrono::milliseconds>(durationCaculatePolygons).count();
+	auto durationCaculatePolygonsMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(durationCaculatePolygons).count();
 	std::cout << "duration calculating polygons = " << durationCaculatePolygonsMilliseconds << " milliseconds" << std::endl;
+	return boundaryPoints;
 
-	size_t numOfPolygons = boundaryPoints.size();
-	int counter = 0;
-	for (size_t polygonIndex = 0; polygonIndex < numOfPolygons; polygonIndex++)
-	{
-		std::vector<Polygons::Point2D> currentPolygonPoints = boundaryPoints[polygonIndex];
-		if (currentPolygonPoints.size() == 0) {
-			//I think it can only happen when the foreground pixels are only one line or one column (and therefore no polygon to surround them)
-			continue;
-		}
-		counter++;
-		ofstream currentFile;
-		std::string filePath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/polygons_folder/polygon" + std::to_string(counter) + ".csv";
-		currentFile.open(filePath);
-		for (size_t i = 0; i < currentPolygonPoints.size(); i++)
-		{
-			int xVal = currentPolygonPoints[i].X;
-			int yVal = currentPolygonPoints[i].Y;
-			currentFile << xVal << ", " << yVal << endl;
-		}
-		currentFile.close();
-	}
+	//size_t numOfPolygons = boundaryPoints.size();
+	//int counter = 0;
+	//for (size_t polygonIndex = 0; polygonIndex < numOfPolygons; polygonIndex++)
+	//{
+	//	std::vector<std::vector<cv::Point>> currentPolygonPoints = boundaryPoints[polygonIndex];
+	//	if (currentPolygonPoints.size() == 0) {
+	//		//I think it can only happen when the foreground pixels are only one line or one column (and therefore no polygon to surround them)
+	//		continue;
+	//	}
+	//	counter++;
+	//	std::ofstream currentFile;
+	//	std::string filePath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/polygons_folder/polygon" + std::to_string(counter) + ".csv";
+	//	currentFile.open(filePath);
+	//	for (size_t i = 0; i < currentPolygonPoints.size(); i++)
+	//	{
+	//		int xVal = currentPolygonPoints[i].X;
+	//		int yVal = currentPolygonPoints[i].Y;
+	//		currentFile << xVal << ", " << yVal << std::endl;
+	//	}
+	//	currentFile.close();
+	//}
 
 	MessageBox(0, "Finished calculating LOS polygons  ", "Los algorithm", MB_OK);
 }
 
 
 /*reads the pixels in the framebuffer and write them as BMP image to filename*/
-void saveScreenShot(string filename, int WindowWidth, int windowHeight)
+void saveScreenShot(std::string filename, int WindowWidth, int windowHeight)
 {
 	int nSize = WindowWidth * windowHeight * 3;
 	unsigned char* rgbImage = new unsigned char[nSize];
@@ -316,7 +340,7 @@ void saveScreenShot(string filename, int WindowWidth, int windowHeight)
 	FILE* Out = fopen(filename.c_str(), "wb");
 	if (!Out)
 	{
-		cout << "Couldn't open " << filename << endl;
+		std::cout << "Couldn't open " << filename << std::endl;
 		return;
 	}
 		
@@ -349,6 +373,10 @@ void saveScreenShot(string filename, int WindowWidth, int windowHeight)
 	delete[] binaryImageRGB;
 	//MessageBox(0, "Framebuffer was saved in saved_images folder  ", "Los algorithm", MB_OK);
 }
+
+
+
+
 
 int main()
 {
@@ -392,7 +420,7 @@ int main()
 	}
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader defaultShader("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 
 	GLenum err012 = glGetError();
@@ -402,8 +430,8 @@ int main()
 		printOpenGLError(err012);
 	}
 
-	Shader shaderBlue("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
-	Shader shaderRed("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
+	Shader shaderBlue("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
+	Shader shaderRed("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -449,7 +477,7 @@ int main()
 	cameras.push_back(&camera2);
 
 	size_t cameraIndex = 0;
-	Camera* activeCamera;
+	
 	
 
 
@@ -460,7 +488,7 @@ int main()
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
-	std::string parentDir = "D:/Developments/OpenGL/clean_configuration_cmake1";
+	std::string parentDir = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1";
 
 	std::string modelName1 = "bunny";
 	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	
@@ -479,15 +507,15 @@ int main()
 	std::string modelPath3 = "/Resources/models/" + modelName3 + "/scene.gltf";
 
 	
-	string modelName = "circle";
+	std::string modelName = "circle";
 	ModelParameters params;
 	int numOfAngles = 72;
 	int numOfRadiuses = 2;
-	float radius = 0.8f;
+	float radius = 1.0f;
 	float minRadius = 0.1f;        
 	float circleCenterX = 0.0f;
 	float circleCenterY = 0.0f;
-	float zVal = -0.4f;  
+	float zVal = -0.5f;  
 	CircleModel* circleModel = new CircleModel(modelName, params, numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
 
 	
@@ -592,6 +620,7 @@ int main()
 
 		activeCamera->updateViewMatrixByUserParameters();
 		activeCamera->updateProjectionMatrixByUserParameters();
+		
 		
 		
 

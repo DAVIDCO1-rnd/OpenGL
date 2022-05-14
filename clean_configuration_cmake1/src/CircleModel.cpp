@@ -4,7 +4,7 @@
 
 
 
-CircleModel::CircleModel(string modelName, ModelParameters params, int numOfAngles, float radius, float minRadius, int numOfRadiuses, float circleCenterX, float circleCenterY, float zVal) : Model(modelName, params) {
+CircleModel::CircleModel(std::string modelName, ModelParameters params, int numOfAngles, float radius, float minRadius, int numOfRadiuses, float circleCenterX, float circleCenterY, float zVal) : Model(modelName, params) {
     createMesh(numOfAngles, radius, minRadius, numOfRadiuses, circleCenterX, circleCenterY, zVal);
 }
 
@@ -193,11 +193,11 @@ void CircleModel::createMesh(int numOfAngles, float radius, float minRadius, int
     convertIndicesToMat1i();        
 }
 
-vector<unsigned int> CircleModel::indices() const {
+std::vector<unsigned int> CircleModel::indices() const {
     return this->_indices;
 }
 
-void CircleModel::indicesWithLos(vector<unsigned int> indices) {
+void CircleModel::indicesWithLos(std::vector<unsigned int> indices) {
     this->_indices = indices;
 }  
 
