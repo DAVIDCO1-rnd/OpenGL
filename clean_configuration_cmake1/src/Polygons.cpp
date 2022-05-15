@@ -699,8 +699,7 @@ namespace Polygons {
 
 		cv::RNG rng(12345);
 		cv::Mat image_with_contours = rgbImg.clone();
-		for (int i = 2; i < 3; i++) {
-		//for (int i = 0; i < (int)contours.size(); i++) {
+		for (int i = 0; i < (int)contours.size(); i++) {
 			if (contours[i].size() < 5) {
 				continue;
 			}
