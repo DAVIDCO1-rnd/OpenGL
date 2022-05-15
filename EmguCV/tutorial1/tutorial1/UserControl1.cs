@@ -100,6 +100,13 @@ namespace tutorial1
             return ret;
         }
 
+        //public Image<Bgr, byte> CreateImageFromBytesArray(byte[] bytes)
+        //{
+        //    Image<Bgr, byte> image = new Image<Bgr, byte>(width, height);
+        //    image.Bytes = bytes;
+        //    return image;
+        //}
+
         private Image<Bgr, byte> findContours()
         {
             Image<Gray, byte> imgOutput = imgInput.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
@@ -114,13 +121,13 @@ namespace tutorial1
             for (int contourIdx = 0; contourIdx < contours.Size; contourIdx++)
             {
                 int[] heirarcyOfCurrentCountour = GetHierarchy(hierarchyMat, contourIdx);
-                double blue = rand.Next(0, 129);
-                double green = rand.Next(0, 129);
-                double red = rand.Next(0, 129);
+                double blue = rand.Next(0, 231);
+                double green = rand.Next(0, 231);
+                double red = rand.Next(0, 231);
                 int thickness = 5;
-                CvInvoke.DrawContours(imgout, contours, contourIdx, new MCvScalar(blue, green, red), thickness);
+                CvInvoke.DrawContours(imgCopy, contours, contourIdx, new MCvScalar(blue, green, red), thickness);
             }
-            return imgout;
+            return imgCopy;
         }
 
         private void findContoursToolStripMenuItem_Click(object sender, EventArgs e)
