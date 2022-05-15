@@ -222,11 +222,11 @@ namespace ImGuiCameras
 		}
 		if (ImGui::Button("Save framebuffer to file")) // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 		{
-			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+			saveScreenShot("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
 		}
 		if (ImGui::Button("Calculate LOS polygons")) // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 		{
-			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+			saveScreenShot("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
 			std::vector<std::vector<cv::Point>> boundaryPoints = calculatePolygons(width, height);
 			drawBoundaryPoints(boundaryPoints);
 			std::vector<std::vector<glm::vec3>> worldCoords = activeCamera->convert2dPixelsTo3dWorldCoordinates(boundaryPoints);
@@ -305,7 +305,7 @@ std::vector<std::vector<cv::Point>> calculatePolygons(size_t width, size_t heigh
 	//	}
 	//	counter++;
 	//	std::ofstream currentFile;
-	//	std::string filePath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/polygons_folder/polygon" + std::to_string(counter) + ".csv";
+	//	std::string filePath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/polygons_folder/polygon" + std::to_string(counter) + ".csv";
 	//	currentFile.open(filePath);
 	//	for (size_t i = 0; i < currentPolygonPoints.size(); i++)
 	//	{
@@ -421,7 +421,7 @@ int main()
 	}
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader defaultShader("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 
 	GLenum err012 = glGetError();
@@ -431,8 +431,8 @@ int main()
 		printOpenGLError(err012);
 	}
 
-	Shader shaderBlue("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
-	Shader shaderRed("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
+	Shader shaderBlue("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
+	Shader shaderRed("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -489,7 +489,7 @@ int main()
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
-	std::string parentDir = "D:/Developments/OpenGL/clean_configuration_cmake1";
+	std::string parentDir = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1";
 
 	std::string modelName1 = "bunny";
 	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	
@@ -529,6 +529,9 @@ int main()
 	// Load in a model
 	
 	ModelParameters params1;
+	params1.translateX = 0.0f;
+	params1.translateY = 0.4f;
+	params1.translateZ = 0.1f;
 	params1.angleX = -92.0f;
 	params1.angleY = 153.0f;
 	params1.angleZ = 67.0f;
@@ -538,11 +541,11 @@ int main()
 
 	
 	ModelParameters params2;	
-	//params2.angleY = -62.0f;
+	params2.angleY = -62.0f;
 
-	params2.angleX = -17.0f;
-	params2.angleY = -100.0f;
-	params2.angleZ = 0.0f;
+	//params2.angleX = -17.0f;
+	//params2.angleY = -100.0f;
+	//params2.angleZ = 0.0f;
 
 	params2.translateX = 1.0f;
 	params2.translateY = -0.1f;
@@ -552,12 +555,12 @@ int main()
 
 	
 	ModelParameters params3;
-	//params3.angleX = 68.0f;
-	//params3.angleY = 0.0f;
-	//params3.angleZ = 17.0f;
-	params3.angleX = 60.0f;
-	params3.angleY = 16.0f;
+	params3.angleX = 68.0f;
+	params3.angleY = 0.0f;
 	params3.angleZ = 17.0f;
+	//params3.angleX = 60.0f;
+	//params3.angleY = 16.0f;
+	//params3.angleZ = 17.0f;
 
 	params3.translateX = 0.2f;
 	params3.translateY = 0.0f;
