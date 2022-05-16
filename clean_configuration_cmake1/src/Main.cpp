@@ -323,6 +323,11 @@ std::vector<std::vector<cv::Point>> calculatePolygons(size_t width, size_t heigh
 /*reads the pixels in the framebuffer and write them as BMP image to filename*/
 void saveScreenShot(std::string filename, int WindowWidth, int windowHeight)
 {
+	cv::Mat1f depthImg(windowHeight, WindowWidth);
+	glReadPixels(0, 0, depthImg.cols, depthImg.rows, GL_DEPTH_COMPONENT, GL_FLOAT, depthImg.data);
+	imshow("depth image", depthImg);
+	cv::waitKey(0);
+
 	int nSize = WindowWidth * windowHeight * 3;
 	unsigned char* rgbImage = new unsigned char[nSize];
 	if (!rgbImage)
@@ -573,9 +578,9 @@ int main()
 	
 
 	std::vector<Model*> models;
-	models.push_back(&model1);
-	models.push_back(&model2);
-	models.push_back(&model3);
+	//models.push_back(&model1);
+	//models.push_back(&model2);
+	//models.push_back(&model3);
 
 	size_t modelIndex = 0;
 	

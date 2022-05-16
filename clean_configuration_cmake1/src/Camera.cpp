@@ -87,6 +87,11 @@ void Camera::setParams(CameraParameters params) {
 }
 
 std::vector<std::vector<glm::vec3>> Camera::convert2dPixelsTo3dWorldCoordinates(std::vector<std::vector<cv::Point>> pixels) {
+	cv::Mat1f depthImg(height, width);
+	glReadPixels(0, 0, depthImg.cols, depthImg.rows, GL_DEPTH_COMPONENT, GL_FLOAT, depthImg.data);
+	imshow("depth image", depthImg);
+	cv::waitKey(0);
+
 	std::vector<std::vector<glm::vec3>> worldCoordsPolygons;
 	size_t numOfPolygons = pixels.size();
 	for (size_t i = 0; i < numOfPolygons; i++) {
@@ -100,11 +105,14 @@ std::vector<std::vector<glm::vec3>> Camera::convert2dPixelsTo3dWorldCoordinates(
 
 			float xNdc = ((2.0f * (float)x) / ((float)width - 1.0f)) - 1.0f;
 			float yNdc = ((2.0f * ((float)height - 1.0f - y)) / ((float)height - 1.0f)) - 1.0f;
-			float zNdc = 1; //it's not correct but for now we assume the plate is in the same height
+			float zNdc = depthImg.at<float>(x, y);
 
 			glm::vec4 ndc = glm::vec4(xNdc, yNdc, zNdc, 1.0f);
+
+			glm::mat projectionMatrixTranspose = glm::transpose(projectionMatrix);
+			glm::mat viewMatrixTranspose = glm::transpose(viewMatrix);
 			
-			glm::mat4 vpMatrix = projectionMatrix * viewMatrix;
+			glm::mat4 vpMatrix = viewMatrixTranspose * projectionMatrixTranspose;
 			glm::mat4 inverseVpMatrix = glm::inverse(vpMatrix);
 
 			glm::vec4 temp = inverseVpMatrix * ndc;

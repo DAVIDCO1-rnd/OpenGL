@@ -707,6 +707,7 @@ namespace Polygons {
 			drawContours(image_with_contours, contours, i, color, 2);
 		}
 		imshow("image_with_contours", image_with_contours);
+
 		cv::waitKey(0);
 		//imwrite("blue_channel.jpg", image_contour_blue);
 		cv::destroyAllWindows();
@@ -727,6 +728,7 @@ namespace Polygons {
 			return contours;
 
 		cv::Mat3b rgbImg(height, width, CV_8UC3);
+		
 
 		//use fast 4-byte alignment (default anyway) if possible
 		//glPixelStorei(GL_PACK_ALIGNMENT, (rgbImg.step & 3) ? 1 : 4);
@@ -736,6 +738,8 @@ namespace Polygons {
 
 		//glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, rgbImage);
 		glReadPixels(0, 0, rgbImg.cols, rgbImg.rows, GL_BGR, GL_UNSIGNED_BYTE, rgbImg.data);
+
+
 		cv::flip(rgbImg, rgbImg, 0);
 
 		
