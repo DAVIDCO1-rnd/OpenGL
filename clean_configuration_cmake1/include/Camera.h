@@ -95,6 +95,6 @@ public:
 
 	void setParams(CameraParameters params);
 
-	std::vector<std::vector<glm::vec3>> convert2dPixelsTo3dWorldCoordinates(std::vector<std::vector<cv::Point>> pixels);
+
 };
 #endif

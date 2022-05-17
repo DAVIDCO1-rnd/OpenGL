@@ -28,6 +28,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <iostream>
+#include <vector>
 
 
 
@@ -41,6 +42,101 @@ void drawBoundaryPoints(std::vector<std::vector<cv::Point>> contours);
 const unsigned int width = 1280;
 const unsigned int height = 720;
 Camera* activeCamera;
+
+const GLdouble MIN_Z = 0.7; //should be between 0 to 1 (otherwise clamped to the closest edge)
+const GLdouble MAX_Z = 0.8; //should be between 0 to 1 (otherwise clamped to the closest edge)
+const GLdouble CLEAR_DEPTH_VALUE = MAX_Z;
+
+const GLdouble DESIRED_MIN_Z = -1.0;
+const GLdouble DESIRED_MAX_Z = 1.0;
+
+std::vector<GLfloat> depth_values;
+
+float calculatePixelDepth(int pixel_x, int pixel_y)
+{
+	float min_depth = *std::min_element(depth_values.begin(), depth_values.end());
+	float max_depth = *std::max_element(depth_values.begin(), depth_values.end());
+
+	int pixel_y_upside_down = height - pixel_y;
+	size_t pixel_index = (pixel_y_upside_down - 1)*width + pixel_x;
+	float pixel_depth = depth_values[pixel_index];
+
+	float pixel_depth_new_range = ((pixel_depth - MIN_Z) / (MAX_Z - MIN_Z)) * (DESIRED_MAX_Z - DESIRED_MIN_Z) + DESIRED_MIN_Z;
+
+	return pixel_depth_new_range;
+}
+
+glm::vec3 convertPixelToWorldPosition(Camera* camera, int pixel_x, int pixel_y)
+{
+	glm::mat4 view = camera->getViewMatrix();
+	glm::mat4 projection = camera->getProjectionMatrix();
+	glm::mat4 matProjection = projection * view;
+	glm::mat4 matInverse = glm::inverse(matProjection);
+
+	float pixel_depth = calculatePixelDepth(pixel_x, pixel_y);
+	int pixel_y_upside_down = height - pixel_y;
+	float ndc_x = (pixel_x - 0.5*width) / (0.5*width);
+	float ndc_y = (pixel_y_upside_down - 0.5*height) / (0.5*height);
+
+	glm::vec4 ndc_vec = glm::vec4(ndc_x, ndc_y, pixel_depth, 1.0);
+	glm::vec4 pos = matInverse * ndc_vec;
+	glm::vec3 world_coords = glm::vec3(pos.x, pos.y, pos.z);
+	float w = 1.0 / pos.w;
+
+	world_coords.x = world_coords.x * w;
+	world_coords.y = world_coords.y * w;
+	world_coords.z = world_coords.z * w;
+
+	return world_coords;
+}
+
+std::vector<std::vector<glm::vec3>> convert2dPixelsTo3dWorldCoordinates(Camera* camera, std::vector<std::vector<cv::Point>> pixels) {
+	//cv::Mat1f depthImg(height, width);
+	//glReadPixels(0, 0, depthImg.cols, depthImg.rows, GL_DEPTH_COMPONENT, GL_FLOAT, depthImg.data);
+	//imshow("depth image", depthImg);
+	//cv::waitKey(0);
+
+	for (int i = 0; i < width*height; i++)
+	{
+		depth_values.push_back(0.0);
+	}
+	glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, &depth_values[0]);
+
+	std::vector<std::vector<glm::vec3>> worldCoordsPolygons;
+	size_t numOfPolygons = pixels.size();
+	for (size_t i = 0; i < numOfPolygons; i++) {
+		std::vector<cv::Point> polygon = pixels[i];
+		size_t numOfPointsInPolygon = polygon.size();
+		std::vector<glm::vec3> currentPolygonWorldCoords;
+		for (size_t j = 0; j < numOfPointsInPolygon; j++) {
+			cv::Point pixel = polygon[j];
+			int x = pixel.x;
+			int y = pixel.y;
+
+			glm::vec3 worldCoords = convertPixelToWorldPosition(activeCamera, x, y);
+			currentPolygonWorldCoords.push_back(worldCoords);
+
+			//float xNdc = ((2.0f * (float)x) / ((float)width - 1.0f)) - 1.0f;
+			//float yNdc = ((2.0f * ((float)height - 1.0f - y)) / ((float)height - 1.0f)) - 1.0f;
+			//float zNdc = depthImg.at<float>(x, y);
+
+			//glm::vec4 ndc = glm::vec4(xNdc, yNdc, zNdc, 1.0f);
+
+			//glm::mat projectionMatrixTranspose = glm::transpose(camera->getProjectionMatrix());
+			//glm::mat viewMatrixTranspose = glm::transpose(camera->getViewMatrix());
+
+			//glm::mat4 vpMatrix = viewMatrixTranspose * projectionMatrixTranspose;
+			//glm::mat4 inverseVpMatrix = glm::inverse(vpMatrix);
+
+			//glm::vec4 temp = inverseVpMatrix * ndc;
+			//glm::vec3 worldCoords = glm::vec3(temp.x / temp.w, temp.y / temp.w, temp.z / temp.w);
+			//currentPolygonWorldCoords.push_back(worldCoords);
+		}
+		worldCoordsPolygons.push_back(currentPolygonWorldCoords);
+	}
+	return worldCoordsPolygons;
+}
+
 
 namespace ImGuiGeneral
 {
@@ -222,14 +318,14 @@ namespace ImGuiCameras
 		}
 		if (ImGui::Button("Save framebuffer to file")) // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 		{
-			saveScreenShot("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
 		}
 		if (ImGui::Button("Calculate LOS polygons")) // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 		{
-			saveScreenShot("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
+			saveScreenShot("D:/Developments/OpenGL/clean_configuration_cmake1/saved_images/screenShot.bmp", width, height);
 			std::vector<std::vector<cv::Point>> boundaryPoints = calculatePolygons(width, height);
 			drawBoundaryPoints(boundaryPoints);
-			std::vector<std::vector<glm::vec3>> worldCoords = activeCamera->convert2dPixelsTo3dWorldCoordinates(boundaryPoints);
+			std::vector<std::vector<glm::vec3>> worldCoords = convert2dPixelsTo3dWorldCoordinates(activeCamera, boundaryPoints);
 		}
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
@@ -305,7 +401,7 @@ std::vector<std::vector<cv::Point>> calculatePolygons(size_t width, size_t heigh
 	//	}
 	//	counter++;
 	//	std::ofstream currentFile;
-	//	std::string filePath = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/polygons_folder/polygon" + std::to_string(counter) + ".csv";
+	//	std::string filePath = "D:/Developments/OpenGL/clean_configuration_cmake1/matlab/Boundary_tracing_using_the_Moore_neighbourhood/polygons_folder/polygon" + std::to_string(counter) + ".csv";
 	//	currentFile.open(filePath);
 	//	for (size_t i = 0; i < currentPolygonPoints.size(); i++)
 	//	{
@@ -320,13 +416,17 @@ std::vector<std::vector<cv::Point>> calculatePolygons(size_t width, size_t heigh
 }
 
 
+
+
+
+
 /*reads the pixels in the framebuffer and write them as BMP image to filename*/
 void saveScreenShot(std::string filename, int WindowWidth, int windowHeight)
 {
-	cv::Mat1f depthImg(windowHeight, WindowWidth);
-	glReadPixels(0, 0, depthImg.cols, depthImg.rows, GL_DEPTH_COMPONENT, GL_FLOAT, depthImg.data);
-	imshow("depth image", depthImg);
-	cv::waitKey(0);
+	//cv::Mat1f depthImg(windowHeight, WindowWidth);
+	//glReadPixels(0, 0, depthImg.cols, depthImg.rows, GL_DEPTH_COMPONENT, GL_FLOAT, depthImg.data);
+	//imshow("depth image", depthImg);
+	//cv::waitKey(0);
 
 	int nSize = WindowWidth * windowHeight * 3;
 	unsigned char* rgbImage = new unsigned char[nSize];
@@ -418,6 +518,8 @@ int main()
 	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
 	glViewport(0, 0, width, height);
 
+	glDepthRange(MIN_Z, MAX_Z);
+
 	GLenum err011 = glGetError();
 	if (err011 != GL_NO_ERROR)
 	{
@@ -426,7 +528,7 @@ int main()
 	}
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader defaultShader("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
+	Shader defaultShader("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/default.fs");
 
 
 	GLenum err012 = glGetError();
@@ -436,8 +538,8 @@ int main()
 		printOpenGLError(err012);
 	}
 
-	Shader shaderBlue("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
-	Shader shaderRed("C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
+	Shader shaderBlue("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderBlue.fs");
+	Shader shaderRed("D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.vs", "D:/Developments/OpenGL/clean_configuration_cmake1/src/shaders/shaderRed.fs");
 
 	// Take care of all the light related things
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -494,7 +596,7 @@ int main()
 	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
 	*/
 	//std::string parentDir = (fs::current_path().fs::path::parent_path()).string();
-	std::string parentDir = "C:/Users/David Cohn/Documents/Github/OpenGL/clean_configuration_cmake1";
+	std::string parentDir = "D:/Developments/OpenGL/clean_configuration_cmake1";
 
 	std::string modelName1 = "bunny";
 	std::string modelPath1 = "/Resources/models/" + modelName1 + "/scene.gltf";	
@@ -578,7 +680,7 @@ int main()
 	
 
 	std::vector<Model*> models;
-	//models.push_back(&model1);
+	models.push_back(&model1);
 	//models.push_back(&model2);
 	//models.push_back(&model3);
 
@@ -614,6 +716,7 @@ int main()
 
 		// Specify the color of the background
 		glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+		glClearDepth(CLEAR_DEPTH_VALUE);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
