@@ -51,6 +51,13 @@ private:
 	float angleDegY;
 	float angleDegZ;
 	MathUseful mathUseful;
+	std::vector<GLfloat> depth_values;
+
+	GLdouble min_z; //should be between 0 to 1 (otherwise clamped to the closest edge)
+	GLdouble max_z; //should be between 0 to 1 (otherwise clamped to the closest edge)
+	GLdouble clear_depth_value;
+	GLdouble desired_min_z;
+	GLdouble desired_max_z;
 
 public:
 	glm::vec3 position;
@@ -69,7 +76,7 @@ public:
 	float sensitivity = 100.0f;
 
 	// Camera constructor to set up initial values
-	Camera(int width, int height, glm::vec3 position, float fov, float nearZ, float farZ, std::string cameraName);
+	Camera(int width, int height, glm::vec3 position, float fov, float nearZ, float farZ, std::string cameraName, GLdouble min_z, GLdouble max_z, GLdouble clear_depth_value, GLdouble desired_min_z, GLdouble desired_max_z);
 
 	// Updates the camera matrix to the Vertex Shader
 	void updateMatrix();
@@ -95,6 +102,10 @@ public:
 
 	void setParams(CameraParameters params);
 
+	glm::vec3 convertPixelToWorldPosition(int pixel_x, int pixel_y);
 
+	std::vector<std::vector<glm::vec3>> convert2dPixelsTo3dWorldCoordinates(std::vector<std::vector<cv::Point>> pixels);
+
+	float calculatePixelDepth(int pixel_x, int pixel_y);
 };
 #endif

@@ -2,7 +2,7 @@
 
 
 
-Camera::Camera(int width, int height, glm::vec3 position, float fovDeg, float nearPlane, float farPlane, std::string cameraName)
+Camera::Camera(int width, int height, glm::vec3 position, float fovDeg, float nearPlane, float farPlane, std::string cameraName, GLdouble min_z, GLdouble max_z, GLdouble clear_depth_value, GLdouble desired_min_z, GLdouble desired_max_z)
 {
 	this->cameraName = cameraName;
 	Camera::width = width;
@@ -11,6 +11,14 @@ Camera::Camera(int width, int height, glm::vec3 position, float fovDeg, float ne
 	this->fovDeg = fovDeg;
 	this->nearPlane = nearPlane;
 	this->farPlane = farPlane;
+
+	this->min_z = min_z;
+	this->max_z = max_z;
+	this->clear_depth_value = clear_depth_value;
+	this->desired_min_z = desired_min_z;
+	this->desired_max_z = desired_max_z;
+
+
 
 	this->updateMatrix();
 }
@@ -84,6 +92,89 @@ CameraParameters Camera::getParams() const {
 
 void Camera::setParams(CameraParameters params) {
 	this->params = params;
+}
+
+std::vector<std::vector<glm::vec3>> Camera::convert2dPixelsTo3dWorldCoordinates(std::vector<std::vector<cv::Point>> pixels) {
+	//cv::Mat1f depthImg(height, width);
+	//glReadPixels(0, 0, depthImg.cols, depthImg.rows, GL_DEPTH_COMPONENT, GL_FLOAT, depthImg.data);
+	//imshow("depth image", depthImg);
+	//cv::waitKey(0);
+
+	for (int i = 0; i < width * height; i++)
+	{
+		depth_values.push_back(0.0);
+	}
+	glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, &depth_values[0]);
+
+	std::vector<std::vector<glm::vec3>> worldCoordsPolygons;
+	size_t numOfPolygons = pixels.size();
+	for (size_t i = 0; i < numOfPolygons; i++) {
+		std::vector<cv::Point> polygon = pixels[i];
+		size_t numOfPointsInPolygon = polygon.size();
+		std::vector<glm::vec3> currentPolygonWorldCoords;
+		for (size_t j = 0; j < numOfPointsInPolygon; j++) {
+			cv::Point pixel = polygon[j];
+			int x = pixel.x;
+			int y = pixel.y;
+
+			glm::vec3 worldCoords = convertPixelToWorldPosition(x, y);
+			currentPolygonWorldCoords.push_back(worldCoords);
+
+			//float xNdc = ((2.0f * (float)x) / ((float)width - 1.0f)) - 1.0f;
+			//float yNdc = ((2.0f * ((float)height - 1.0f - y)) / ((float)height - 1.0f)) - 1.0f;
+			//float zNdc = depthImg.at<float>(x, y);
+
+			//glm::vec4 ndc = glm::vec4(xNdc, yNdc, zNdc, 1.0f);
+
+			//glm::mat projectionMatrixTranspose = glm::transpose(camera->getProjectionMatrix());
+			//glm::mat viewMatrixTranspose = glm::transpose(camera->getViewMatrix());
+
+			//glm::mat4 vpMatrix = viewMatrixTranspose * projectionMatrixTranspose;
+			//glm::mat4 inverseVpMatrix = glm::inverse(vpMatrix);
+
+			//glm::vec4 temp = inverseVpMatrix * ndc;
+			//glm::vec3 worldCoords = glm::vec3(temp.x / temp.w, temp.y / temp.w, temp.z / temp.w);
+			//currentPolygonWorldCoords.push_back(worldCoords);
+		}
+		worldCoordsPolygons.push_back(currentPolygonWorldCoords);
+	}
+	return worldCoordsPolygons;
+}
+
+float Camera::calculatePixelDepth(int pixel_x, int pixel_y)
+{
+	float min_depth = *std::min_element(depth_values.begin(), depth_values.end());
+	float max_depth = *std::max_element(depth_values.begin(), depth_values.end());
+
+	int pixel_y_upside_down = height - pixel_y;
+	size_t pixel_index = (pixel_y_upside_down - 1) * width + pixel_x;
+	float pixel_depth = depth_values[pixel_index];
+
+	float pixel_depth_new_range = ((pixel_depth - min_z) / (max_z - min_z)) * (desired_max_z - desired_min_z) + desired_min_z;
+
+	return pixel_depth_new_range;
+}
+
+glm::vec3 Camera::convertPixelToWorldPosition(int pixel_x, int pixel_y)
+{
+	glm::mat4 matProjection = this->projectionMatrix * this->viewMatrix;
+	glm::mat4 matInverse = glm::inverse(matProjection);
+
+	float pixel_depth = calculatePixelDepth(pixel_x, pixel_y);
+	int pixel_y_upside_down = height - pixel_y;
+	float ndc_x = (pixel_x - 0.5 * width) / (0.5 * width);
+	float ndc_y = (pixel_y_upside_down - 0.5 * height) / (0.5 * height);
+
+	glm::vec4 ndc_vec = glm::vec4(ndc_x, ndc_y, pixel_depth, 1.0);
+	glm::vec4 pos = matInverse * ndc_vec;
+	glm::vec3 world_coords = glm::vec3(pos.x, pos.y, pos.z);
+	float w = 1.0 / pos.w;
+
+	world_coords.x = world_coords.x * w;
+	world_coords.y = world_coords.y * w;
+	world_coords.z = world_coords.z * w;
+
+	return world_coords;
 }
 
 
