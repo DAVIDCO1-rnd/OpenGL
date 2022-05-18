@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 using Emgu.CV;
 using Emgu.CV.Structure;
@@ -17,7 +18,7 @@ namespace tutorial1
     {
         Random rand = new Random();
         Image<Bgr, byte> imgInput;
-        Image<Bgr, byte> imgCopy;
+        Image<Bgr, byte> imgWithContours;
         public UserControl1()
         {
             InitializeComponent();
@@ -32,10 +33,9 @@ namespace tutorial1
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 imgInput = new Image<Bgr, byte>(ofd.FileName);
-                imgCopy = imgInput.Copy();
+                imgWithContours = imgInput.Copy();
                 pictureBox1.Image = imgInput.Bitmap;
-                Image<Bgr, byte> imgout = findContours();                                
-                pictureBox2.Image = imgout.Bitmap;
+                calcContoursAndDisplay();
             }
         }
 
@@ -107,20 +107,39 @@ namespace tutorial1
         //    return image;
         //}
 
-        private void convertPixelToWorld(float pixel_x, float pixel_y, float center_x, float center_y, int width, int height, float radius, out float world_x, out float world_y)
+        private void convertPixelToWorld3DPoint(float pixel_x, float pixel_y, float center_x, float center_y, int width, int height, float radius, out float world_x, out float world_y)
         {
-            //I assume here that the height of the image = 2 * radius
-            float aspect = (float)imgInput.Width / (float)imgInput.Height;
+            float aspect;
 
             float min_pixel_x = 0.0f;
             float max_pixel_x = (float)width - 1;
-            float min_world_x = center_x - radius * aspect;
-            float max_world_x = center_x + radius * aspect;
+            float min_world_x;
+            float max_world_x;
 
             float min_pixel_y = 0.0f;
             float max_pixel_y = (float)height - 1;
-            float min_world_y = center_y - radius;
-            float max_world_y = center_y + radius;
+            float min_world_y;
+            float max_world_y;
+
+
+            if (width >= height)
+            {
+                //I assume here that the height of the image = 2 * radius
+                aspect = (float)width / (float)height;
+                min_world_x = center_x - radius * aspect;
+                max_world_x = center_x + radius * aspect;
+                min_world_y = center_y - radius;
+                max_world_y = center_y + radius;
+            }
+            else //height > width
+            {
+                //I assume here that the width of the image = 2 * radius
+                aspect = (float)height / (float)width;
+                min_world_x = center_x - radius;
+                max_world_x = center_x + radius;
+                min_world_y = center_y - radius * aspect;
+                max_world_y = center_y + radius * aspect;
+            }
 
             float ratio_x = (pixel_x - min_pixel_x) / (max_pixel_x - min_pixel_x);
             float ratio_y = (pixel_y - min_pixel_y) / (max_pixel_y - min_pixel_y);
@@ -128,67 +147,109 @@ namespace tutorial1
             world_y = min_world_y + ratio_y * (max_world_y - min_world_y);
         }
 
-        private Image<Bgr, byte> findContours()
+        Image<Gray, byte> convertRgbToBinaryImage(Image<Bgr, byte> imgInput)
         {
-            Image<Gray, byte> imgOutput = imgInput.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
-            Emgu.CV.Util.VectorOfVectorOfPoint contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
+            Image<Gray, byte> binaryImage = imgInput.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
+            return binaryImage;
+        }
+
+
+
+        private void calcPixelContours(Image<Gray, byte> binaryImage, out Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours, out Point[][] pixelsContoursArray, out List<int[]> hierarchies)
+        {
+            pixelsContours = new Emgu.CV.Util.VectorOfVectorOfPoint();
             Mat hierarchyMat = new Mat();
+            CvInvoke.FindContours(binaryImage, pixelsContours, hierarchyMat, Emgu.CV.CvEnum.RetrType.Tree, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
 
-            Image<Bgr, byte> imgout = new Image<Bgr, byte>(imgInput.Width, imgInput.Height, new Bgr(255, 255, 255));
+            hierarchies = new List<int[]>();
+            for (int contourIdx = 0; contourIdx < pixelsContours.Size; contourIdx++)
+            {
+                int[] hierarcyOfCurrentCountour = GetHierarchy(hierarchyMat, contourIdx);
+                hierarchies.Add(hierarcyOfCurrentCountour);
+            }
 
-            CvInvoke.FindContours(imgOutput, contours, hierarchyMat, Emgu.CV.CvEnum.RetrType.Tree, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
+            pixelsContoursArray = pixelsContours.ToArrayOfArray();
+        }
 
-            Point[][] contoursArray = contours.ToArrayOfArray();
+        
+        private Image<Bgr, byte> createImageWithContours(Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours)
+        {
+            Image<Bgr, byte> imgWithContours = new Image<Bgr, byte>(imgInput.Width, imgInput.Height, new Bgr(255, 255, 255));
+            for (int contourIdx = 0; contourIdx < pixelsContours.Size; contourIdx++)
+            {
+                double blue = rand.Next(0, 231);
+                double green = rand.Next(0, 231);
+                double red = rand.Next(0, 231);
+                int thickness = 5;
+                CvInvoke.DrawContours(imgWithContours, pixelsContours, contourIdx, new MCvScalar(blue, green, red), thickness);
+            }
+            return imgWithContours;
+        }
 
+        
+        private List<Matrix<float>> convertPixelsPointsToWorld3DPoints(Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours, float radius, float z, float center_x, float center_y)
+        {
+            float world_x;
+            float world_y;
+
+            List<Matrix<float>> worldPoints = new List<Matrix<float>>();
+            for (int i = 0; i < pixelsContours.Size; i++)
+            {
+                Point[] currentContoursArray = pixelsContours[i].ToArray();
+                int numOfPoints = currentContoursArray.Length;
+                Matrix<float> singleContourWorldPoints = new Matrix<float>(numOfPoints, 3);
+
+                for (int j = 0; j < numOfPoints; j++)
+                {
+                    int pixel_x = currentContoursArray[j].X;
+                    int pixel_y = currentContoursArray[j].Y;
+                    convertPixelToWorld3DPoint(pixel_x, pixel_y, center_x, center_y, imgInput.Width, imgInput.Height, radius, out world_x, out world_y);
+
+                    singleContourWorldPoints[j, 0] = world_x;
+                    singleContourWorldPoints[j, 1] = world_y;
+                    singleContourWorldPoints[j, 2] = z;
+                }
+                float[,] elements = singleContourWorldPoints.Data;
+                worldPoints.Add(singleContourWorldPoints);
+            }
+            return worldPoints;
+        }
+
+        private void calcContoursAndDisplay()
+        {
             float radius = 10000.0f;
             float z = 500.0f;
 
             float center_x = 0.0f;
             float center_y = 0.0f;
 
-            float world_x;
-            float world_y;
 
-            List<Matrix<float>> worldPoints = new List<Matrix<float>>();
-            for (int i = 0; i < contours.Size; i++)
-            {
-                Point[] currentContoursArray = contours[i].ToArray();
-                int numOfPoints = currentContoursArray.Length;
-                Matrix<float> singleContourWorldPoints = new Matrix<float>(numOfPoints, 3);
+            List<int[]> hierarchies;
+            Point[][] pixelsContoursArray;
+            Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours;
 
-                for (int j=0; j<numOfPoints; j++)
-                {
-                    int pixel_x = currentContoursArray[j].X;
-                    int pixel_y = currentContoursArray[j].Y;
-                    convertPixelToWorld(pixel_x, pixel_y, center_x, center_y, imgInput.Width, imgInput.Height, radius, out world_x, out world_y);
+            DateTime start = DateTime.Now;
 
-                    singleContourWorldPoints[j, 0] = world_x;
-                    singleContourWorldPoints[j, 1] = world_y;
-                    singleContourWorldPoints[j, 2] = z;                    
-                }
-                float[,] elements = singleContourWorldPoints.Data;
-                worldPoints.Add(singleContourWorldPoints);
-            }
-            
+            Image<Gray, byte> binaryImage = convertRgbToBinaryImage(imgInput);
+            calcPixelContours(binaryImage, out pixelsContours, out pixelsContoursArray, out hierarchies);
+            Image<Bgr, byte> imgWithContours = createImageWithContours(pixelsContours);
+            List<Matrix<float>> worldPoints = convertPixelsPointsToWorld3DPoints(pixelsContours, radius, z, center_x, center_y);
+
+            DateTime end = DateTime.Now;
+
+            TimeSpan ts = (end - start);
+            label1.Text = String.Format("Elapsed Time is {0} ms", ts.TotalMilliseconds);
 
 
-            for (int contourIdx = 0; contourIdx < contours.Size; contourIdx++)
-            {
-                int[] heirarcyOfCurrentCountour = GetHierarchy(hierarchyMat, contourIdx);
-                double blue = rand.Next(0, 231);
-                double green = rand.Next(0, 231);
-                double red = rand.Next(0, 231);
-                int thickness = 5;
-                CvInvoke.DrawContours(imgCopy, contours, contourIdx, new MCvScalar(blue, green, red), thickness);
-            }
-            return imgCopy;
+
+
+            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox2.Image = imgWithContours.Bitmap;
         }
 
         private void findContoursToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
-            Image<Bgr, byte> imgout = findContours();
-            pictureBox2.Image = imgout.Bitmap;
+            calcContoursAndDisplay();
         }
     }
 }
