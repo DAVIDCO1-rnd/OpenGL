@@ -107,6 +107,27 @@ namespace tutorial1
         //    return image;
         //}
 
+        private void convertPixelToWorld(float pixel_x, float pixel_y, float center_x, float center_y, int width, int height, float radius, out float world_x, out float world_y)
+        {
+            //I assume here that the height of the image = 2 * radius
+            float aspect = (float)imgInput.Width / (float)imgInput.Height;
+
+            float min_pixel_x = 0.0f;
+            float max_pixel_x = (float)width - 1;
+            float min_world_x = center_x - radius * aspect;
+            float max_world_x = center_x + radius * aspect;
+
+            float min_pixel_y = 0.0f;
+            float max_pixel_y = (float)height - 1;
+            float min_world_y = center_y - radius;
+            float max_world_y = center_y + radius;
+
+            float ratio_x = (pixel_x - min_pixel_x) / (max_pixel_x - min_pixel_x);
+            float ratio_y = (pixel_y - min_pixel_y) / (max_pixel_y - min_pixel_y);
+            world_x = min_world_x + ratio_x * (max_world_x - min_world_x);
+            world_y = min_world_y + ratio_y * (max_world_y - min_world_y);
+        }
+
         private Image<Bgr, byte> findContours()
         {
             Image<Gray, byte> imgOutput = imgInput.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
@@ -117,7 +138,40 @@ namespace tutorial1
 
             CvInvoke.FindContours(imgOutput, contours, hierarchyMat, Emgu.CV.CvEnum.RetrType.Tree, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
 
-            Point[][] contoursArray = contours.ToArrayOfArray();            
+            Point[][] contoursArray = contours.ToArrayOfArray();
+
+            float radius = 10000.0f;
+            float z = 500.0f;
+
+            float center_x = 0.0f;
+            float center_y = 0.0f;
+
+            float world_x;
+            float world_y;
+
+            List<Matrix<float>> worldPoints = new List<Matrix<float>>();
+            for (int i = 0; i < contours.Size; i++)
+            {
+                Point[] currentContoursArray = contours[i].ToArray();
+                int numOfPoints = currentContoursArray.Length;
+                Matrix<float> singleContourWorldPoints = new Matrix<float>(numOfPoints, 3);
+
+                for (int j=0; j<numOfPoints; j++)
+                {
+                    int pixel_x = currentContoursArray[j].X;
+                    int pixel_y = currentContoursArray[j].Y;
+                    convertPixelToWorld(pixel_x, pixel_y, center_x, center_y, imgInput.Width, imgInput.Height, radius, out world_x, out world_y);
+
+                    singleContourWorldPoints[j, 0] = world_x;
+                    singleContourWorldPoints[j, 1] = world_y;
+                    singleContourWorldPoints[j, 2] = z;                    
+                }
+                float[,] elements = singleContourWorldPoints.Data;
+                worldPoints.Add(singleContourWorldPoints);
+            }
+            
+
+
             for (int contourIdx = 0; contourIdx < contours.Size; contourIdx++)
             {
                 int[] heirarcyOfCurrentCountour = GetHierarchy(hierarchyMat, contourIdx);
