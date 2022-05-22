@@ -690,21 +690,33 @@ namespace Polygons {
 		}
 	}
 
+	struct myclass {
+		bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.y < pt2.y); }
+	} myobject;
+	
+
 	std::vector<std::vector<cv::Point>> calcContours(cv::Mat3b rgbImg, cv::Mat binaryImage) {
 		std::vector<std::vector<cv::Point>> contours;
 		std::vector<cv::Vec4i> hierarchy;
 		findContours(binaryImage, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
 		
-
+		//double peri = cv::ar CvInvoke.ArcLength(currentContour, closed);
+		
+		bool closed = true;
 		cv::RNG rng(12345);
 		cv::Mat image_with_contours = rgbImg.clone();
 		for (int i = 0; i < (int)contours.size(); i++) {
-			if (contours[i].size() < 5) {
+			std::vector<cv::Point> currentContour = contours[i];
+			if (currentContour.size() < 5) {
 				continue;
 			}
+			std::vector<cv::Point> sortedContour = currentContour;
+			sort(sortedContour.begin(), sortedContour.end(), myobject);
+			double peri = cv::arcLength(currentContour, closed);
+			std::vector<std::vector<cv::Point>> singleContour(1, currentContour);;
 			cv::Scalar color = cv::Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
-			drawContours(image_with_contours, contours, i, color, 2);
+			cv::drawContours(image_with_contours, singleContour, 0, color, 2);
 		}
 		imshow("image_with_contours", image_with_contours);
 
