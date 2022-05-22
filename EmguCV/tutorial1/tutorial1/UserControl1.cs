@@ -163,12 +163,13 @@ namespace tutorial1
 
             approxPixelsContours = new Emgu.CV.Util.VectorOfVectorOfPoint();
 
-            double epsilon = 0.0;
+            double epsilon = 10.0;
             bool closed = true;
 
             for (int contourIdx = 0; contourIdx < pixelsContours.Size; contourIdx++)
             {
                 Emgu.CV.Util.VectorOfPoint currentContour = pixelsContours[contourIdx];
+                double peri = CvInvoke.ArcLength(currentContour, closed);
                 Emgu.CV.Util.VectorOfPoint currentapproxContour = new Emgu.CV.Util.VectorOfPoint();
                 CvInvoke.ApproxPolyDP(currentContour, currentapproxContour, epsilon, closed);
                 approxPixelsContours.Push(currentapproxContour);
