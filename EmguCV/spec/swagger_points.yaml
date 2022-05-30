@@ -21,7 +21,7 @@ paths:
       - "Points"
       summary: "Logs out current logged in user session"
       description: ""
-      operationId: "getPoints"
+      operationId: "getSinglePoint"
       produces:
       - "application/xml"
       - "application/json"
@@ -30,7 +30,7 @@ paths:
         200:
           description: "successful operation"
           schema:
-            type: "array"
+            type: "Point"
             items:
               $ref: "#/definitions/Point"
             example:
