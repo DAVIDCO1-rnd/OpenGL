@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1972
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EOSimU.API.AutoGen", "src\EOSimU.API.AutoGen\EOSimU.API.AutoGen.csproj", "{60BCEE10-0E95-4D49-9B07-326253D31F57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Implementation", "Implementation\Implementation.csproj", "{526825FF-7516-47A9-B91E-1F8A25FB777F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60BCEE10-0E95-4D49-9B07-326253D31F57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60BCEE10-0E95-4D49-9B07-326253D31F57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60BCEE10-0E95-4D49-9B07-326253D31F57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60BCEE10-0E95-4D49-9B07-326253D31F57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{526825FF-7516-47A9-B91E-1F8A25FB777F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{526825FF-7516-47A9-B91E-1F8A25FB777F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{526825FF-7516-47A9-B91E-1F8A25FB777F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{526825FF-7516-47A9-B91E-1F8A25FB777F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {14661A01-6AA4-4201-8B0C-BA887C40712B}
+	EndGlobalSection
+EndGlobal
