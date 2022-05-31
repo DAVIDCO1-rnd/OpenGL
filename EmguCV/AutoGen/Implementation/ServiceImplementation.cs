@@ -8,7 +8,7 @@ using EOSimU.API.AutoGen.v1alpha3.Modules;
 using EOSimU.API.AutoGen.v1alpha3.Models;
 using Nancy;
 
-using EOSimU.Util;
+
 using System.Threading.Tasks;
 
 namespace EOSimU.API

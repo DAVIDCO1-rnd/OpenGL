@@ -32,7 +32,7 @@ namespace EOSimU.API
     {
         private readonly Action<TinyIoCContainer> registerHook;
         
-        private bool isWindows = UnityEngine.SystemInfo.operatingSystem.Contains("Windows");
+
 
         public SwaggerBootstrapper(Action<TinyIoCContainer> registerHook) : base()
         {
@@ -57,13 +57,19 @@ namespace EOSimU.API
 
         protected override void RequestStartup(TinyIoCContainer requestContainer, Nancy.Bootstrapper.IPipelines pipelines, NancyContext context)
         {
+            pipelines.BeforeRequest.AddItemToStartOfPipeline(ctx => {
+                if (ctx != null)
+                {
+                    Console.WriteLine("Request: " + ctx.Request.Url);
+                }
+                return null;
+            });
+
             pipelines.OnError.AddItemToEndOfPipeline((ctx, ex) => HandleSwaggerException(ctx, ex));
+
             pipelines.AfterRequest += (ctx) =>
             {
-                // Adding this header slow down on Windows, but is neccessary on Linux
-                // NEEDS MORE RESEARCH
-                if (!isWindows)
-                    ctx.Response.Headers["Connection"] = "close";
+                ctx.Response.Headers["Connection"] = "close";
             };
             base.RequestStartup(requestContainer, pipelines, context);
         }
@@ -152,15 +158,15 @@ namespace EOSimU.API
         }
     }
 
-    public static class SwaggerUtils
-    {
-        public static void RegisterCallbacks(TinyIoCContainer container, SceneController controller)
-        {
-            container.Register<SceneService>(new SceneModule(controller));
-            container.Register<EntityService>(new EntityModule(controller));
-            container.Register<EntityCameraService>(new EntityCameraModule(controller));
-            container.Register<EntityCameraQuantumService>(new EntityCameraQuantumModule(controller));
-            container.Register<DefaultService>(new DefaultModule(controller));
-        }
-    }
+    //public static class SwaggerUtils
+    //{
+    //    public static void RegisterCallbacks(TinyIoCContainer container, SceneController controller)
+    //    {
+    //        container.Register<SceneService>(new SceneModule(controller));
+    //        container.Register<EntityService>(new EntityModule(controller));
+    //        container.Register<EntityCameraService>(new EntityCameraModule(controller));
+    //        container.Register<EntityCameraQuantumService>(new EntityCameraQuantumModule(controller));
+    //        container.Register<DefaultService>(new DefaultModule(controller));
+    //    }
+    //}
 }

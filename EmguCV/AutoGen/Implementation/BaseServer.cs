@@ -12,7 +12,12 @@ namespace EOSimU.API
 
         void Main(string[] args)
         {
-            host = new NancyHost(new SwaggerBootstrapper((ioc) => SwaggerUtils.RegisterCallbacks(ioc, controller)), new Uri(uri));
+            HostConfiguration hostConfigs = new HostConfiguration()
+            {
+                UrlReservations = new UrlReservations() { CreateAutomatically = true },
+            };
+
+            host = new NancyHost(new Uri(uri), new SwaggerBootstrapper(RegisterSupport.RegisterCallbacks), hostConfigs);
             host.Start();
         }
 
