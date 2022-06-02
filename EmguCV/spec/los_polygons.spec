@@ -14,18 +14,27 @@ tags:
 schemes:
 - "http"
 paths:
-  /Scene/Init/{scenarioName}:
+  /Scene/Init/{scenarioName}{target3dLocationAndHeight}:
     post:
       tags:
       - "Scene"
       summary: "Initialize the scenario"
       operationId: "SceneInit"
       parameters:
-      - name: "scenarioName"
-        in: "path"
+      - in: "path"
+        name: "scenarioName"
         description: "Name of scenario to load"
         required: true
         type: "string"
+      - in: "path"
+        name: "target3dLocationAndHeight"
+        description: "target location"
+        required: true
+        type: "array"
+        collectionFormat: csv
+        items:
+          type: number
+          format: double        
       responses:
         "204":
           description: "successful operation"
@@ -66,13 +75,13 @@ definitions:
     - "longitude"
     - "altitude"
     properties:
-      latitude:
+      x:
         type: "number"
         format: "double"
-      longitude:
+      y:
         type: "number"
         format: "double"
-      altitude:
+      z:
         type: "number"
         format: "double"
   Polygon:
