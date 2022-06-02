@@ -1,30 +1,30 @@
-using System;
-using Nancy.Hosting.Self;
+//using System;
+//using Nancy.Hosting.Self;
 
-namespace EOSimU.API
-{
-    public class BaseServer
-    {
-        public string uri = "http://localhost:8080/";
-        private NancyHost host;
+//namespace EOSimU.API
+//{
+//    public class BaseServer
+//    {
+//        public string uri = "http://localhost:8080/";
+//        private NancyHost host;
 
-        public SceneController controller;
+//        public SceneController controller;
 
-        void Main(string[] args)
-        {
-            HostConfiguration hostConfigs = new HostConfiguration()
-            {
-                UrlReservations = new UrlReservations() { CreateAutomatically = true },
-            };
+//        void Main(string[] args)
+//        {
+//            HostConfiguration hostConfigs = new HostConfiguration()
+//            {
+//                UrlReservations = new UrlReservations() { CreateAutomatically = true },
+//            };
 
-            host = new NancyHost(new Uri(uri), new SwaggerBootstrapper(RegisterSupport.RegisterCallbacks), hostConfigs);
-            host.Start();
-        }
+//            host = new NancyHost(new Uri(uri), new SwaggerBootstrapper(RegisterSupport.RegisterCallbacks), hostConfigs);
+//            host.Start();
+//        }
 
-        //private void OnDestroy()
-        //{
-        //    host?.Stop();
-        //    host?.Dispose();
-        //}
-    }
-}
+//        //private void OnDestroy()
+//        //{
+//        //    host?.Stop();
+//        //    host?.Dispose();
+//        //}
+//    }
+//}
