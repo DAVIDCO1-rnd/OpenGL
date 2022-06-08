@@ -63,12 +63,16 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Category.cs" />
-    <Compile Include="Models\Pet.cs" />
-    <Compile Include="Models\Tag.cs" />
-    <Compile Include="Modules\PetModule.cs" />
+    <Compile Include="Models\Point.cs" />
+    <Compile Include="Models\Polygon.cs" />
+    <Compile Include="Modules\EntityModule.cs" />
+    <Compile Include="Modules\SceneModule.cs" />
+    <Compile Include="Swagger\SwaggerSupport.cs" />
+    <Compile Include="Utils\BaseServer.cs" />
     <Compile Include="Utils\LocalDateConverter.cs" />
     <Compile Include="Utils\Parameters.cs" />
+    <Compile Include="Utils\RegisterSupport.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MsBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

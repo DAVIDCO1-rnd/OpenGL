@@ -7,17 +7,15 @@ info:
 host: "localhost:8080"
 basePath: "/v1alpha3"
 tags:
-- name: "Scene"
-  description: "Scene operations"
-- name: "Entity"
-  description: "Common entities operations"
+- name: "PolygonsLos"
+  description: "Polygons Los operations"
 schemes:
 - "http"
 paths:
-  /Scene/Init/{scenarioName}{target3dLocationAndHeight}:
+  /PolygonsLos/Init/{scenarioName}{cameraX}/{cameraY}/{cameraZ}/{plateHeightAboveTarget}:
     post:
       tags:
-      - "Scene"
+      - "PolygonsLos"
       summary: "Initialize the scenario"
       operationId: "SceneInit"
       parameters:
@@ -27,37 +25,67 @@ paths:
         required: true
         type: "string"
       - in: "path"
-        name: "target3dLocationAndHeight"
-        description: "target location"
+        name: "cameraX"
+        description: "cameraX location"
         required: true
-        type: "array"
-        collectionFormat: csv
-        items:
-          type: number
-          format: double        
+        type: number
+        format: double
+      - in: "path"
+        name: "cameraY"
+        description: "cameraY location"
+        required: true
+        type: number
+        format: double
+      - in: "path"
+        name: "cameraZ"
+        description: "cameraZ location"
+        required: true
+        type: number
+        format: double
+      - in: "path"
+        name: "plateHeightAboveTarget"
+        description: "Height (in meters) of the plate above the target"
+        required: true
+        type: number
+        format: double        
       responses:
         "204":
           description: "successful operation"
         "404":
           description: "scenario not found"
-  /Entity/Polygons{target3dLocationAndHeight}:
+  /PolygonsLos/getPolygons/{cameraX}/{cameraY}/{cameraZ}/{plateHeightAboveTarget}:
     get:
       tags:
-      - "Entity"
+      - "PolygonsLos"
       summary: "Returns a list of polygons given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)"
       operationId: "ScenePolygons"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "target3dLocationAndHeight"
-        description: "target location"
+        name: "cameraX"
+        description: "cameraX location"
         required: true
-        type: "array"
-        collectionFormat: csv
-        items:
-          type: number
-          format: double
+        type: number
+        format: double
+      - in: "path"
+        name: "cameraY"
+        description: "cameraY location"
+        required: true
+        type: number
+        format: double
+      - in: "path"
+        name: "cameraZ"
+        description: "cameraZ location"
+        required: true
+        type: number
+        format: double
+      - in: "path"
+        name: "plateHeightAboveTarget"
+        description: "Height (in meters) of the plate above the target"
+        required: true
+        type: number
+        format: double        
       responses:
         "200":
           description: "successful operation"

@@ -158,7 +158,7 @@ namespace tutorial1
         private void calcPixelContours(Image<Gray, byte> binaryImage, out Emgu.CV.Util.VectorOfVectorOfPoint approxPixelsContours, out Point[][] approxPixelsContoursArray, out List<int[]> hierarchies)
         {
             Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours = new Emgu.CV.Util.VectorOfVectorOfPoint();
-            Mat hierarchyMat = new Mat();
+            Emgu.CV.Mat hierarchyMat = new Emgu.CV.Mat();
             CvInvoke.FindContours(binaryImage, pixelsContours, hierarchyMat, Emgu.CV.CvEnum.RetrType.Tree, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
 
             approxPixelsContours = new Emgu.CV.Util.VectorOfVectorOfPoint();
