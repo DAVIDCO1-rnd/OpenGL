@@ -12,7 +12,7 @@ tags:
 schemes:
 - "http"
 paths:
-  /PolygonsLos/Init/{scenarioName}{cameraX}/{cameraY}/{cameraZ}/{plateHeightAboveTarget}:
+  /PolygonsLos/Init/{scenarioName}/{cameraX}/{cameraY}/{cameraZ}/{plateHeightAboveTarget}:
     post:
       tags:
       - "PolygonsLos"
