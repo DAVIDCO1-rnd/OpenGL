@@ -36,7 +36,7 @@ namespace EOSimU.API.AutoGen.v1alpha3.Adaptors
                 int width = 2048;
                 int height = 2560;
 
-                service.initLos(scenarioName, cameraXDouble, cameraYDouble, cameraZDouble, plateHeightAboveTargetDouble, epsilon, width, height);
+                service.InitLos(scenarioName, cameraXDouble, cameraYDouble, cameraZDouble, plateHeightAboveTargetDouble, epsilon, width, height);
             }
         }
 

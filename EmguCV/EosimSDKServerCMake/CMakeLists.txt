@@ -4,10 +4,13 @@ project(EosimSdkServerSolution VERSION 1.0.0 LANGUAGES CSharp)
 
 include(CSharpUtilities)
 
-ADD_LIBRARY(PluginEosimImpProject SHARED PluginEosimImp/PolygonsLosModuleImplementation.cs)
+set(CMAKE_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.1")
+
+file(GLOB IMAPLEMENTATION_FILES "PluginEosimImp/*.cs")
+ADD_LIBRARY(PluginEosimImpProject SHARED ${IMAPLEMENTATION_FILES})
+target_compile_options(PluginEosimImpProject PUBLIC "/unsafe")
 if(WIN32)
 	set_property(TARGET PluginEosimImpProject PROPERTY VS_DOTNET_REFERENCE_Emgu.CV.World "C:/Emgu/libemgucv-windesktop-3.1.0.2504-r16.12/bin/Emgu.CV.World.dll")
-	set_property(TARGET PluginEosimImpProject PROPERTY DOTNET_TARGET_FRAMEWORK_VERSION "v4.5")
 endif(WIN32)
 
 file(GLOB SOURCES_FILES
@@ -24,7 +27,7 @@ endforeach(SUBSOURCE)
 
 message(STATUS "SOURCES_FILES = ${SOURCES_FILES}")
 
-set(CMAKE_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.1")
+
 
 ADD_LIBRARY(PluginProtocolSwaggerProject SHARED ${SOURCES_FILES})
 
