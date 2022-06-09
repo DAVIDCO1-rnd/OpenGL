@@ -1,30 +1,29 @@
 ﻿using System;
 using Nancy.Hosting.Self;
+using EOSimU.API.AutoGen.Swagger;
 
-namespace EOSimU.API
+namespace EOSimU.API.Utils
 {
-    public class BaseServer
-    {
-        public string uri = "http://localhost:8080/";
-        private NancyHost host;
+    public class BaseServer : IDisposable
+    {        
+        private NancyHost hostNancy;
+        public string hostUrl = "http://localhost:8080/";       
 
-        public SceneController controller;
-
-        void Main(string[] args)
+        public void Start()
         {
             HostConfiguration hostConfigs = new HostConfiguration()
             {
                 UrlReservations = new UrlReservations() { CreateAutomatically = true },
             };
 
-            host = new NancyHost(new Uri(uri), new SwaggerBootstrapper(RegisterSupport.RegisterCallbacks), hostConfigs);
-            host.Start();
+            hostNancy = new NancyHost(new System.Uri(hostUrl), new SwaggerBootstrapper(RegisterSupport.RegisterCallbacks), hostConfigs);
+            hostNancy.Start();
         }
 
-        //private void OnDestroy()
-        //{
-        //    host?.Stop();
-        //    host?.Dispose();
-        //}
+        public void Dispose()
+        {
+            hostNancy.Stop();
+            hostNancy.Dispose();
+        }
     }
 }
