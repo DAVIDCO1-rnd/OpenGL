@@ -15,11 +15,12 @@ if(WIN32)
 endif(WIN32)
 
 file(GLOB SOURCES_FILES
-	"src/PluginProtocolSwagger/AutoGen/Adaptors/*.cs"
 	"src/PluginProtocolSwagger/AutoGen/Models/*.cs"
 	"src/PluginProtocolSwagger/AutoGen/Modules/*.cs"
-	"src/PluginProtocolSwagger/AutoGen/Swagger/*.cs"
 	"src/PluginProtocolSwagger/AutoGen/Utils/*.cs"
+	"src/PluginProtocolSwagger/Adaptors/*.cs"
+	"src/PluginProtocolSwagger/ServerUtils/*.cs"
+	"src/PluginProtocolSwagger/Swagger/*.cs"
 )	
 
 foreach (SUBSOURCE ${SOURCES_FILES})
@@ -35,12 +36,12 @@ ADD_LIBRARY(PluginProtocolSwaggerProject SHARED ${SOURCES_FILES})
 if(WIN32)
 	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCES "Microsoft.CSharp;System")
 	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Emgu.CV.World "C:/EmguCV/bin/Emgu.CV.World.dll")
-	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Sharpility "../dlls/Sharpility.dll")
-	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_NodaTime "../dlls/NodaTime.dll")
-	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Nancy "../dlls/Nancy.dll")
-	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Nancy.Hosting.Self "../dlls/Nancy.Hosting.Self.dll")	
-	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Newtonsoft.Json "../dlls/Newtonsoft.Json.dll")
-	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_System.Collections.Immutable "../dlls/System.Collections.Immutable.dll")
+	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Sharpility "./dlls/Sharpility.dll")
+	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_NodaTime "./dlls/NodaTime.dll")
+	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Nancy "./dlls/Nancy.dll")
+	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Nancy.Hosting.Self "./dlls/Nancy.Hosting.Self.dll")	
+	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Newtonsoft.Json "./dlls/Newtonsoft.Json.dll")
+	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_System.Collections.Immutable "./dlls/System.Collections.Immutable.dll")
 endif(WIN32)
 
 target_link_libraries(PluginProtocolSwaggerProject PUBLIC PluginEosimImpProject)

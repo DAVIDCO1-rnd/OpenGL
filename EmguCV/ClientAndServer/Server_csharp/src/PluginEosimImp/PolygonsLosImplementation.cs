@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EOSim.SDK.Logic
 {
-    public sealed class PolygonsLosModuleImplementation
+    public sealed class PolygonsLosImplementation
     {
         public void InitLos(string scenarioName, double cameraX, double cameraY, double cameraZ, double plateHeightAbovePoint, double epsilon, int width, int height)
         {

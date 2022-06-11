@@ -3,11 +3,11 @@ using EOSimU.API.AutoGen.v1alpha3.Modules;
 using Nancy;
 using System.Collections.Generic;
 
-namespace EOSimU.API.AutoGen.v1alpha3.Adaptors
+namespace EOSimU.API.Adaptors
 {
     internal class PolygonsLosAdaptor : EOSimU.API.AutoGen.v1alpha3.Modules.PolygonsLosService
     {
-        private EOSim.SDK.Logic.PolygonsLosModuleImplementation service;
+        private EOSim.SDK.Logic.PolygonsLosImplementation service;
 
         private double cameraX;
         private double cameraY;
@@ -15,7 +15,7 @@ namespace EOSimU.API.AutoGen.v1alpha3.Adaptors
         private double plateHeightAbovePoint;
         private double epsilon = 1.0;
 
-        public PolygonsLosAdaptor(EOSim.SDK.Logic.PolygonsLosModuleImplementation service)
+        public PolygonsLosAdaptor(EOSim.SDK.Logic.PolygonsLosImplementation service)
         {
             this.service = service;
         }

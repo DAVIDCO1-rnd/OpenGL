@@ -10,7 +10,7 @@ using Nancy.Bootstrapper;
 using Nancy.Diagnostics;
 #endif
 
-namespace EOSimU.API.AutoGen.Swagger
+namespace EOSimU.API.Swagger
 {
     class SwaggerException : Exception
     {

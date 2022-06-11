@@ -1,6 +1,6 @@
 ﻿using System;
 using Nancy.Hosting.Self;
-using EOSimU.API.AutoGen.Swagger;
+using EOSimU.API.Swagger;
 using EOSimU.API.AutoGen.v1alpha3.Modules;
 
 namespace EOSimU.API.Utils
@@ -17,7 +17,7 @@ namespace EOSimU.API.Utils
                 UrlReservations = new Nancy.Hosting.Self.UrlReservations() { CreateAutomatically = true },
             };
 
-            hostNancy = new Nancy.Hosting.Self.NancyHost(new System.Uri(hostUrl), new EOSimU.API.AutoGen.Swagger.SwaggerBootstrapper(EOSimU.API.Utils.RegisterSupport.RegisterCallbacks), hostConfigs);
+            hostNancy = new Nancy.Hosting.Self.NancyHost(new System.Uri(hostUrl), new EOSimU.API.Swagger.SwaggerBootstrapper(EOSimU.API.Utils.RegisterSupport.RegisterCallbacks), hostConfigs);
             hostNancy.Start();
         }
 
