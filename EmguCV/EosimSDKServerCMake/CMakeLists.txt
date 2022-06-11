@@ -6,19 +6,20 @@ include(CSharpUtilities)
 
 set(CMAKE_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.1")
 
-file(GLOB IMAPLEMENTATION_FILES "PluginEosimImp/*.cs")
+file(GLOB IMAPLEMENTATION_FILES "src/PluginEosimImp/*.cs")
 ADD_LIBRARY(PluginEosimImpProject SHARED ${IMAPLEMENTATION_FILES})
 target_compile_options(PluginEosimImpProject PUBLIC "/unsafe")
 if(WIN32)
-	set_property(TARGET PluginEosimImpProject PROPERTY VS_DOTNET_REFERENCE_Emgu.CV.World "C:/Emgu/libemgucv-windesktop-3.1.0.2504-r16.12/bin/Emgu.CV.World.dll")
+	set_property(TARGET PluginEosimImpProject PROPERTY VS_DOTNET_REFERENCE_Emgu.CV.World "C:/EmguCV/bin/Emgu.CV.World.dll")
+	set_property(TARGET PluginEosimImpProject PROPERTY VS_DOTNET_REFERENCE_cvextern "C:/EmguCV/bin/x64/cvextern.dll")	
 endif(WIN32)
 
 file(GLOB SOURCES_FILES
-	"PluginProtocolSwagger/AutoGen/Adaptors/*.cs"
-	"PluginProtocolSwagger/AutoGen/Models/*.cs"
-	"PluginProtocolSwagger/AutoGen/Modules/*.cs"
-	"PluginProtocolSwagger/AutoGen/Swagger/*.cs"
-	"PluginProtocolSwagger/AutoGen/Utils/*.cs"
+	"src/PluginProtocolSwagger/AutoGen/Adaptors/*.cs"
+	"src/PluginProtocolSwagger/AutoGen/Models/*.cs"
+	"src/PluginProtocolSwagger/AutoGen/Modules/*.cs"
+	"src/PluginProtocolSwagger/AutoGen/Swagger/*.cs"
+	"src/PluginProtocolSwagger/AutoGen/Utils/*.cs"
 )	
 
 foreach (SUBSOURCE ${SOURCES_FILES})
@@ -33,7 +34,7 @@ ADD_LIBRARY(PluginProtocolSwaggerProject SHARED ${SOURCES_FILES})
 
 if(WIN32)
 	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCES "Microsoft.CSharp;System")
-	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Emgu.CV.World "C:/Emgu/libemgucv-windesktop-3.1.0.2504-r16.12/bin/Emgu.CV.World.dll")
+	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Emgu.CV.World "C:/EmguCV/bin/Emgu.CV.World.dll")
 	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Sharpility "../dlls/Sharpility.dll")
 	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_NodaTime "../dlls/NodaTime.dll")
 	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Nancy "../dlls/Nancy.dll")
@@ -46,12 +47,12 @@ target_link_libraries(PluginProtocolSwaggerProject PUBLIC PluginEosimImpProject)
 
 #C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1\System.dll
 
-file(GLOB PROTOCOL_PLUGIN_FILES "ProtocolPluginLoader/*.cs")
+file(GLOB PROTOCOL_PLUGIN_FILES "src/ProtocolPluginLoader/*.cs")
 ADD_LIBRARY(ProtocolPluginLoaderProject SHARED ${PROTOCOL_PLUGIN_FILES})
 	
 target_link_libraries(ProtocolPluginLoaderProject PUBLIC PluginProtocolSwaggerProject)
 
-add_executable(ServerApp ServerApp/Program.cs)
+add_executable(ServerApp src/ServerApp/Program.cs)
 target_link_libraries(ServerApp PUBLIC ProtocolPluginLoaderProject)
 
 

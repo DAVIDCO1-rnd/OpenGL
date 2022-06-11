@@ -69,6 +69,38 @@ namespace EOSimU.API.AutoGen.v1alpha3.Adaptors
             return listOfPolygons;
         }
 
+
+        public List<Polygon> CreateDummyListOfPolygons()
+        {
+            List<Polygon> listOfPolygons = new List<Polygon>();
+            int numOfPolygons = 2;
+            List<int> numOfPointsForEachPolygon = new List<int> { 5, 7 };
+            for (int i = 0; i < numOfPolygons; i++)
+            {
+                List<Point> currentPolygonPoints = new List<Point>();
+                int numOfPoints = numOfPointsForEachPolygon[i];
+                for (int j = 0; j < numOfPoints; j++)
+                {
+                    float x = i * 10 + j + 1;
+                    float y = i * 10 + j + 1;
+                    float z = 1000.0f;
+
+                    Point.PointBuilder pointBuilder = new Point.PointBuilder();
+                    pointBuilder.X(x);
+                    pointBuilder.Y(y);
+                    pointBuilder.Z(z);
+                    Point currentPoint = pointBuilder.Build();
+                    currentPolygonPoints.Add(currentPoint);
+                }
+
+                Polygon.PolygonBuilder currentPolygonBuilder = new Polygon.PolygonBuilder();
+                currentPolygonBuilder.Vertices(currentPolygonPoints);
+                Polygon currentPolygon = currentPolygonBuilder.Build();
+                listOfPolygons.Add(currentPolygon);
+            }
+            return listOfPolygons;
+        }
+
         public List<Polygon> ScenePolygons(NancyContext context, double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget)
         {
             if (cameraX == null || cameraY == null || cameraZ == null || plateHeightAboveTarget == null)
@@ -82,7 +114,8 @@ namespace EOSimU.API.AutoGen.v1alpha3.Adaptors
                 double cameraZDouble = (double)cameraZ;
                 double plateHeightAboveTargetDouble = (double)plateHeightAboveTarget;
                 List<Emgu.CV.Matrix<float>> listOfMatrices = service.CalculateWorldPoints(cameraXDouble, cameraYDouble, cameraZDouble, plateHeightAboveTargetDouble, epsilon);
-                List<Polygon> listOfPolygons = ConvertListOfMatricesToListOfPolygons(listOfMatrices);
+                //List<Polygon> listOfPolygons = ConvertListOfMatricesToListOfPolygons(listOfMatrices);
+                List<Polygon> listOfPolygons = CreateDummyListOfPolygons();
                 return listOfPolygons;
             }
         }

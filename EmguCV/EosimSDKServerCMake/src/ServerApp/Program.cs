@@ -1,6 +1,5 @@
 ﻿using System;
 using EOSim.SDK.ProtocolPlugins;
-using System.Threading;
 
 
 namespace ServerApp
@@ -10,10 +9,9 @@ namespace ServerApp
         [STAThread]
         static void Main(string[] args)
         {
-            SynchronizationContext sctx = SynchronizationContext.Current;
-            using (var p = new ProtocolPluginLoader())
+            using (var eosimLoader = new EOSim.SDK.ProtocolPlugins.ProtocolPluginLoader())
             {
-                p.BootstrapProtocolAndImplementation();
+                eosimLoader.BootstrapProtocolAndImplementation();
                 Console.ReadLine();
             }
         }

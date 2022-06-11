@@ -4,11 +4,11 @@ namespace EOSim.SDK.ProtocolPlugins
 {
     class SwaggerProtocolPlugin : IProtocolPlugin
     {
-        BaseServer server;
+        EOSimU.API.Utils.BaseServer server;
 
         public void Bootstrap()
         {
-            server = new BaseServer();
+            server = new EOSimU.API.Utils.BaseServer();
             server.Start();
         }
 
