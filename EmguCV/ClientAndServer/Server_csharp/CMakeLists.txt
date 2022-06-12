@@ -56,6 +56,21 @@ target_link_libraries(ProtocolPluginLoaderProject PUBLIC PluginProtocolSwaggerPr
 add_executable(ServerApp src/ServerApp/Program.cs)
 target_link_libraries(ServerApp PUBLIC ProtocolPluginLoaderProject)
 
+message(STATUS "CMAKE_COMMAND=${CMAKE_COMMAND}")
+message(STATUS "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
 
+
+message(STATUS "PROJECT_SOURCE_DIR = ${PROJECT_SOURCE_DIR}/build/Debug/")
+
+#[[
+file(GLOB OUTPUT_FILES "${PROJECT_SOURCE_DIR}/build/Debug/*")
+foreach(OUTPUT_SINGLE_FILE ${OUTPUT_FILES})
+    if(WIN32)
+        add_custom_command(TARGET ServerApp POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_SINGLE_FILE} ${PROJECT_SOURCE_DIR}/build/david)
+    endif(WIN32)
+endforeach(OUTPUT_SINGLE_FILE)
+]]
+
+add_custom_command(TARGET ServerApp POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/build/Debug ${PROJECT_SOURCE_DIR}/build/david)
 
 
