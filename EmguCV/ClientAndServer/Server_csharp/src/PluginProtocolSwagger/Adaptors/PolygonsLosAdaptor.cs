@@ -59,6 +59,7 @@ namespace EOSimU.API.Adaptors
                     pointBuilder.Y(y);
                     pointBuilder.Z(z);
                     Point currentPoint = pointBuilder.Build();
+                    currentPolygonPoints.Add(currentPoint);
                 }
 
                 Polygon.PolygonBuilder currentPolygonBuilder = new Polygon.PolygonBuilder();
@@ -114,8 +115,8 @@ namespace EOSimU.API.Adaptors
                 double cameraZDouble = (double)cameraZ;
                 double plateHeightAboveTargetDouble = (double)plateHeightAboveTarget;
                 List<Emgu.CV.Matrix<float>> listOfMatrices = service.CalculateWorldPoints(cameraXDouble, cameraYDouble, cameraZDouble, plateHeightAboveTargetDouble, epsilon);
-                //List<Polygon> listOfPolygons = ConvertListOfMatricesToListOfPolygons(listOfMatrices);
-                List<Polygon> listOfPolygons = CreateDummyListOfPolygons();
+                List<Polygon> listOfPolygons = ConvertListOfMatricesToListOfPolygons(listOfMatrices);
+                //List<Polygon> listOfPolygons = CreateDummyListOfPolygons();
                 return listOfPolygons;
             }
         }

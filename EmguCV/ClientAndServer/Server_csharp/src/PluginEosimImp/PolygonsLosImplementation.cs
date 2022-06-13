@@ -17,8 +17,8 @@ namespace EOSim.SDK.Logic
 
         public List<Emgu.CV.Matrix<float>> CalculateWorldPoints(double cameraX, double cameraY, double cameraZ, double plateHeightAbovePoint, double epsilon)
         {
-            List<Emgu.CV.Matrix<float>> worldPoints = new List<Emgu.CV.Matrix<float>>();
-            //List<Emgu.CV.Matrix<float>> worldPoints = createDummyMatrix();
+            //List<Emgu.CV.Matrix<float>> worldPoints = new List<Emgu.CV.Matrix<float>>();
+            List<Emgu.CV.Matrix<float>> worldPoints = createDummyMatrix();
             return worldPoints;
         }
 
