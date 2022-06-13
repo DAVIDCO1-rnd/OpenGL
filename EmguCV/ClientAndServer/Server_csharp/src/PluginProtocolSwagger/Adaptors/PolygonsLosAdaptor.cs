@@ -43,7 +43,7 @@ namespace EOSimU.API.Adaptors
         public List<Polygon> ConvertListOfMatricesToListOfPolygons(List<Emgu.CV.Matrix<float>> listOfMatrices)
         {
             List<Polygon> listOfPolygons = new List<Polygon>();
-            int numOfPolygons = listOfPolygons.Count;
+            int numOfPolygons = listOfMatrices.Count;
             for (int i = 0; i < numOfPolygons; i++)
             {
                 List<Point> currentPolygonPoints = new List<Point>();
