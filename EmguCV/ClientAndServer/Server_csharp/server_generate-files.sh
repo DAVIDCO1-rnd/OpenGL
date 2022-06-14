@@ -41,5 +41,10 @@ cmake 	-B build \
 
 #cmake -GVisual Studio 14 -Bbuild/win32/x86 -H.  
 
+#MY_OUTPUT_PATH="D:\\BLABLA"
+#echo $MY_OUTPUT_PATH
+#sed -i "s/<OutputPath>.*<\/OutputPath>/<OutputPath>`echo ${MY_OUTPUT_PATH}`<\/OutputPath>/" build/ServerApp.csproj
+#sed -i "s/<StartProgram>.*<\/StartProgram>/<StartProgram>`echo ${MY_OUTPUT_PATH}`\/ServerApp.exe<\/StartProgram>/" build/ServerApp.csproj
+
 
 
