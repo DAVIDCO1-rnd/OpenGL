@@ -12,7 +12,8 @@ ADD_LIBRARY(PluginEosimImpProject SHARED ${IMPLEMENTATION_FILES})
 target_compile_options(PluginEosimImpProject PUBLIC "/unsafe")
 if(WIN32)
 	set_property(TARGET PluginEosimImpProject PROPERTY VS_DOTNET_REFERENCE_Emgu.CV.World "./dlls/Emgu/Emgu.CV.World.dll")
-	set_property(TARGET PluginEosimImpProject PROPERTY VS_DOTNET_REFERENCE_cvextern "./dlls/Emgu/cvextern.dll")	
+	set_property(TARGET PluginEosimImpProject PROPERTY VS_DOTNET_REFERENCE_System.Drawing "./dlls/System.Drawing.dll")
+	set_property(TARGET PluginEosimImpProject PROPERTY VS_DOTNET_REFERENCE_System.Xml "./dlls/System.Xml.dll") 
 endif(WIN32)
 
 file(GLOB SOURCES_FILES
@@ -87,6 +88,8 @@ foreach(OUTPUT_SINGLE_FILE ${OUTPUT_FILES})
 endforeach(OUTPUT_SINGLE_FILE)
 ]]
 
-add_custom_command(TARGET ServerApp POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/build/${my_config} ${PROJECT_SOURCE_DIR}/build/david)
+#add_custom_command(TARGET ServerApp POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/build/${my_config} ${PROJECT_SOURCE_DIR}/build/david)
+
+
 
 
