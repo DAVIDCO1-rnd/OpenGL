@@ -12,7 +12,7 @@ tags:
 schemes:
 - "http"
 paths:
-  /PolygonsLos/Init/{scenarioName}/{cameraX}/{cameraY}/{cameraZ}/{plateHeightAboveTarget}:
+  /PolygonsLos/Init/{terrainName}:
     post:
       tags:
       - "PolygonsLos"
@@ -20,40 +20,16 @@ paths:
       operationId: "SceneInit"
       parameters:
       - in: "path"
-        name: "scenarioName"
-        description: "Name of scenario to load"
+        name: "terrainName"
+        description: "Name of terrain to add to scenario"
         required: true
         type: "string"
-      - in: "path"
-        name: "cameraX"
-        description: "cameraX location"
-        required: true
-        type: number
-        format: double
-      - in: "path"
-        name: "cameraY"
-        description: "cameraY location"
-        required: true
-        type: number
-        format: double
-      - in: "path"
-        name: "cameraZ"
-        description: "cameraZ location"
-        required: true
-        type: number
-        format: double
-      - in: "path"
-        name: "plateHeightAboveTarget"
-        description: "Height (in meters) of the plate above the target"
-        required: true
-        type: number
-        format: double        
       responses:
         "204":
           description: "successful operation"
         "404":
           description: "scenario not found"
-  /PolygonsLos/getPolygons/{cameraX}/{cameraY}/{cameraZ}/{plateHeightAboveTarget}:
+  /PolygonsLos/getPolygons/{targetLatitude}/{targetLongitude}/{targetHeight}/{plateHeightAboveTarget}:
     get:
       tags:
       - "PolygonsLos"
@@ -63,20 +39,20 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "cameraX"
-        description: "cameraX location"
+        name: "targetLatitude"
+        description: "target latitude"
         required: true
         type: number
         format: double
       - in: "path"
-        name: "cameraY"
-        description: "cameraY location"
+        name: "targetLongitude"
+        description: "target longitude"
         required: true
         type: number
         format: double
       - in: "path"
-        name: "cameraZ"
-        description: "cameraZ location"
+        name: "targetHeight"
+        description: "target height"
         required: true
         type: number
         format: double
@@ -103,13 +79,13 @@ definitions:
     - "longitude"
     - "altitude"
     properties:
-      x:
+      latitude:
         type: "number"
         format: "double"
-      y:
+      longitude:
         type: "number"
         format: "double"
-      z:
+      height:
         type: "number"
         format: "double"
   Polygon:
