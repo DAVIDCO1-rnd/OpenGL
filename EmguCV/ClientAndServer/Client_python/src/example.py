@@ -31,7 +31,17 @@ except ApiException as e:
 
 try:
     # Returns a list of polygons given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)
-    api_response = api_instance.scene_polygons(camera_x, camera_y, camera_z, plate_height_above_target)
-    pprint(api_response)
+    polygons = api_instance.scene_polygons(camera_x, camera_y, camera_z, plate_height_above_target)
+    numOfPolygons = len(polygons)
+    for polygon in polygons:
+        numOfPoints = len(polygon.vertices)
+        for i in range(0, numOfPoints):
+            point = polygon.vertices[i]
+            x = point.x
+            y = point.y
+
+            pass
+
+    #pprint(polygons)
 except ApiException as e:
     print("Exception when calling PolygonsLosApi->scene_polygons: %s\n" % e)
