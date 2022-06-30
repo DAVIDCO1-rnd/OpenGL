@@ -228,14 +228,26 @@ namespace EOSim.SDK.Logic
             return worldPoints;
         }
 
+        void convertGeodesicToCartesian(double latitude, double longitude, double height, out double x, out double y, out double z)
+        {
+            //for now, no conversion function
+            x = latitude;
+            y = longitude;
+            z = height;
+        }
 
-        public List<Emgu.CV.Matrix<float>> CalculateWorldPoints(double cameraX, double cameraY, double cameraZ, double plateHeightAbovePoint, double epsilon)
+        public List<Emgu.CV.Matrix<float>> CalculateWorldPoints(double targetLatitude, double targetLongitude, double targetHeigh, double plateHeightAbovePoint, double epsilon)
         {
             float radius = 10000.0f;
             float z = 500.0f;
 
             float center_x = 0.0f;
             float center_y = 0.0f;
+
+            double cameraX;
+            double cameraY;
+            double cameraZ;
+            convertGeodesicToCartesian(targetLatitude, targetLongitude, targetHeigh, out cameraX, out cameraY, out cameraZ);
 
             //List<Emgu.CV.Matrix<float>> worldPoints = new List<Emgu.CV.Matrix<float>>();
             //List<Emgu.CV.Matrix<float>> worldPoints = createDummyMatrix();

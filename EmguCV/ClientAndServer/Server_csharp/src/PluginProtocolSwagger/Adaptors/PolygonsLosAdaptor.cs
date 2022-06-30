@@ -39,14 +39,14 @@ namespace EOSimU.API.Adaptors
                 Emgu.CV.Matrix<float> currentMatrix = listOfMatrices[i];
                 for (int j=0; j < currentMatrix.Rows; j++)
                 {
-                    float x = currentMatrix[j, 0];
-                    float y = currentMatrix[j, 1];
-                    float z = currentMatrix[j, 2];
+                    float latitude = currentMatrix[j, 0];
+                    float longitude = currentMatrix[j, 1];
+                    float height = currentMatrix[j, 2];
 
                     Point.PointBuilder pointBuilder = new Point.PointBuilder();
-                    pointBuilder.Latitude(x);
-                    pointBuilder.Y(y);
-                    pointBuilder.Height(z);
+                    pointBuilder.Latitude(latitude);
+                    pointBuilder.Y(longitude);
+                    pointBuilder.Height(height);
                     Point currentPoint = pointBuilder.Build();
                     currentPolygonPoints.Add(currentPoint);
                 }
@@ -71,14 +71,14 @@ namespace EOSimU.API.Adaptors
                 int numOfPoints = numOfPointsForEachPolygon[i];
                 for (int j = 0; j < numOfPoints; j++)
                 {
-                    float x = i * 10 + j + 1;
-                    float y = i * 10 + j + 1;
-                    float z = 1000.0f;
+                    float latitude = i * 10 + j + 1;
+                    float longitude = i * 10 + j + 1;
+                    float height = 1000.0f;
 
                     Point.PointBuilder pointBuilder = new Point.PointBuilder();
-                    pointBuilder.Latitude(x);
-                    pointBuilder.Y(y);
-                    pointBuilder.Height(z);
+                    pointBuilder.Latitude(latitude);
+                    pointBuilder.Y(longitude);
+                    pointBuilder.Height(height);
                     Point currentPoint = pointBuilder.Build();
                     currentPolygonPoints.Add(currentPoint);
                 }
