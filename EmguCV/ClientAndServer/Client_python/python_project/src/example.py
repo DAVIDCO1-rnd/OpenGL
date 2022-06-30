@@ -4,6 +4,7 @@ from __future__ import print_function
 import cv2
 import time
 import polygonsAdaptor
+import utils3D
 
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
@@ -42,7 +43,8 @@ try:
     plate_height_above_target = 3.4  # float | Height (in meters) of the plate above the target
     # Returns a list of polygons given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)
     polygons3D = api_instance.scene_polygons(target_latitude, target_longitude, target_height, plate_height_above_target)
-    pprint(polygons3D)
+    utils3D.plotPolygons(polygons3D)
+    #pprint(polygons3D)
     polygons2D = api_instance.scene_polygons_pixels(target_latitude, target_longitude, target_height, plate_height_above_target)
     #pprint(polygons2D)
     contours1 = polygonsAdaptor.convertPolygonsListToTuple(polygons2D)
