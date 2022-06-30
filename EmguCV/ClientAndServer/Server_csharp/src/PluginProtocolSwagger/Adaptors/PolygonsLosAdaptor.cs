@@ -44,9 +44,9 @@ namespace EOSimU.API.Adaptors
                     float z = currentMatrix[j, 2];
 
                     Point.PointBuilder pointBuilder = new Point.PointBuilder();
-                    pointBuilder.X(x);
+                    pointBuilder.Latitude(x);
                     pointBuilder.Y(y);
-                    pointBuilder.Z(z);
+                    pointBuilder.Height(z);
                     Point currentPoint = pointBuilder.Build();
                     currentPolygonPoints.Add(currentPoint);
                 }
@@ -76,9 +76,9 @@ namespace EOSimU.API.Adaptors
                     float z = 1000.0f;
 
                     Point.PointBuilder pointBuilder = new Point.PointBuilder();
-                    pointBuilder.X(x);
+                    pointBuilder.Latitude(x);
                     pointBuilder.Y(y);
-                    pointBuilder.Z(z);
+                    pointBuilder.Height(z);
                     Point currentPoint = pointBuilder.Build();
                     currentPolygonPoints.Add(currentPoint);
                 }

@@ -79,13 +79,13 @@ definitions:
     - "longitude"
     - "altitude"
     properties:
-      x:
+      latitude:
         type: "number"
         format: "double"
       y:
         type: "number"
         format: "double"
-      z:
+      height:
         type: "number"
         format: "double"
   Polygon:

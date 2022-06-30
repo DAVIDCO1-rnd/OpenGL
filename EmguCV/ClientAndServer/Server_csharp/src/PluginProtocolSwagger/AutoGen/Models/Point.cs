@@ -13,9 +13,9 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
     public sealed class Point:  IEquatable<Point>
     { 
         /// <summary>
-        /// X
+        /// Latitude
         /// </summary>
-        public double? X { get; private set; }
+        public double? Latitude { get; private set; }
 
         /// <summary>
         /// Y
@@ -23,9 +23,9 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
         public double? Y { get; private set; }
 
         /// <summary>
-        /// Z
+        /// Height
         /// </summary>
-        public double? Z { get; private set; }
+        public double? Height { get; private set; }
 
 
         /// <summary>
@@ -37,14 +37,14 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
         {
         }
 
-        private Point(double? X, double? Y, double? Z)
+        private Point(double? Latitude, double? Y, double? Height)
         {
             
-            this.X = X;
+            this.Latitude = Latitude;
             
             this.Y = Y;
             
-            this.Z = Z;
+            this.Height = Height;
             
         }
 
@@ -65,9 +65,9 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
         public PointBuilder With()
         {
             return Builder()
-                .X(X)
+                .Latitude(Latitude)
                 .Y(Y)
-                .Z(Z);
+                .Height(Height);
         }
 
         public override string ToString()
@@ -117,9 +117,9 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
         /// </summary>
         public sealed class PointBuilder
         {
-            private double? _X;
+            private double? _Latitude;
             private double? _Y;
-            private double? _Z;
+            private double? _Height;
 
             internal PointBuilder()
             {
@@ -131,12 +131,12 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
             }
 
             /// <summary>
-            /// Sets value for Point.X property.
+            /// Sets value for Point.Latitude property.
             /// </summary>
-            /// <param name="value">X</param>
-            public PointBuilder X(double? value)
+            /// <param name="value">Latitude</param>
+            public PointBuilder Latitude(double? value)
             {
-                _X = value;
+                _Latitude = value;
                 return this;
             }
 
@@ -151,12 +151,12 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
             }
 
             /// <summary>
-            /// Sets value for Point.Z property.
+            /// Sets value for Point.Height property.
             /// </summary>
-            /// <param name="value">Z</param>
-            public PointBuilder Z(double? value)
+            /// <param name="value">Height</param>
+            public PointBuilder Height(double? value)
             {
-                _Z = value;
+                _Height = value;
                 return this;
             }
 
@@ -169,14 +169,18 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
             {
                 Validate();
                 return new Point(
-                    X: _X,
+                    Latitude: _Latitude,
                     Y: _Y,
-                    Z: _Z
+                    Height: _Height
                 );
             }
 
             private void Validate()
             { 
+                if (_Latitude == null)
+                {
+                    throw new ArgumentException("Latitude is a required property for Point and cannot be null");
+                } 
             }
         }
 
