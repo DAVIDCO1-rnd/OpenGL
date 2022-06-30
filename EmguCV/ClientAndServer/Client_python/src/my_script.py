@@ -1,7 +1,7 @@
 import cv2
 
 
-filename = '../../../images/screenShot.bmp'
+filename = 'C:/temp/OpenGL/EmguCV/ClientAndServer/images/screenShot.bmp'
 color_image = cv2.imread(filename, cv2.IMREAD_COLOR)
 grayscale_image = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
 thresh = 127
@@ -14,9 +14,9 @@ cv2.drawContours(image=image_with_contours, contours=contours, contourIdx=-1, co
 tt = contours[1]
 print(tt)
 
-cv2.imshow("image_with_contours", image_with_contours)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.imshow("image_with_contours", image_with_contours)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
 
 
 # import cv2
