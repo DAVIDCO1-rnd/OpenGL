@@ -95,7 +95,7 @@ namespace EOSim.SDK.Logic
 
             approxPixelsContours = new Emgu.CV.Util.VectorOfVectorOfPoint();
 
-            double epsilon = 1.0;
+            double epsilon = 0.0;
             bool closed = true;
 
             for (int contourIdx = 0; contourIdx < pixelsContours.Size; contourIdx++)
@@ -128,7 +128,9 @@ namespace EOSim.SDK.Logic
 
             //string fileName = "D:/Developments/OpenGL/EmguCV/ClientAndServer/Server_csharp/images/screenShot.bmp";
             string fileName = "../../../images/screenShot.bmp";
+            string destFilePath = "../../../network_folder/screenShot.bmp";
             imgInput = new Image<Bgr, byte>(fileName);
+            imgInput.Save(destFilePath);
             Image<Gray, byte> binaryImage = convertRgbToBinaryImage(imgInput);
             calcPixelContours(binaryImage, out pixelsContours, out pixelsContoursArray, out hierarchies);
             return pixelsContours;

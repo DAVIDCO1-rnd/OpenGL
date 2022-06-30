@@ -10,7 +10,7 @@ java -jar ../spec/openapi-generator-cli.jar generate \
 	-g python \
 	-o ${CLIENT_GENERATED_CODE}
 	
-cp -R src/example.py ${CLIENT_GENERATED_CODE}
+cp -R src/* ${CLIENT_GENERATED_CODE}
 
 
 
