@@ -13,19 +13,19 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
     public sealed class Point:  IEquatable<Point>
     { 
         /// <summary>
-        /// Latitude
+        /// X
         /// </summary>
-        public double? Latitude { get; private set; }
+        public double? X { get; private set; }
 
         /// <summary>
-        /// Longitude
+        /// Y
         /// </summary>
-        public double? Longitude { get; private set; }
+        public double? Y { get; private set; }
 
         /// <summary>
-        /// Height
+        /// Z
         /// </summary>
-        public double? Height { get; private set; }
+        public double? Z { get; private set; }
 
 
         /// <summary>
@@ -37,14 +37,14 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
         {
         }
 
-        private Point(double? Latitude, double? Longitude, double? Height)
+        private Point(double? X, double? Y, double? Z)
         {
             
-            this.Latitude = Latitude;
+            this.X = X;
             
-            this.Longitude = Longitude;
+            this.Y = Y;
             
-            this.Height = Height;
+            this.Z = Z;
             
         }
 
@@ -65,9 +65,9 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
         public PointBuilder With()
         {
             return Builder()
-                .Latitude(Latitude)
-                .Longitude(Longitude)
-                .Height(Height);
+                .X(X)
+                .Y(Y)
+                .Z(Z);
         }
 
         public override string ToString()
@@ -117,9 +117,9 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
         /// </summary>
         public sealed class PointBuilder
         {
-            private double? _Latitude;
-            private double? _Longitude;
-            private double? _Height;
+            private double? _X;
+            private double? _Y;
+            private double? _Z;
 
             internal PointBuilder()
             {
@@ -131,32 +131,32 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
             }
 
             /// <summary>
-            /// Sets value for Point.Latitude property.
+            /// Sets value for Point.X property.
             /// </summary>
-            /// <param name="value">Latitude</param>
-            public PointBuilder Latitude(double? value)
+            /// <param name="value">X</param>
+            public PointBuilder X(double? value)
             {
-                _Latitude = value;
+                _X = value;
                 return this;
             }
 
             /// <summary>
-            /// Sets value for Point.Longitude property.
+            /// Sets value for Point.Y property.
             /// </summary>
-            /// <param name="value">Longitude</param>
-            public PointBuilder Longitude(double? value)
+            /// <param name="value">Y</param>
+            public PointBuilder Y(double? value)
             {
-                _Longitude = value;
+                _Y = value;
                 return this;
             }
 
             /// <summary>
-            /// Sets value for Point.Height property.
+            /// Sets value for Point.Z property.
             /// </summary>
-            /// <param name="value">Height</param>
-            public PointBuilder Height(double? value)
+            /// <param name="value">Z</param>
+            public PointBuilder Z(double? value)
             {
-                _Height = value;
+                _Z = value;
                 return this;
             }
 
@@ -169,22 +169,14 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
             {
                 Validate();
                 return new Point(
-                    Latitude: _Latitude,
-                    Longitude: _Longitude,
-                    Height: _Height
+                    X: _X,
+                    Y: _Y,
+                    Z: _Z
                 );
             }
 
             private void Validate()
             { 
-                if (_Latitude == null)
-                {
-                    throw new ArgumentException("Latitude is a required property for Point and cannot be null");
-                } 
-                if (_Longitude == null)
-                {
-                    throw new ArgumentException("Longitude is a required property for Point and cannot be null");
-                } 
             }
         }
 

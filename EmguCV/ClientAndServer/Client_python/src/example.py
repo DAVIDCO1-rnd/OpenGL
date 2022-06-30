@@ -32,35 +32,35 @@ configuration = openapi_client.Configuration(
 with openapi_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = openapi_client.PolygonsLosApi(api_client)
-    terrain_name = 'terrain_name_example' # str | Name of scenario to load
+    scenario_name = 'scenario_name_example' # str | Name of scenario to load
+camera_x = 3.4 # float | cameraX location
+camera_y = 3.4 # float | cameraY location
+camera_z = 3.4 # float | cameraZ location
+plate_height_above_target = 3.4 # float | Height (in meters) of the plate above the target
 
 try:
     # Initialize the scenario
-    api_instance.scene_init(terrain_name)
+    api_instance.scene_init(scenario_name, camera_x, camera_y, camera_z, plate_height_above_target)
 except ApiException as e:
     print("Exception when calling PolygonsLosApi->scene_init: %s\n" % e)
 
 try:
-    target_latitude = 3.4
-    target_longitude = 3.4
-    target_height = 3.4
-    plate_height_above_target = 3.4
     # Returns a list of polygons given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)
-    polygons = api_instance.scene_polygons(target_latitude, target_longitude, target_height, plate_height_above_target)
-    # contours1 = convertPolygonsListToTuple(polygons)
-    # filename = '../../network_folder/screenShot.bmp'
-    # color_image = cv2.imread(filename, cv2.IMREAD_COLOR)
-    # image_with_contours = color_image.copy()
-    #
-    # grayscale_image = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
-    # thresh = 127
-    # binary_image = cv2.threshold(grayscale_image, thresh, 255, cv2.THRESH_BINARY)[1]
-    # contours, hierarchy = cv2.findContours(binary_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # cv2.drawContours(image=image_with_contours, contours=contours1, contourIdx=-1, color=(0, 255, 0), thickness=2,
-    #                  lineType=cv2.LINE_AA)
-    # cv2.imshow("image_with_contours", image_with_contours)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    polygons = api_instance.scene_polygons(camera_x, camera_y, camera_z, plate_height_above_target)
+    contours1 = convertPolygonsListToTuple(polygons)
+    filename = '../../network_folder/screenShot.bmp'
+    color_image = cv2.imread(filename, cv2.IMREAD_COLOR)
+    image_with_contours = color_image.copy()
+
+    grayscale_image = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
+    thresh = 127
+    binary_image = cv2.threshold(grayscale_image, thresh, 255, cv2.THRESH_BINARY)[1]
+    contours, hierarchy = cv2.findContours(binary_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    cv2.drawContours(image=image_with_contours, contours=contours1, contourIdx=-1, color=(0, 255, 0), thickness=2,
+                     lineType=cv2.LINE_AA)
+    cv2.imshow("image_with_contours", image_with_contours)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     pass
 
