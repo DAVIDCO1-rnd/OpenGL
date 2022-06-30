@@ -32,19 +32,19 @@ configuration = openapi_client.Configuration(
 with openapi_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = openapi_client.PolygonsLosApi(api_client)
-    scenario_name = 'scenario_name_example' # str | Name of scenario to load
-camera_x = 3.4 # float | cameraX location
-camera_y = 3.4 # float | cameraY location
-camera_z = 3.4 # float | cameraZ location
-plate_height_above_target = 3.4 # float | Height (in meters) of the plate above the target
+    terrain_name = 'terrain_name_example' # str | Name of terrain to add to scenario
 
 try:
     # Initialize the scenario
-    api_instance.scene_init(scenario_name, camera_x, camera_y, camera_z, plate_height_above_target)
+    api_instance.scene_init(terrain_name)
 except ApiException as e:
     print("Exception when calling PolygonsLosApi->scene_init: %s\n" % e)
 
 try:
+    camera_x = 3.4  # float | cameraX location
+    camera_y = 3.4  # float | cameraY location
+    camera_z = 3.4  # float | cameraZ location
+    plate_height_above_target = 3.4  # float | Height (in meters) of the plate above the target
     # Returns a list of polygons given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)
     polygons = api_instance.scene_polygons(camera_x, camera_y, camera_z, plate_height_above_target)
     contours1 = convertPolygonsListToTuple(polygons)

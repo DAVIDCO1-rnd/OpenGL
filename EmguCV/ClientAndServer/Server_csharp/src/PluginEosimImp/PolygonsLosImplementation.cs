@@ -15,7 +15,7 @@ namespace EOSim.SDK.Logic
         Image<Bgr, byte> imgInput;
 
 
-        public void InitLos(string scenarioName, double cameraX, double cameraY, double cameraZ, double plateHeightAbovePoint, double epsilon, int width, int height)
+        public void InitLos(string terrainName, double epsilon, int width, int height)
         {
             //dummy code - do nothing for now
             int david = 5;

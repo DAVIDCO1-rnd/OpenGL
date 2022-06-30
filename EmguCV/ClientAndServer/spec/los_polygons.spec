@@ -12,7 +12,7 @@ tags:
 schemes:
 - "http"
 paths:
-  /PolygonsLos/Init/{scenarioName}/{cameraX}/{cameraY}/{cameraZ}/{plateHeightAboveTarget}:
+  /PolygonsLos/Init/{terrainName}:
     post:
       tags:
       - "PolygonsLos"
@@ -20,34 +20,10 @@ paths:
       operationId: "SceneInit"
       parameters:
       - in: "path"
-        name: "scenarioName"
+        name: "terrainName"
         description: "Name of scenario to load"
         required: true
         type: "string"
-      - in: "path"
-        name: "cameraX"
-        description: "cameraX location"
-        required: true
-        type: number
-        format: double
-      - in: "path"
-        name: "cameraY"
-        description: "cameraY location"
-        required: true
-        type: number
-        format: double
-      - in: "path"
-        name: "cameraZ"
-        description: "cameraZ location"
-        required: true
-        type: number
-        format: double
-      - in: "path"
-        name: "plateHeightAboveTarget"
-        description: "Height (in meters) of the plate above the target"
-        required: true
-        type: number
-        format: double        
       responses:
         "204":
           description: "successful operation"

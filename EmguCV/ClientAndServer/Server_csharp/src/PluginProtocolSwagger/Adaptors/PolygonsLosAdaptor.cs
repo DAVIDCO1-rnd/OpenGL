@@ -20,24 +20,13 @@ namespace EOSimU.API.Adaptors
             this.service = service;
         }
 
-        public void SceneInit(NancyContext context, string scenarioName, double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget)
+        public void SceneInit(NancyContext context, string terrainName)
         {
-            if (cameraX == null || cameraY == null || cameraZ == null || plateHeightAboveTarget == null)
-            {
-                return;
-            }
-            else
-            {
-                double cameraXDouble = (double)cameraX;
-                double cameraYDouble = (double)cameraY;
-                double cameraZDouble = (double)cameraZ;
-                double plateHeightAboveTargetDouble = (double)plateHeightAboveTarget;
-                epsilon = 1.0;
-                int width = 2048;
-                int height = 2560;
+            epsilon = 1.0;
+            int width = 2048;
+            int height = 2560;
 
-                service.InitLos(scenarioName, cameraXDouble, cameraYDouble, cameraZDouble, plateHeightAboveTargetDouble, epsilon, width, height);
-            }
+            service.InitLos(terrainName, epsilon, width, height);
         }
 
         public List<Polygon> ConvertListOfMatricesToListOfPolygons(List<Emgu.CV.Matrix<float>> listOfMatrices)
@@ -120,5 +109,7 @@ namespace EOSimU.API.Adaptors
                 return listOfPolygons;
             }
         }
+
+
     }
 }

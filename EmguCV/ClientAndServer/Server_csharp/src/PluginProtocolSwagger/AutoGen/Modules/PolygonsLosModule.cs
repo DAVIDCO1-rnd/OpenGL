@@ -22,24 +22,12 @@ namespace EOSimU.API.AutoGen.v1alpha3.Modules
         /// <param name="service">Service handling requests</param>
         public PolygonsLosModule(PolygonsLosService service) : base("/v1alpha3")
         { 
-            Post["/PolygonsLos/Init/{scenarioName}/{cameraX}/{cameraY}/{cameraZ}/{plateHeightAboveTarget}"] = parameters =>
+            Post["/PolygonsLos/Init/{terrainName}"] = parameters =>
             {
-                var scenarioName = Parameters.ValueOf<string>(parameters, Context.Request, "scenarioName", ParameterType.Path);
-                var cameraX = Parameters.ValueOf<double?>(parameters, Context.Request, "cameraX", ParameterType.Path);
-                var cameraY = Parameters.ValueOf<double?>(parameters, Context.Request, "cameraY", ParameterType.Path);
-                var cameraZ = Parameters.ValueOf<double?>(parameters, Context.Request, "cameraZ", ParameterType.Path);
-                var plateHeightAboveTarget = Parameters.ValueOf<double?>(parameters, Context.Request, "plateHeightAboveTarget", ParameterType.Path);
-                Preconditions.IsNotNull(scenarioName, "Required parameter: 'scenarioName' is missing at 'SceneInit'");
+                var terrainName = Parameters.ValueOf<string>(parameters, Context.Request, "terrainName", ParameterType.Path);
+                Preconditions.IsNotNull(terrainName, "Required parameter: 'terrainName' is missing at 'SceneInit'");
                 
-                Preconditions.IsNotNull(cameraX, "Required parameter: 'cameraX' is missing at 'SceneInit'");
-                
-                Preconditions.IsNotNull(cameraY, "Required parameter: 'cameraY' is missing at 'SceneInit'");
-                
-                Preconditions.IsNotNull(cameraZ, "Required parameter: 'cameraZ' is missing at 'SceneInit'");
-                
-                Preconditions.IsNotNull(plateHeightAboveTarget, "Required parameter: 'plateHeightAboveTarget' is missing at 'SceneInit'");
-                
-                service.SceneInit(Context, scenarioName, cameraX, cameraY, cameraZ, plateHeightAboveTarget);
+                service.SceneInit(Context, terrainName);
                 return new Response { ContentType = ""};
             };
 
@@ -71,13 +59,9 @@ namespace EOSimU.API.AutoGen.v1alpha3.Modules
         /// 
         /// </summary>
         /// <param name="context">Context of request</param>
-        /// <param name="scenarioName">Name of scenario to load</param>
-        /// <param name="cameraX">cameraX location</param>
-        /// <param name="cameraY">cameraY location</param>
-        /// <param name="cameraZ">cameraZ location</param>
-        /// <param name="plateHeightAboveTarget">Height (in meters) of the plate above the target</param>
+        /// <param name="terrainName">Name of scenario to load</param>
         /// <returns></returns>
-        void SceneInit(NancyContext context, string scenarioName, double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget);
+        void SceneInit(NancyContext context, string terrainName);
 
         /// <summary>
         /// 
@@ -96,9 +80,9 @@ namespace EOSimU.API.AutoGen.v1alpha3.Modules
     /// </summary>
     public abstract class AbstractPolygonsLosService: PolygonsLosService
     {
-        public virtual void SceneInit(NancyContext context, string scenarioName, double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget)
+        public virtual void SceneInit(NancyContext context, string terrainName)
         {
-            SceneInit(scenarioName, cameraX, cameraY, cameraZ, plateHeightAboveTarget);
+            SceneInit(terrainName);
         }
 
         public virtual List<Polygon> ScenePolygons(NancyContext context, double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget)
@@ -106,7 +90,7 @@ namespace EOSimU.API.AutoGen.v1alpha3.Modules
             return ScenePolygons(cameraX, cameraY, cameraZ, plateHeightAboveTarget);
         }
 
-        protected abstract void SceneInit(string scenarioName, double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget);
+        protected abstract void SceneInit(string terrainName);
 
         protected abstract List<Polygon> ScenePolygons(double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget);
     }
