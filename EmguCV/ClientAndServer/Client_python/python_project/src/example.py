@@ -3,6 +3,11 @@ from __future__ import print_function
 import numpy as np
 import cv2
 import time
+
+import sys
+# insert at 1, 0 is the script path (or '' in REPL)
+sys.path.insert(1, '../python_client_generated_code')
+
 import openapi_client
 from openapi_client.rest import ApiException
 from pprint import pprint
@@ -48,7 +53,7 @@ try:
     # Returns a list of polygons given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)
     polygons = api_instance.scene_polygons(camera_x, camera_y, camera_z, plate_height_above_target)
     contours1 = convertPolygonsListToTuple(polygons)
-    filename = '../../network_folder/screenShot.bmp'
+    filename = '../../../network_folder/screenShot.bmp'
     color_image = cv2.imread(filename, cv2.IMREAD_COLOR)
     image_with_contours = color_image.copy()
 
