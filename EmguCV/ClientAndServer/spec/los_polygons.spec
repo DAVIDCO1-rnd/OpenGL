@@ -76,8 +76,8 @@ definitions:
     type: "object"
     required:
     - "latitude"
-    - "longitude"
-    - "altitude"
+    - "y"
+    - "height"
     properties:
       latitude:
         type: "number"

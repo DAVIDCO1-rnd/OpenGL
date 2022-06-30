@@ -181,6 +181,14 @@ namespace EOSimU.API.AutoGen.v1alpha3.Models
                 {
                     throw new ArgumentException("Latitude is a required property for Point and cannot be null");
                 } 
+                if (_Y == null)
+                {
+                    throw new ArgumentException("Y is a required property for Point and cannot be null");
+                } 
+                if (_Height == null)
+                {
+                    throw new ArgumentException("Height is a required property for Point and cannot be null");
+                } 
             }
         }
 

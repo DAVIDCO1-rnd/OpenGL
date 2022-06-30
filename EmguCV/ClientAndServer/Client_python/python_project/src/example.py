@@ -1,8 +1,9 @@
 from __future__ import print_function
 
-import numpy as np
+
 import cv2
 import time
+import polygonsAdaptor
 
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
@@ -12,18 +13,7 @@ import openapi_client
 from openapi_client.rest import ApiException
 from pprint import pprint
 
-def convertPolygonsListToTuple(polygons):
-    polygonsList = []
-    for polygon in polygons:
-        numOfPoints = len(polygon.vertices)
-        polygonNumpy = np.zeros((numOfPoints, 1, 2), dtype=int)
-        for i in range(0, numOfPoints):
-            point = polygon.vertices[i]
-            polygonNumpy[i, 0, 0] = point.latitude
-            polygonNumpy[i, 0, 1] = point.y
-        polygonsList.append(polygonNumpy)
-    polygonsTuple = tuple(polygonsList)
-    return polygonsTuple
+
 
 # Defining the host is optional and defaults to http://localhost:8080/v1alpha3
 # See configuration.py for a list of all supported configuration parameters.
@@ -52,7 +42,7 @@ try:
     plate_height_above_target = 3.4  # float | Height (in meters) of the plate above the target
     # Returns a list of polygons given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)
     polygons = api_instance.scene_polygons(camera_x, camera_y, camera_z, plate_height_above_target)
-    contours1 = convertPolygonsListToTuple(polygons)
+    contours1 = polygonsAdaptor.convertPolygonsListToTuple(polygons)
     filename = '../../../network_folder/screenShot.bmp'
     color_image = cv2.imread(filename, cv2.IMREAD_COLOR)
     image_with_contours = color_image.copy()
