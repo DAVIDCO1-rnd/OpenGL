@@ -29,7 +29,7 @@ paths:
           description: "successful operation"
         "404":
           description: "scenario not found"
-  /PolygonsLos/getPolygons/{cameraX}/{cameraY}/{cameraZ}/{plateHeightAboveTarget}:
+  /PolygonsLos/getPolygons/{targetLatitude}/{targetLongitude}/{targetHeight}/{plateHeightAboveTarget}:
     get:
       tags:
       - "PolygonsLos"
@@ -39,20 +39,20 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "cameraX"
-        description: "cameraX location"
+        name: "targetLatitude"
+        description: "target latitude"
         required: true
         type: number
         format: double
       - in: "path"
-        name: "cameraY"
-        description: "cameraY location"
+        name: "targetLongitude"
+        description: "target longitude"
         required: true
         type: number
         format: double
       - in: "path"
-        name: "cameraZ"
-        description: "cameraZ location"
+        name: "targetHeight"
+        description: "target height"
         required: true
         type: number
         format: double
