@@ -47,6 +47,23 @@ namespace EOSimU.API.AutoGen.v1alpha3.Modules
                 
                 return service.ScenePolygons(Context, targetLatitude, targetLongitude, targetHeight, plateHeightAboveTarget).ToArray();
             };
+
+            Get["/PolygonsLos/getPolygons2D/{targetLatitude}/{targetLongitude}/{targetHeight}/{plateHeightAboveTarget}"] = parameters =>
+            {
+                var targetLatitude = Parameters.ValueOf<double?>(parameters, Context.Request, "targetLatitude", ParameterType.Path);
+                var targetLongitude = Parameters.ValueOf<double?>(parameters, Context.Request, "targetLongitude", ParameterType.Path);
+                var targetHeight = Parameters.ValueOf<double?>(parameters, Context.Request, "targetHeight", ParameterType.Path);
+                var plateHeightAboveTarget = Parameters.ValueOf<double?>(parameters, Context.Request, "plateHeightAboveTarget", ParameterType.Path);
+                Preconditions.IsNotNull(targetLatitude, "Required parameter: 'targetLatitude' is missing at 'ScenePolygonsPixels'");
+                
+                Preconditions.IsNotNull(targetLongitude, "Required parameter: 'targetLongitude' is missing at 'ScenePolygonsPixels'");
+                
+                Preconditions.IsNotNull(targetHeight, "Required parameter: 'targetHeight' is missing at 'ScenePolygonsPixels'");
+                
+                Preconditions.IsNotNull(plateHeightAboveTarget, "Required parameter: 'plateHeightAboveTarget' is missing at 'ScenePolygonsPixels'");
+                
+                return service.ScenePolygonsPixels(Context, targetLatitude, targetLongitude, targetHeight, plateHeightAboveTarget).ToArray();
+            };
         }
     }
 
@@ -73,6 +90,17 @@ namespace EOSimU.API.AutoGen.v1alpha3.Modules
         /// <param name="plateHeightAboveTarget">Height (in meters) of the plate above the target</param>
         /// <returns>List&lt;Polygon&gt;</returns>
         List<Polygon> ScenePolygons(NancyContext context, double? targetLatitude, double? targetLongitude, double? targetHeight, double? plateHeightAboveTarget);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context">Context of request</param>
+        /// <param name="targetLatitude">target latitude</param>
+        /// <param name="targetLongitude">target longitude</param>
+        /// <param name="targetHeight">target height</param>
+        /// <param name="plateHeightAboveTarget">Height (in meters) of the plate above the target</param>
+        /// <returns>List&lt;Polygon2D&gt;</returns>
+        List<Polygon2D> ScenePolygonsPixels(NancyContext context, double? targetLatitude, double? targetLongitude, double? targetHeight, double? plateHeightAboveTarget);
     }
 
     /// <summary>
@@ -90,9 +118,16 @@ namespace EOSimU.API.AutoGen.v1alpha3.Modules
             return ScenePolygons(targetLatitude, targetLongitude, targetHeight, plateHeightAboveTarget);
         }
 
+        public virtual List<Polygon2D> ScenePolygonsPixels(NancyContext context, double? targetLatitude, double? targetLongitude, double? targetHeight, double? plateHeightAboveTarget)
+        {
+            return ScenePolygonsPixels(targetLatitude, targetLongitude, targetHeight, plateHeightAboveTarget);
+        }
+
         protected abstract void SceneInit(string terrainName);
 
         protected abstract List<Polygon> ScenePolygons(double? targetLatitude, double? targetLongitude, double? targetHeight, double? plateHeightAboveTarget);
+
+        protected abstract List<Polygon2D> ScenePolygonsPixels(double? targetLatitude, double? targetLongitude, double? targetHeight, double? plateHeightAboveTarget);
     }
 
 }

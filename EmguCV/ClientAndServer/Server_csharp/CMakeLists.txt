@@ -44,6 +44,7 @@ if(WIN32)
 	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Nancy.Hosting.Self "./dlls/Nancy.Hosting.Self.dll")	
 	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_Newtonsoft.Json "./dlls/Newtonsoft.Json.dll")
 	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_System.Collections.Immutable "./dlls/System.Collections.Immutable.dll")
+	set_property(TARGET PluginProtocolSwaggerProject PROPERTY VS_DOTNET_REFERENCE_System.Drawing "./dlls/System.Drawing.dll")
 endif(WIN32)
 
 target_link_libraries(PluginProtocolSwaggerProject PUBLIC PluginEosimImpProject)

@@ -1,7 +1,7 @@
 import cv2
 
 
-filename = '../../images/screenShot.bmp'
+filename = '../../../images/screenShot.bmp'
 color_image = cv2.imread(filename, cv2.IMREAD_COLOR)
 grayscale_image = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
 thresh = 127

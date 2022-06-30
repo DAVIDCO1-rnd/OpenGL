@@ -36,13 +36,16 @@ except ApiException as e:
     print("Exception when calling PolygonsLosApi->scene_init: %s\n" % e)
 
 try:
-    camera_x = 3.4  # float | cameraX location
-    camera_y = 3.4  # float | cameraY location
-    camera_z = 3.4  # float | cameraZ location
+    target_latitude = 3.4  # float | cameraX location
+    target_longitude = 3.4  # float | cameraY location
+    target_height = 3.4  # float | cameraZ location
     plate_height_above_target = 3.4  # float | Height (in meters) of the plate above the target
     # Returns a list of polygons given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)
-    polygons = api_instance.scene_polygons(camera_x, camera_y, camera_z, plate_height_above_target)
-    contours1 = polygonsAdaptor.convertPolygonsListToTuple(polygons)
+    polygons3D = api_instance.scene_polygons(target_latitude, target_longitude, target_height, plate_height_above_target)
+    pprint(polygons3D)
+    polygons2D = api_instance.scene_polygons_pixels(target_latitude, target_longitude, target_height, plate_height_above_target)
+    #pprint(polygons2D)
+    contours1 = polygonsAdaptor.convertPolygonsListToTuple(polygons2D)
     filename = '../../../network_folder/screenShot.bmp'
     color_image = cv2.imread(filename, cv2.IMREAD_COLOR)
     image_with_contours = color_image.copy()

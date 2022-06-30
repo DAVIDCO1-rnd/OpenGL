@@ -29,24 +29,55 @@ namespace EOSimU.API.Adaptors
             service.InitLos(terrainName, epsilon, width, height);
         }
 
-        public List<Polygon> ConvertListOfMatricesToListOfPolygons(List<Emgu.CV.Matrix<float>> listOfMatrices)
+        List<Polygon2D> ConvertPixelsToListOf2DPolygons(Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours)
+        {
+
+            List<Polygon2D> listOfPolygons2D = new List<Polygon2D>();
+            int numOfPolygons = pixelsContours.Size;
+            for (int i = 0; i < numOfPolygons; i++)
+            {
+                List<Pixel> currentPolygon2DPixels = new List<Pixel>();
+                System.Drawing.Point[] currentContoursArray = pixelsContours[i].ToArray();
+                int numOfPoints = currentContoursArray.Length;
+                for (int j = 0; j < numOfPoints; j++)
+                {
+                    int pixel_x = currentContoursArray[j].X;
+                    int pixel_y = currentContoursArray[j].Y;
+
+
+                    Pixel.PixelBuilder pixelBuilder = new Pixel.PixelBuilder();
+                    pixelBuilder.X(pixel_x);
+                    pixelBuilder.Y(pixel_y);
+                    Pixel currenPixel = pixelBuilder.Build();
+                    currentPolygon2DPixels.Add(currenPixel);
+                }
+
+                Polygon2D.Polygon2DBuilder currentPolygon2DBuilder = new Polygon2D.Polygon2DBuilder();
+                currentPolygon2DBuilder.Vertices(currentPolygon2DPixels);
+                Polygon2D currentPolygon2D = currentPolygon2DBuilder.Build();
+                listOfPolygons2D.Add(currentPolygon2D);
+            }
+            return listOfPolygons2D;
+        }
+
+        public List<Polygon> ConvertListOfMatricesToListOfPolygons(List<Emgu.CV.Matrix<double>> listOfMatrices)
         {
             List<Polygon> listOfPolygons = new List<Polygon>();
             int numOfPolygons = listOfMatrices.Count;
             for (int i = 0; i < numOfPolygons; i++)
             {
                 List<Point> currentPolygonPoints = new List<Point>();
-                Emgu.CV.Matrix<float> currentMatrix = listOfMatrices[i];
+                Emgu.CV.Matrix<double> currentMatrix = listOfMatrices[i];
                 for (int j=0; j < currentMatrix.Rows; j++)
                 {
-                    float latitude = currentMatrix[j, 0];
-                    float longitude = currentMatrix[j, 1];
-                    float height = currentMatrix[j, 2];
+                    double latitude = currentMatrix[j, 0];
+                    double longitude = currentMatrix[j, 1];
+                    double height = currentMatrix[j, 2];
 
                     Point.PointBuilder pointBuilder = new Point.PointBuilder();
-                    pointBuilder.Latitude(latitude);
+                    pointBuilder.X(latitude);
                     pointBuilder.Y(longitude);
-                    pointBuilder.Height(height);
+                    pointBuilder.Z(height);
                     Point currentPoint = pointBuilder.Build();
                     currentPolygonPoints.Add(currentPoint);
                 }
@@ -71,14 +102,14 @@ namespace EOSimU.API.Adaptors
                 int numOfPoints = numOfPointsForEachPolygon[i];
                 for (int j = 0; j < numOfPoints; j++)
                 {
-                    float latitude = i * 10 + j + 1;
-                    float longitude = i * 10 + j + 1;
-                    float height = 1000.0f;
+                    double latitude = i * 10 + j + 1;
+                    double longitude = i * 10 + j + 1;
+                    double height = 1000.0f;
 
                     Point.PointBuilder pointBuilder = new Point.PointBuilder();
-                    pointBuilder.Latitude(latitude);
+                    pointBuilder.X(latitude);
                     pointBuilder.Y(longitude);
-                    pointBuilder.Height(height);
+                    pointBuilder.Z(height);
                     Point currentPoint = pointBuilder.Build();
                     currentPolygonPoints.Add(currentPoint);
                 }
@@ -91,22 +122,41 @@ namespace EOSimU.API.Adaptors
             return listOfPolygons;
         }
 
-        public List<Polygon> ScenePolygons(NancyContext context, double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget)
+        public List<Polygon> ScenePolygons(NancyContext context, double? targetLatitude, double? targetLongitude, double? targetHeight, double? plateHeightAboveTarget)
         {
-            if (cameraX == null || cameraY == null || cameraZ == null || plateHeightAboveTarget == null)
+            if (targetLatitude == null || targetLongitude == null || targetHeight == null || plateHeightAboveTarget == null)
             {
                 return null;
             }
             else
             {
-                double cameraXDouble = (double)cameraX;
-                double cameraYDouble = (double)cameraY;
-                double cameraZDouble = (double)cameraZ;
+                double targetLatitudeDouble = (double)targetLatitude;
+                double targetLongitudeDouble = (double)targetLongitude;
+                double targetHeightDouble = (double)targetHeight;
                 double plateHeightAboveTargetDouble = (double)plateHeightAboveTarget;
-                List<Emgu.CV.Matrix<float>> listOfMatrices = service.CalculateWorldPoints(cameraXDouble, cameraYDouble, cameraZDouble, plateHeightAboveTargetDouble, epsilon);
+                List<Emgu.CV.Matrix<double>> listOfMatrices = service.CalculateWorldPoints(targetLatitudeDouble, targetLongitudeDouble, targetHeightDouble, plateHeightAboveTargetDouble, epsilon);
                 List<Polygon> listOfPolygons = ConvertListOfMatricesToListOfPolygons(listOfMatrices);
                 //List<Polygon> listOfPolygons = CreateDummyListOfPolygons();
                 return listOfPolygons;
+            }
+        }
+
+        public List<Polygon2D> ScenePolygonsPixels(NancyContext context, double? targetLatitude, double? targetLongitude, double? targetHeight, double? plateHeightAboveTarget)
+        {
+            if (targetLatitude == null || targetLongitude == null || targetHeight == null || plateHeightAboveTarget == null)
+            {
+                return null;
+            }
+            else
+            {
+                double targetLatitudeDouble = (double)targetLatitude;
+                double targetLongitudeDouble = (double)targetLongitude;
+                double targetHeightDouble = (double)targetHeight;
+                double plateHeightAboveTargetDouble = (double)plateHeightAboveTarget;
+                Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours = service.CalculatePixels(targetLatitudeDouble, targetLongitudeDouble, targetHeightDouble, plateHeightAboveTargetDouble, epsilon);
+                List<Polygon2D> listOfPolygons2D = ConvertPixelsToListOf2DPolygons(pixelsContours);
+                //List<Polygon> listOfPolygons = CreateDummyListOfPolygons();
+                return listOfPolygons2D;
             }
         }
 

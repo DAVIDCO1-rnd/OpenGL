@@ -156,61 +156,66 @@ namespace EOSim.SDK.Logic
             return imgWithContours;
         }
 
-        private void convertPixelToWorld3DPoint(float pixel_x, float pixel_y, float center_x, float center_y, int width, int height, float radius, out float world_x, out float world_y)
+        private void convertPixelToWorld3DPoint(float pixel_x, float pixel_y, float center_x, float center_y, int width, int height, float radius, out double world_x, out double world_y)
         {
-            world_x = pixel_x;
-            world_y = pixel_y;
+            //world_x = pixel_x;
+            //world_y = pixel_y;
+            //return;
+
+            float aspect;
+
+            float min_pixel_x = 0.0f;
+            float max_pixel_x = (float)width - 1;
+            float min_world_x;
+            float max_world_x;
+
+            float min_pixel_y = 0.0f;
+            float max_pixel_y = (float)height - 1;
+            float min_world_y;
+            float max_world_y;
+
+
+            if (width >= height)
+            {
+                //I assume here that the height of the image = 2 * radius
+                aspect = (float)width / (float)height;
+                min_world_x = center_x - radius * aspect;
+                max_world_x = center_x + radius * aspect;
+                min_world_y = center_y - radius;
+                max_world_y = center_y + radius;
+            }
+            else //height > width
+            {
+                //I assume here that the width of the image = 2 * radius
+                aspect = (float)height / (float)width;
+                min_world_x = center_x - radius;
+                max_world_x = center_x + radius;
+                min_world_y = center_y - radius * aspect;
+                max_world_y = center_y + radius * aspect;
+            }
+
+            float ratio_x = (pixel_x - min_pixel_x) / (max_pixel_x - min_pixel_x);
+            float ratio_y = (pixel_y - min_pixel_y) / (max_pixel_y - min_pixel_y);
+            world_x = (double)(min_world_x + ratio_x * (max_world_x - min_world_x));
+            world_y = (double)(min_world_y + ratio_y * (max_world_y - min_world_y));
+
+            //world_x = pixel_x;
+            //world_y = pixel_y;
+
             return;
-
-            //float aspect;
-
-            //float min_pixel_x = 0.0f;
-            //float max_pixel_x = (float)width - 1;
-            //float min_world_x;
-            //float max_world_x;
-
-            //float min_pixel_y = 0.0f;
-            //float max_pixel_y = (float)height - 1;
-            //float min_world_y;
-            //float max_world_y;
-
-
-            //if (width >= height)
-            //{
-            //    //I assume here that the height of the image = 2 * radius
-            //    aspect = (float)width / (float)height;
-            //    min_world_x = center_x - radius * aspect;
-            //    max_world_x = center_x + radius * aspect;
-            //    min_world_y = center_y - radius;
-            //    max_world_y = center_y + radius;
-            //}
-            //else //height > width
-            //{
-            //    //I assume here that the width of the image = 2 * radius
-            //    aspect = (float)height / (float)width;
-            //    min_world_x = center_x - radius;
-            //    max_world_x = center_x + radius;
-            //    min_world_y = center_y - radius * aspect;
-            //    max_world_y = center_y + radius * aspect;
-            //}
-
-            //float ratio_x = (pixel_x - min_pixel_x) / (max_pixel_x - min_pixel_x);
-            //float ratio_y = (pixel_y - min_pixel_y) / (max_pixel_y - min_pixel_y);
-            //world_x = min_world_x + ratio_x * (max_world_x - min_world_x);
-            //world_y = min_world_y + ratio_y * (max_world_y - min_world_y);
         }
 
-        private List<Matrix<float>> ConvertPixelsPointsToWorld3DPoints(Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours, float radius, float z, float center_x, float center_y)
+        private List<Matrix<double>> ConvertPixelsPointsToWorld3DPoints(Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours, float radius, float z, float center_x, float center_y)
         {
-            float world_x;
-            float world_y;
+            double world_x;
+            double world_y;
 
-            List<Matrix<float>> worldPoints = new List<Matrix<float>>();
+            List<Matrix<double>> worldPoints = new List<Matrix<double>>();
             for (int i=0; i<pixelsContours.Size; i++)
             {
                 System.Drawing.Point[] currentContoursArray = pixelsContours[i].ToArray();
                 int numOfPoints = currentContoursArray.Length;
-                Matrix<float> singleContourWorldPoints = new Matrix<float>(numOfPoints, 3);
+                Matrix<double> singleContourWorldPoints = new Matrix<double>(numOfPoints, 3);
 
                 for (int j=0; j < numOfPoints; j++)
                 {
@@ -218,11 +223,11 @@ namespace EOSim.SDK.Logic
                     int pixel_y = currentContoursArray[j].Y;
                     convertPixelToWorld3DPoint(pixel_x, pixel_y, center_x, center_y, imgInput.Width, imgInput.Height, radius, out world_x, out world_y);
 
-                    singleContourWorldPoints[j, 0] = world_x;
-                    singleContourWorldPoints[j, 1] = world_y;
+                    singleContourWorldPoints[j, 0] = Math.Round(world_x, 3);
+                    singleContourWorldPoints[j, 1] = Math.Round(world_y, 3);
                     singleContourWorldPoints[j, 2] = z;
                 }
-                float[,] elements = singleContourWorldPoints.Data;
+                double[,] elements = singleContourWorldPoints.Data;
                 worldPoints.Add(singleContourWorldPoints);
             }
             return worldPoints;
@@ -236,7 +241,17 @@ namespace EOSim.SDK.Logic
             z = height;
         }
 
-        public List<Emgu.CV.Matrix<float>> CalculateWorldPoints(double targetLatitude, double targetLongitude, double targetHeigh, double plateHeightAbovePoint, double epsilon)
+        public Emgu.CV.Util.VectorOfVectorOfPoint CalculatePixels(double targetLatitude, double targetLongitude, double targetHeigh, double plateHeightAbovePoint, double epsilon)
+        {
+            double cameraX;
+            double cameraY;
+            double cameraZ;
+            convertGeodesicToCartesian(targetLatitude, targetLongitude, targetHeigh, out cameraX, out cameraY, out cameraZ);
+            Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours = CalcPixelsContours(cameraX, cameraY, plateHeightAbovePoint, epsilon);
+            return pixelsContours;
+        }
+
+        public List<Emgu.CV.Matrix<double>> CalculateWorldPoints(double targetLatitude, double targetLongitude, double targetHeigh, double plateHeightAbovePoint, double epsilon)
         {
             float radius = 10000.0f;
             float z = 500.0f;
@@ -254,7 +269,7 @@ namespace EOSim.SDK.Logic
             Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours = CalcPixelsContours(cameraX, cameraY, plateHeightAbovePoint, epsilon);
             int contoursThreshold = 10; //contours with less vertices than contoursThreshold will not be rendered to image
             Image<Bgr, byte> imageWithContours = GetImageWithPixelsContours(pixelsContours, contoursThreshold);
-            List<Matrix<float>> worldPoints = ConvertPixelsPointsToWorld3DPoints(pixelsContours, radius, z, center_x, center_y);
+            List<Matrix<double>> worldPoints = ConvertPixelsPointsToWorld3DPoints(pixelsContours, radius, z, center_x, center_y);
 
             return worldPoints;
         }

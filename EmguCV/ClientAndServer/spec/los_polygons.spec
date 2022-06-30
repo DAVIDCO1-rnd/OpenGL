@@ -71,21 +71,63 @@ paths:
               $ref: "#/definitions/Polygon"
         "401":
           description: "no scene loaded"
+  /PolygonsLos/getPolygons2D/{targetLatitude}/{targetLongitude}/{targetHeight}/{plateHeightAboveTarget}:
+    get:
+      tags:
+      - "PolygonsLos"
+      summary: "Returns a list of 2D polygons on an image given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)"
+      operationId: "ScenePolygonsPixels"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "targetLatitude"
+        description: "target latitude"
+        required: true
+        type: number
+        format: double
+      - in: "path"
+        name: "targetLongitude"
+        description: "target longitude"
+        required: true
+        type: number
+        format: double
+      - in: "path"
+        name: "targetHeight"
+        description: "target height"
+        required: true
+        type: number
+        format: double
+      - in: "path"
+        name: "plateHeightAboveTarget"
+        description: "Height (in meters) of the plate above the target"
+        required: true
+        type: number
+        format: double        
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Polygon2D"
+        "401":
+          description: "no scene loaded"          
 definitions:
   Point:
     type: "object"
     required:
-    - "latitude"
+    - "x"
     - "y"
-    - "height"
+    - "z"
     properties:
-      latitude:
+      x:
         type: "number"
         format: "double"
       y:
         type: "number"
         format: "double"
-      height:
+      z:
         type: "number"
         format: "double"
   Polygon:
@@ -97,3 +139,24 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Point"
+  Pixel:
+    type: "object"
+    required:
+    - "x"
+    - "y"
+    properties:
+      x:
+        type: "number"
+        format: "int"
+      y:
+        type: "number"
+        format: "int"
+  Polygon2D:
+    type: "object"
+    required:
+    - "vertices"
+    properties:
+      vertices:
+        type: "array"
+        items:
+          $ref: "#/definitions/Pixel"          
