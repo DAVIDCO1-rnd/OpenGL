@@ -14,30 +14,20 @@ namespace EOSimU.API.Adaptors
         private double cameraZ;
         private double plateHeightAbovePoint;
         private double epsilon = 1.0;
+        private static bool firstTime = true; 
 
         public PolygonsLosAdaptor(EOSim.SDK.Logic.PolygonsLosImplementation service)
         {
             this.service = service;
         }
 
-        public void SceneInit(NancyContext context, string scenarioName, double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget)
+        public void SceneInit(NancyContext context, string terrainName)
         {
-            if (cameraX == null || cameraY == null || cameraZ == null || plateHeightAboveTarget == null)
-            {
-                return;
-            }
-            else
-            {
-                double cameraXDouble = (double)cameraX;
-                double cameraYDouble = (double)cameraY;
-                double cameraZDouble = (double)cameraZ;
-                double plateHeightAboveTargetDouble = (double)plateHeightAboveTarget;
-                epsilon = 1.0;
-                int width = 2048;
-                int height = 2560;
+            epsilon = 1.0;
+            int width = 2048;
+            int height = 2560;
 
-                service.InitLos(scenarioName, cameraXDouble, cameraYDouble, cameraZDouble, plateHeightAboveTargetDouble, epsilon, width, height);
-            }
+            service.InitLos(terrainName, epsilon, width, height);
         }
 
         public List<Polygon> ConvertListOfMatricesToListOfPolygons(List<Emgu.CV.Matrix<float>> listOfMatrices)
@@ -50,14 +40,14 @@ namespace EOSimU.API.Adaptors
                 Emgu.CV.Matrix<float> currentMatrix = listOfMatrices[i];
                 for (int j=0; j < currentMatrix.Rows; j++)
                 {
-                    float x = currentMatrix[j, 0];
-                    float y = currentMatrix[j, 1];
-                    float z = currentMatrix[j, 2];
+                    float latitude = currentMatrix[j, 0];
+                    float longitude = currentMatrix[j, 1];
+                    float height = currentMatrix[j, 2];
 
                     Point.PointBuilder pointBuilder = new Point.PointBuilder();
-                    pointBuilder.X(x);
-                    pointBuilder.Y(y);
-                    pointBuilder.Z(z);
+                    pointBuilder.Latitude(latitude);
+                    pointBuilder.Longitude(longitude);
+                    pointBuilder.Height(height);
                     Point currentPoint = pointBuilder.Build();
                     currentPolygonPoints.Add(currentPoint);
                 }
@@ -82,14 +72,14 @@ namespace EOSimU.API.Adaptors
                 int numOfPoints = numOfPointsForEachPolygon[i];
                 for (int j = 0; j < numOfPoints; j++)
                 {
-                    float x = i * 10 + j + 1;
-                    float y = i * 10 + j + 1;
-                    float z = 1000.0f;
+                    float latitude = i * 10 + j + 1;
+                    float longitude = i * 10 + j + 1;
+                    float height = 1000.0f;
 
                     Point.PointBuilder pointBuilder = new Point.PointBuilder();
-                    pointBuilder.X(x);
-                    pointBuilder.Y(y);
-                    pointBuilder.Z(z);
+                    pointBuilder.Latitude(latitude);
+                    pointBuilder.Longitude(longitude);
+                    pointBuilder.Height(height);
                     Point currentPoint = pointBuilder.Build();
                     currentPolygonPoints.Add(currentPoint);
                 }
@@ -102,23 +92,56 @@ namespace EOSimU.API.Adaptors
             return listOfPolygons;
         }
 
-        public List<Polygon> ScenePolygons(NancyContext context, double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget)
+
+
+        public List<Polygon> ScenePolygons(NancyContext context, double? targetLatitude, double? targetLongitude, double? targetHeight, double? plateHeightAboveTarget)
         {
-            if (cameraX == null || cameraY == null || cameraZ == null || plateHeightAboveTarget == null)
+            if (targetLatitude == null || targetLongitude == null || targetHeight == null || plateHeightAboveTarget == null)
             {
                 return null;
             }
             else
             {
-                double cameraXDouble = (double)cameraX;
-                double cameraYDouble = (double)cameraY;
-                double cameraZDouble = (double)cameraZ;
+                double targetLatitudeDouble = (double)targetLatitude;
+                double targetLongitudeDouble = (double)targetLongitude;
+                double targetHeightDouble = (double)targetHeight;
                 double plateHeightAboveTargetDouble = (double)plateHeightAboveTarget;
-                List<Emgu.CV.Matrix<float>> listOfMatrices = service.CalculateWorldPoints(cameraXDouble, cameraYDouble, cameraZDouble, plateHeightAboveTargetDouble, epsilon);
+                List<Emgu.CV.Matrix<float>> listOfMatrices = new List<Emgu.CV.Matrix<float>>();
+                if (firstTime == true)
+                {
+                    firstTime = false;
+                    for (int i=0; i<5; i++)
+                    {
+                        listOfMatrices = service.CalculateWorldPoints(targetLatitudeDouble, targetLongitudeDouble, targetHeightDouble, plateHeightAboveTargetDouble, epsilon);
+                    }
+                }
+                else
+                {
+                    listOfMatrices = service.CalculateWorldPoints(targetLatitudeDouble, targetLongitudeDouble, targetHeightDouble, plateHeightAboveTargetDouble, epsilon);
+                }
                 List<Polygon> listOfPolygons = ConvertListOfMatricesToListOfPolygons(listOfMatrices);
                 //List<Polygon> listOfPolygons = CreateDummyListOfPolygons();
                 return listOfPolygons;
             }
         }
+
+        //public List<Polygon> ScenePolygons(NancyContext context, double? cameraX, double? cameraY, double? cameraZ, double? plateHeightAboveTarget)
+        //{
+        //    if (cameraX == null || cameraY == null || cameraZ == null || plateHeightAboveTarget == null)
+        //    {
+        //        return null;
+        //    }
+        //    else
+        //    {
+        //        double cameraXDouble = (double)cameraX;
+        //        double cameraYDouble = (double)cameraY;
+        //        double cameraZDouble = (double)cameraZ;
+        //        double plateHeightAboveTargetDouble = (double)plateHeightAboveTarget;
+        //        List<Emgu.CV.Matrix<float>> listOfMatrices = service.CalculateWorldPoints(cameraXDouble, cameraYDouble, cameraZDouble, plateHeightAboveTargetDouble, epsilon);
+        //        List<Polygon> listOfPolygons = ConvertListOfMatricesToListOfPolygons(listOfMatrices);
+        //        //List<Polygon> listOfPolygons = CreateDummyListOfPolygons();
+        //        return listOfPolygons;
+        //    }
+        //}
     }
 }
