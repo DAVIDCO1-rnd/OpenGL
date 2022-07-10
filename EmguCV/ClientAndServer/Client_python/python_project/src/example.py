@@ -23,6 +23,64 @@ configuration = openapi_client.Configuration(
 )
 
 
+# decorator to calculate duration
+# taken by any function.
+def calculate_time(func):
+    # added arguments inside the inner1,
+    # if function takes any arguments,
+    # can be added like this.
+    def inner1(*args, **kwargs):
+        # storing time before function execution
+        begin = time.time()
+
+        func(*args, **kwargs)
+
+        # storing time after function execution
+        end = time.time()
+        time_execution = end - begin
+        print("Total time taken in : ", func.__name__, time_execution)
+        return time_execution
+
+    return inner1
+
+@calculate_time
+def get_polygons_data():
+    try:
+        target_latitude = 0.0  # float | cameraX location
+        target_longitude = 0.0  # float | cameraY location
+        target_height = 2.5  # float | cameraZ location
+        plate_height_above_target = 500.0  # float | Height (in meters) of the plate above the target
+        # Returns a list of polygons given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)
+        polygons3D = api_instance.scene_polygons(target_latitude, target_longitude, target_height,
+                                                 plate_height_above_target)
+        target_location = np.array([target_latitude, target_longitude, target_height])
+        utils3D.plotPolygons(polygons3D, target_location)
+        pprint(polygons3D)
+        polygons2D = api_instance.scene_polygons_pixels(target_latitude, target_longitude, target_height,
+                                                        plate_height_above_target)
+        # pprint(polygons2D)
+        contours1 = polygonsAdaptor.convertPolygonsListToTuple(polygons2D)
+        filename = '../../../network_folder/screenShot.bmp'
+        color_image = cv2.imread(filename, cv2.IMREAD_COLOR)
+        image_with_contours = color_image.copy()
+
+        grayscale_image = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
+        thresh = 127
+        binary_image = cv2.threshold(grayscale_image, thresh, 255, cv2.THRESH_BINARY)[1]
+        contours, hierarchy = cv2.findContours(binary_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(image=image_with_contours, contours=contours1, contourIdx=-1, color=(0, 255, 0), thickness=2,
+                         lineType=cv2.LINE_AA)
+        cv2.imshow("image_with_contours", image_with_contours)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+        pass
+
+        # pprint(contours)
+    except ApiException as e:
+        print("Exception when calling PolygonsLosApi->scene_polygons: %s\n" % e)
+
+
 
 # Enter a context with an instance of the API client
 with openapi_client.ApiClient(configuration) as api_client:
@@ -36,35 +94,4 @@ try:
 except ApiException as e:
     print("Exception when calling PolygonsLosApi->scene_init: %s\n" % e)
 
-try:
-    target_latitude = 0.0  # float | cameraX location
-    target_longitude = 0.0  # float | cameraY location
-    target_height = 2.5  # float | cameraZ location
-    plate_height_above_target = 500.0  # float | Height (in meters) of the plate above the target
-    # Returns a list of polygons given a target location (latitude, longtitude, altitude) and a height above the target. Meaning the parameter is an array of 4 doubles (latitude, longtitude, altitude, height)
-    polygons3D = api_instance.scene_polygons(target_latitude, target_longitude, target_height, plate_height_above_target)
-    target_location = np.array([target_latitude, target_longitude, target_height])
-    utils3D.plotPolygons(polygons3D, target_location)
-    #pprint(polygons3D)
-    polygons2D = api_instance.scene_polygons_pixels(target_latitude, target_longitude, target_height, plate_height_above_target)
-    #pprint(polygons2D)
-    contours1 = polygonsAdaptor.convertPolygonsListToTuple(polygons2D)
-    filename = '../../../network_folder/screenShot.bmp'
-    color_image = cv2.imread(filename, cv2.IMREAD_COLOR)
-    image_with_contours = color_image.copy()
-
-    grayscale_image = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
-    thresh = 127
-    binary_image = cv2.threshold(grayscale_image, thresh, 255, cv2.THRESH_BINARY)[1]
-    contours, hierarchy = cv2.findContours(binary_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cv2.drawContours(image=image_with_contours, contours=contours1, contourIdx=-1, color=(0, 255, 0), thickness=2,
-                     lineType=cv2.LINE_AA)
-    cv2.imshow("image_with_contours", image_with_contours)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    pass
-
-    #pprint(contours)
-except ApiException as e:
-    print("Exception when calling PolygonsLosApi->scene_polygons: %s\n" % e)
+get_polygons_data()
