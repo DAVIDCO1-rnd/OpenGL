@@ -33,13 +33,13 @@ def calculate_time(func):
         # storing time before function execution
         begin = time.time()
 
-        func(*args, **kwargs)
+        returned_value = func(*args, **kwargs)
 
         # storing time after function execution
         end = time.time()
-        time_execution = end - begin
-        print("Total time taken in : ", func.__name__, time_execution)
-        return time_execution
+        time_measurement = end - begin
+        print("Total time taken in : ", func.__name__, time_measurement)
+        return {'returned_value': returned_value, 'time_measurement': time_measurement}
 
     return inner1
 
@@ -79,7 +79,7 @@ def get_polygons_data():
         # pprint(contours)
     except ApiException as e:
         print("Exception when calling PolygonsLosApi->scene_polygons: %s\n" % e)
-
+    return polygons3D
 
 
 # Enter a context with an instance of the API client
@@ -94,4 +94,12 @@ try:
 except ApiException as e:
     print("Exception when calling PolygonsLosApi->scene_init: %s\n" % e)
 
-get_polygons_data()
+num_of_iterations = 1
+times_arr = np.zeros(num_of_iterations)
+for i in range(0,num_of_iterations):
+    res = get_polygons_data()
+    current_time = res['time_measurement']
+    times_arr[i] = current_time
+mean_time = np.mean(times_arr)
+print(mean_time)
+pass
