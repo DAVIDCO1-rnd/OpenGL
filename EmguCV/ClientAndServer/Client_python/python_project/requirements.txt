@@ -1,0 +1,4 @@
+opencv-python
+matplotlib
+
+-r ./python_client_generated_code/requirements.txt
