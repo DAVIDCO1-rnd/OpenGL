@@ -4,6 +4,8 @@ build/
 out/
 .vscode/
 **/.vs
+**/.idea
+**/__pycache__
 
 **/glfw-3.3.7
 **/opencv_4.5.5
