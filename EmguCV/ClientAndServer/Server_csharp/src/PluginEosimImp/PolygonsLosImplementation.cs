@@ -7,6 +7,7 @@ using System.Drawing;
 
 using Emgu.CV;
 using Emgu.CV.Structure;
+using System.IO;
 
 namespace EOSim.SDK.Logic
 {
@@ -126,9 +127,16 @@ namespace EOSim.SDK.Logic
             Point[][] pixelsContoursArray;
             Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours;
 
+            string currentFolder = Directory.GetCurrentDirectory();
             //string fileName = "D:/Developments/OpenGL/EmguCV/ClientAndServer/Server_csharp/images/screenShot.bmp";
-            string fileName = "../../../images/screenShot.bmp";
-            string destFilePath = "../../../network_folder/screenShot.bmp";
+
+            string parentFolder = Directory.GetParent(currentFolder).FullName;
+            string grandparentFolder = Directory.GetParent(parentFolder).FullName;
+            string greatGrandparentFolder = Directory.GetParent(grandparentFolder).FullName;
+            string images_folder = Path.Combine(greatGrandparentFolder, "images");
+            string network_folder = Path.Combine(greatGrandparentFolder, "network_folder");
+            string fileName = Path.Combine(images_folder, "screenShot.bmp");
+            string destFilePath = Path.Combine(network_folder, "screenShot.bmp");
             imgInput = new Image<Bgr, byte>(fileName);
             imgInput.Save(destFilePath);
             Image<Gray, byte> binaryImage = convertRgbToBinaryImage(imgInput);
