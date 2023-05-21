@@ -1,0 +1,10 @@
+get_filename_component(target_name ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+file(GLOB IMPLEMENTATION_FILES "./*.cs")
+ADD_LIBRARY(${target_name} SHARED ${IMPLEMENTATION_FILES})
+target_compile_options(${target_name} PUBLIC "/unsafe")
+if(WIN32)
+	set_property(TARGET ${target_name} PROPERTY VS_DOTNET_REFERENCE_Emgu.CV.World "../../dlls/Emgu/Emgu.CV.World.dll")
+	set_property(TARGET ${target_name} PROPERTY VS_DOTNET_REFERENCE_System.Drawing "../../dlls/System.Drawing.dll")
+	set_property(TARGET ${target_name} PROPERTY VS_DOTNET_REFERENCE_System.Xml "../../dlls/System.Xml.dll") 
+endif(WIN32)
