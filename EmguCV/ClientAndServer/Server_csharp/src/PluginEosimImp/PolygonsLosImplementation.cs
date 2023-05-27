@@ -24,7 +24,18 @@ namespace EOSim.SDK.Logic
 
         private Image<Gray, byte> convertRgbToBinaryImage(Image<Bgr, byte> imgInput)
         {
-            Image<Gray, byte> binaryImage = imgInput.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
+            Image<Gray, byte> grayImage = imgInput.Convert<Gray, byte>();
+            Image<Gray, byte> binaryImage = grayImage.ThresholdBinary(new Gray(100), new Gray(255));
+
+            //CvInvoke.Imshow("imgInput", imgInput);
+            //CvInvoke.WaitKey(0);
+
+            //CvInvoke.Imshow("grayImage", grayImage);
+            //CvInvoke.WaitKey(0);
+
+            //CvInvoke.Imshow("binaryImage", binaryImage);
+            //CvInvoke.WaitKey(0);
+
             return binaryImage;
         }
 
@@ -135,9 +146,11 @@ namespace EOSim.SDK.Logic
             string greatGrandparentFolder = Directory.GetParent(grandparentFolder).FullName;
             string images_folder = Path.Combine(greatGrandparentFolder, "images");
             string network_folder = Path.Combine(greatGrandparentFolder, "network_folder");
-            string fileName = Path.Combine(images_folder, "screenShot.bmp");
+            string fileName = Path.Combine(images_folder, "1.png");
             string destFilePath = Path.Combine(network_folder, "screenShot.bmp");
             imgInput = new Image<Bgr, byte>(fileName);
+            //CvInvoke.Imshow("imgInput", imgInput);
+            //CvInvoke.WaitKey(0);
             imgInput.Save(destFilePath);
             Image<Gray, byte> binaryImage = convertRgbToBinaryImage(imgInput);
             calcPixelContours(binaryImage, out pixelsContours, out pixelsContoursArray, out hierarchies);
@@ -147,7 +160,22 @@ namespace EOSim.SDK.Logic
         private Image<Bgr, byte> GetImageWithPixelsContours(Emgu.CV.Util.VectorOfVectorOfPoint pixelsContours, int threshold)
         {
             Random rand = new Random();
-            Image<Bgr, byte> imgWithContours = new Image<Bgr, byte>(imgInput.Width, imgInput.Height, new Bgr(255, 255, 255));
+            //Image<Bgr, byte> imgWithContours = new Image<Bgr, byte>(imgInput.Width, imgInput.Height, new Bgr(255, 255, 255));
+
+
+            string currentFolder = Directory.GetCurrentDirectory();
+            string parentFolder = Directory.GetParent(currentFolder).FullName;
+            string grandparentFolder = Directory.GetParent(parentFolder).FullName;
+            string greatGrandparentFolder = Directory.GetParent(grandparentFolder).FullName;
+            string images_folder = Path.Combine(greatGrandparentFolder, "images");
+            string network_folder = Path.Combine(greatGrandparentFolder, "network_folder");
+            string fileName = Path.Combine(images_folder, "1.png");
+            Image<Bgr, byte> imgWithContours = new Image<Bgr, byte>(fileName);
+
+
+
+
+
             for (int contourIdx = 0; contourIdx < pixelsContours.Size; contourIdx++)
             {
                 if (pixelsContours[contourIdx].Size < threshold)
@@ -158,7 +186,7 @@ namespace EOSim.SDK.Logic
                 double blue = rand.Next(0, 231);
                 double green = rand.Next(0, 231);
                 double red = rand.Next(0, 231);
-                int thickness = 5;
+                int thickness = 2;
                 CvInvoke.DrawContours(imgWithContours, pixelsContours, contourIdx, new MCvScalar(blue, green, red), thickness);
             }
             return imgWithContours;
@@ -278,6 +306,9 @@ namespace EOSim.SDK.Logic
             int contoursThreshold = 10; //contours with less vertices than contoursThreshold will not be rendered to image
             Image<Bgr, byte> imageWithContours = GetImageWithPixelsContours(pixelsContours, contoursThreshold);
             List<Matrix<double>> worldPoints = ConvertPixelsPointsToWorld3DPoints(pixelsContours, radius, z, center_x, center_y);
+
+            CvInvoke.Imshow("imageWithContours", imageWithContours);
+            CvInvoke.WaitKey(0);
 
             return worldPoints;
         }
