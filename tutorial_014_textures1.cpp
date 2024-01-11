@@ -2,11 +2,11 @@
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <vxt/deps/glm/glm.hpp>
+#include <vxt/deps/glm/gtc/matrix_transform.hpp>
+#include <vxt/deps/glm/gtc/type_ptr.hpp>
 
-#include <learnopengl/shader_s.h>
+#include "shaders/shader_s.h"
 
 #include <iostream>
 

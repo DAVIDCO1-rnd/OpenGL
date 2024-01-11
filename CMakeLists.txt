@@ -65,9 +65,8 @@ shaders/shader_s.h
 resources/shaders/3.3.shader.vs
 resources/shaders/3.3.shader.fs)
 target_include_directories(OpenGL_tutorial_005_shaders PUBLIC Third_party/Includes .)
-if(WIN32)
 target_link_libraries(OpenGL_tutorial_005_shaders ${CMAKE_CURRENT_SOURCE_DIR}/Third_party/Libs/glfw3.lib)
-endif()
+target_compile_features(OpenGL_tutorial_005_shaders PUBLIC cxx_std_17)
 
 
 add_executable(OpenGL_tutorial_006_shaders 
