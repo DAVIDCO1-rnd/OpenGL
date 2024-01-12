@@ -7,6 +7,7 @@
 #include "stb_image.h"
 
 #include <iostream>
+#include <filesystem>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -171,7 +172,20 @@ int main()
 		return -1;
 	}
 
-	Shader ourShader("C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/using_mouse.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/using_mouse.fs");
+	std::string vertex_shader_filename = "using_mouse.vs";
+	std::string fragment_shader_filename = "using_mouse.fs";
+	std::filesystem::path current_folder_path = std::filesystem::current_path();
+	std::filesystem::path folder_name = current_folder_path.filename();
+	//std::filesystem::path main_folder_name = current_folder_path.parent_path().filename();
+	std::filesystem::path folder_base_path = current_folder_path.parent_path().parent_path().parent_path();
+	std::filesystem::path resources_folder_full_path = folder_base_path / "resources";
+	std::filesystem::path shaders_folder_full_path = resources_folder_full_path / "shaders";
+	std::filesystem::path textures_folder_full_path = resources_folder_full_path / "textures";
+	std::filesystem::path vertex_shader_file_full_path = shaders_folder_full_path / vertex_shader_filename;
+	std::string vertex_shader_file_full_path_str = vertex_shader_file_full_path.string();
+	std::filesystem::path fragment_shader_file_full_path = shaders_folder_full_path / fragment_shader_filename;
+	std::string fragment_shader_file_full_path_str = fragment_shader_file_full_path.string();
+	Shader ourShader(vertex_shader_file_full_path_str.c_str(), fragment_shader_file_full_path_str.c_str());
 	
 
 	float minVal = -0.9f;

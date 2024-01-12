@@ -9,6 +9,7 @@
 #include "shaders/shader_s.h"
 
 #include <iostream>
+#include <filesystem>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -52,7 +53,20 @@ int main()
 
 	// build and compile our shader zprogram
 	// ------------------------------------
-	Shader ourShader("../resources/shaders/tutorial_014_textures1.vs", "../resources/shaders/tutorial_014_textures1.fs");
+	std::string vertex_shader_filename = "tutorial_014_textures1.vs";
+	std::string fragment_shader_filename = "tutorial_014_textures1.fs";
+	std::filesystem::path current_folder_path = std::filesystem::current_path();
+	std::filesystem::path folder_name = current_folder_path.filename();
+	//std::filesystem::path main_folder_name = current_folder_path.parent_path().filename();
+	std::filesystem::path folder_base_path = current_folder_path.parent_path().parent_path().parent_path();
+	std::filesystem::path resources_folder_full_path = folder_base_path / "resources";
+	std::filesystem::path shaders_folder_full_path = resources_folder_full_path / "shaders";
+	std::filesystem::path textures_folder_full_path = resources_folder_full_path / "textures";
+	std::filesystem::path vertex_shader_file_full_path = shaders_folder_full_path / vertex_shader_filename;
+	std::string vertex_shader_file_full_path_str = vertex_shader_file_full_path.string();
+	std::filesystem::path fragment_shader_file_full_path = shaders_folder_full_path / fragment_shader_filename;
+	std::string fragment_shader_file_full_path_str = fragment_shader_file_full_path.string();
+	Shader ourShader(vertex_shader_file_full_path_str.c_str(), fragment_shader_file_full_path_str.c_str());
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -104,7 +118,11 @@ int main()
 	// load image, create texture and generate mipmaps
 	int width, height, nrChannels;
 	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-	unsigned char *data = stbi_load("../resources/textures/container.jpg", &width, &height, &nrChannels, 0);
+
+	std::string texture1_filename = "container.jpg";
+	std::filesystem::path texture1_file_full_path = textures_folder_full_path / texture1_filename;
+	std::string texture1_file_full_path_str = texture1_file_full_path.string();
+	unsigned char *data = stbi_load(texture1_file_full_path_str.c_str(), &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -126,7 +144,10 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load image, create texture and generate mipmaps
-	data = stbi_load("../resources/textures/awesomeface.png", &width, &height, &nrChannels, 0);
+	std::string texture2_filename = "awesomeface.png";
+	std::filesystem::path texture2_file_full_path = textures_folder_full_path / texture2_filename;
+	std::string texture2_file_full_path_str = texture2_file_full_path.string();
+	data = stbi_load(texture2_file_full_path_str.c_str(), &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		// note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA

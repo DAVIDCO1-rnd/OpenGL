@@ -6,6 +6,7 @@
 #include "shaders/shader_s.h"
 
 #include <iostream>
+#include <filesystem>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -49,8 +50,19 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader ourShader("D:/Developments/OpenGL/Shaders/clouds.vs", "D:/Developments/OpenGL/Shaders/clouds.fs"); // you can name your shader files however you like
-    //Shader ourShader("./Shaders/clouds.vs", "./Shaders/clouds.fs");
+
+    std::string vertex_shader_filename = "clouds.vs";
+    std::string fragment_shader_filename = "clouds.fs";
+    std::filesystem::path current_folder_path = std::filesystem::current_path();
+    std::filesystem::path folder_name = current_folder_path.filename();
+    //std::filesystem::path main_folder_name = current_folder_path.parent_path().filename();
+    std::filesystem::path folder_base_path = current_folder_path.parent_path().parent_path().parent_path();
+    std::filesystem::path shaders_folder_full_path = folder_base_path / "resources" / "shaders";
+    std::filesystem::path vertex_shader_file_full_path = shaders_folder_full_path / vertex_shader_filename;
+    std::string vertex_shader_file_full_path_str = vertex_shader_file_full_path.string();
+    std::filesystem::path fragment_shader_file_full_path = shaders_folder_full_path / fragment_shader_filename;
+    std::string fragment_shader_file_full_path_str = fragment_shader_file_full_path.string();
+    Shader ourShader(vertex_shader_file_full_path_str.c_str(), fragment_shader_file_full_path_str.c_str());
 
 	float minVal = -0.9f;
 	float maxVal = 0.9f;

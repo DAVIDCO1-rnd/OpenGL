@@ -7,6 +7,7 @@
 #include "stb_image.h"
 
 #include <iostream>
+#include <filesystem>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -46,7 +47,7 @@ void initializeTexture(unsigned char *textureData, int textureWidth, int texture
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, format, GL_UNSIGNED_BYTE, textureData);
 }
 
-void initializeTextureAndLoadImage(char* filePath)
+void initializeTextureAndLoadImage(const char* filePath)
 {
 	// load and create a texture 
 	int textureWidth, textureHeight, textureNumOfChannels;
@@ -97,8 +98,20 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader ourShader("D:/Developments/OpenGL/Shaders/rippleCam.vs", "D:/Developments/OpenGL/Shaders/rippleCam.fs"); // you can name your shader files however you like
-    //Shader ourShader("./Shaders/rippleCam.vs", "./Shaders/rippleCam.fs");
+    std::string vertex_shader_filename = "rippleCam.vs";
+    std::string fragment_shader_filename = "rippleCam.fs";
+    std::filesystem::path current_folder_path = std::filesystem::current_path();
+    std::filesystem::path folder_name = current_folder_path.filename();
+    //std::filesystem::path main_folder_name = current_folder_path.parent_path().filename();
+    std::filesystem::path folder_base_path = current_folder_path.parent_path().parent_path().parent_path();
+    std::filesystem::path resources_folder_full_path = folder_base_path / "resources";
+    std::filesystem::path shaders_folder_full_path = resources_folder_full_path / "shaders";
+    std::filesystem::path textures_folder_full_path = resources_folder_full_path / "textures";
+    std::filesystem::path vertex_shader_file_full_path = shaders_folder_full_path / vertex_shader_filename;
+    std::string vertex_shader_file_full_path_str = vertex_shader_file_full_path.string();
+    std::filesystem::path fragment_shader_file_full_path = shaders_folder_full_path / fragment_shader_filename;
+    std::string fragment_shader_file_full_path_str = fragment_shader_file_full_path.string();
+    Shader ourShader(vertex_shader_file_full_path_str.c_str(), fragment_shader_file_full_path_str.c_str());
 
 	float minVal = -0.9f;
 	float maxVal = 0.9f;
@@ -138,9 +151,11 @@ int main()
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	//char imagePath[] = "D:/Developments/OpenGL/resources/textures/rainforest.png";
-	char imagePath[] = "D:/Developments/OpenGL/resources/textures/dog.jpg";
-	initializeTextureAndLoadImage(imagePath);
+    std::string texture_filename = "rainforest.png";
+    //std::string texture_filename = "dog.jpg";
+    std::filesystem::path texture_file_full_path = textures_folder_full_path / texture_filename;
+    std::string texture_file_full_path_str = texture_file_full_path.string();
+	initializeTextureAndLoadImage(texture_file_full_path_str.c_str());
 
 	int frameCounter = 0;
     // render loop

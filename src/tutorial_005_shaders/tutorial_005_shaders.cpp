@@ -55,7 +55,7 @@ int main()
     std::filesystem::path current_folder_path = std::filesystem::current_path();
     std::filesystem::path folder_name = current_folder_path.filename();
     //std::filesystem::path main_folder_name = current_folder_path.parent_path().filename();
-    std::filesystem::path folder_base_path = current_folder_path.parent_path();
+    std::filesystem::path folder_base_path = current_folder_path.parent_path().parent_path().parent_path();
     std::filesystem::path shaders_folder_full_path = folder_base_path / "resources" / "shaders";
     std::filesystem::path vertex_shader_file_full_path = shaders_folder_full_path / vertex_shader_filename;
     std::string vertex_shader_file_full_path_str = vertex_shader_file_full_path.string();
