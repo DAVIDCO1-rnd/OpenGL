@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "shader_006.h"
+#include "shaders/shader_s.h"
 #include "stb_image.h"
 
 #include <iostream>
@@ -94,7 +94,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	sign(mouze.z) = button is down (positive if down)
 	sign(mouze.w) = button is clicked (positive if clicked)
 	*/
-	return; //couldn't implement it so far. so iMouseX, iMouseY, iMouseZ, iMouseW stays zero for now.
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT)
 	{
@@ -124,6 +123,19 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		
 		//std::cout << "Cursor Position at (" << xpos << " : " << ypos << ")" << std::endl;
 	}
+
+	//if (button == GLFW_MOUSE_BUTTON_LAST)
+	////if (button == GLFW_MOUSE_BUTTON_LAST && action == GLFW_PRESS)
+	//{
+	//	//button is clicked (not down)
+	//	double xpos, ypos;
+	//	//getting cursor position
+	//	glfwGetCursorPos(window, &xpos, &ypos);
+	//	iMouseX = (GLfloat)xpos; //positive since it's down
+	//	GLfloat yUpsideDown = (GLfloat)SCR_HEIGHT - (GLfloat)ypos;
+	//	iMouseY = yUpsideDown; //positive since it's clicked
+	//	std::cout << "Cursor Position at (" << xpos << " : " << ypos << ")" << std::endl;
+	//}
 }
 
 int main()
@@ -159,7 +171,7 @@ int main()
 		return -1;
 	}
 
-	Shader ourShader("C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/ray_tracing_two_spheres_and_walls.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/ray_tracing_two_spheres_and_walls.fs");
+	Shader ourShader("C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/using_mouse.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/using_mouse.fs");
 	
 
 	float minVal = -0.9f;
@@ -224,9 +236,9 @@ int main()
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		double  timeValueDouble = glfwGetTime();
-		float timeValue = static_cast<float>(timeValueDouble);
-		ourShader.setFloat("iTime", timeValue);
+		//double  timeValueDouble = glfwGetTime();
+		//float timeValue = static_cast<float>(timeValueDouble);
+		//ourShader.setFloat("iTime", timeValue);
 
 		unsigned int programID = ourShader.getID();
 		int iResolutionLocation = glGetUniformLocation(programID, "iResolution");

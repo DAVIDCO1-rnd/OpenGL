@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "shader_006.h"
+#include "shaders/shader_s.h"
 #include "stb_image.h"
 
 #include <iostream>
@@ -15,13 +15,7 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-GLfloat iMouseX = 0.0f;
-GLfloat iMouseY = 0.0f;
-GLfloat iMouseZ = 0.0f;
-GLfloat iMouseW = 0.0f;
-
 unsigned int textureID;
-
 
 /*Initializing texture parametrs and loading the texture to openGL*/
 /*parameters:
@@ -68,76 +62,6 @@ void initializeTextureAndLoadImage(char* filePath)
 	}
 }
 
-//static void mouse_callback(GLFWwindow* window, int button, int action, int mods)
-//{
-//	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-//		if (GLFW_PRESS == action)
-//			lbutton_down = true;
-//		else if (GLFW_RELEASE == action)
-//			lbutton_down = false;
-//	}
-//
-//	if (lbutton_down) {
-//		// do your drag here
-//	}
-//}
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-	/*
-	in shadertoy:
-
-	vec4 mouse = iMouse;
-
-	mouse.xy = mouse position during last button down
-	abs(mouse.zw) = mouse position during last button click
-	sign(mouze.z) = button is down (positive if down)
-	sign(mouze.w) = button is clicked (positive if clicked)
-	*/
-
-	if (button == GLFW_MOUSE_BUTTON_LEFT)
-	{
-		double xposDouble, yposDouble;
-		//getting cursor position
-		glfwGetCursorPos(window, &xposDouble, &yposDouble);
-		GLfloat xpos = (GLfloat)xposDouble;
-		GLfloat yUpsideDown = (GLfloat)SCR_HEIGHT - (GLfloat)yposDouble;
-
-		if (action == GLFW_PRESS)
-		{
-			//button is now down (until released)
-			iMouseX = xpos;
-			iMouseY = yUpsideDown;
-
-			iMouseZ = xpos;
-			iMouseW = yUpsideDown;
-		}
-
-		if (action == GLFW_RELEASE)
-		{
-			//button is not down anymore
-			iMouseZ = -xpos;
-			iMouseW = -yUpsideDown;
-		}
-		
-		
-		//std::cout << "Cursor Position at (" << xpos << " : " << ypos << ")" << std::endl;
-	}
-
-	//if (button == GLFW_MOUSE_BUTTON_LAST)
-	////if (button == GLFW_MOUSE_BUTTON_LAST && action == GLFW_PRESS)
-	//{
-	//	//button is clicked (not down)
-	//	double xpos, ypos;
-	//	//getting cursor position
-	//	glfwGetCursorPos(window, &xpos, &ypos);
-	//	iMouseX = (GLfloat)xpos; //positive since it's down
-	//	GLfloat yUpsideDown = (GLfloat)SCR_HEIGHT - (GLfloat)ypos;
-	//	iMouseY = yUpsideDown; //positive since it's clicked
-	//	std::cout << "Cursor Position at (" << xpos << " : " << ypos << ")" << std::endl;
-	//}
-}
-
 int main()
 {
 	// glfw: initialize and configure
@@ -171,8 +95,10 @@ int main()
 		return -1;
 	}
 
-	Shader ourShader("C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/using_mouse.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/using_mouse.fs");
-	
+	// build and compile our shader program
+	// ------------------------------------
+	Shader ourShader("C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/multiple_3d_shapes.vs", "C:/Users/David Cohn/Documents/Github/OpenGL/Shaders/multiple_3d_shapes.fs"); // you can name your shader files however you like
+	//Shader ourShader("./Shaders/multiple_3d_shapes.vs", "./Shaders/multiple_3d_shapes.fs");
 
 	float minVal = -0.9f;
 	float maxVal = 0.9f;
@@ -216,8 +142,7 @@ int main()
 	//char imagePath[] = "D:/Developments/OpenGL/resources/textures/dog.jpg";
 	//initializeTextureAndLoadImage(imagePath);
 
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
-	//int frameCounter = 0;
+	int frameCounter = 0;
 	// render loop
 	// -----------
 	while (!glfwWindowShouldClose(window))
@@ -236,19 +161,16 @@ int main()
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		//double  timeValueDouble = glfwGetTime();
-		//float timeValue = static_cast<float>(timeValueDouble);
-		//ourShader.setFloat("iTime", timeValue);
+		double  timeValueDouble = glfwGetTime();
+		float timeValue = static_cast<float>(timeValueDouble);
+		ourShader.setFloat("iTime", timeValue);
 
 		unsigned int programID = ourShader.getID();
 		int iResolutionLocation = glGetUniformLocation(programID, "iResolution");
 		glUniform2f(iResolutionLocation, (GLfloat)SCR_WIDTH, (GLfloat)SCR_HEIGHT);
 
-		int iMouseLocation = glGetUniformLocation(programID, "iMouse");
-		glUniform4f(iMouseLocation, iMouseX, iMouseY, iMouseZ, iMouseW);
-
-		//frameCounter++;
-		//ourShader.setInt("iFrame", frameCounter);
+		frameCounter++;
+		ourShader.setInt("iFrame", frameCounter);
 
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
