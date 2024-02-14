@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(OpenGL_tutorials_solution VERSION 1.0.0)
 
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	set(MY_ARCH "x64")
+else(CMAKE_SIZEOF_VOID_P EQUAL 4)
+	set(MY_ARCH "x86")
+endif()
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${MY_ARCH}/$<CONFIG>)
+
 MACRO(SUBDIRLIST result curdir)
   FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
   SET(dirlist "")
