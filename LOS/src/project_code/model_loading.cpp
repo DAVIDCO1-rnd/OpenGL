@@ -78,12 +78,12 @@ int main()
 
     // build and compile shaders
     // -------------------------
-    Shader ourShader("/home/davidco1/Developments/OpenGL/LOS/src/project_code/model_loading.vs", "/home/davidco1/Developments/OpenGL/LOS/src/project_code/model_loading.fs");
+    Shader ourShader("D:/Github/OpenGL/LOS/src/project_code/model_loading.vs", "D:/Github/OpenGL/LOS/src/project_code/model_loading.fs");
 
     // load models
     // -----------
     //Model ourModel(FileSystem::getPath("resources/objects/backpack/backpack.obj"));
-    Model ourModel(FileSystem::getPath("resources/data/bunny.obj"));
+    Model ourModel("D:/Github/OpenGL/clean_configuration_cmake/Data/bunny.obj");
 
     
     // draw in wireframe
