@@ -17,8 +17,8 @@ add_executable(${target_name}
     ${CMAKE_SOURCE_DIR}/Third_party/glad/src/glad.c
     ${stb_image_folder}/stb_image.cpp
     ${stb_image_folder}/stb_image.h
-    ${CMAKE_SOURCE_DIR}/resources/shaders/using_mouse.vs
-    ${CMAKE_SOURCE_DIR}/resources/shaders/using_mouse.fs
+    ${CMAKE_SOURCE_DIR}/resources/shaders/using_mouse.vert
+    ${CMAKE_SOURCE_DIR}/resources/shaders/using_mouse.frag
 )
 
 target_include_directories(${target_name} PUBLIC 

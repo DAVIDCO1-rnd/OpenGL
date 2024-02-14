@@ -14,8 +14,8 @@ add_executable(${target_name}
     ${CMAKE_SOURCE_DIR}/Third_party/Includes/GLFW/glfw3native.h
     ${CMAKE_SOURCE_DIR}/Third_party/Includes/KHR/khrplatform.h
     ${CMAKE_SOURCE_DIR}/Third_party/glad/src/glad.c
-    ${CMAKE_SOURCE_DIR}/resources/shaders/sea.vs
-    ${CMAKE_SOURCE_DIR}/resources/shaders/sea.fs
+    ${CMAKE_SOURCE_DIR}/resources/shaders/sea.vert
+    ${CMAKE_SOURCE_DIR}/resources/shaders/sea.frag
 )
 
 target_include_directories(${target_name} PUBLIC 

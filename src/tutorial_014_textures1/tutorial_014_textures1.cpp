@@ -53,8 +53,8 @@ int main()
 
 	// build and compile our shader zprogram
 	// ------------------------------------
-	std::string vertex_shader_filename = "tutorial_014_textures1.vs";
-	std::string fragment_shader_filename = "tutorial_014_textures1.fs";
+	std::string vertex_shader_filename = "tutorial_014_textures1.vert";
+	std::string fragment_shader_filename = "tutorial_014_textures1.frag";
 	std::filesystem::path current_folder_path = std::filesystem::current_path();
 	std::filesystem::path folder_name = current_folder_path.filename();
 	//std::filesystem::path main_folder_name = current_folder_path.parent_path().filename();

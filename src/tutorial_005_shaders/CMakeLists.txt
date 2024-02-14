@@ -15,8 +15,8 @@ add_executable(${target_name}
     ${CMAKE_SOURCE_DIR}/Third_party/Includes/KHR/khrplatform.h
     ${CMAKE_SOURCE_DIR}/Third_party/glad/src/glad.c
     ${main_include_folder}/shaders/shader_s.h
-    ${CMAKE_SOURCE_DIR}/resources/shaders/3.3.shader.vs
-    ${CMAKE_SOURCE_DIR}/resources/shaders/3.3.shader.fs
+    ${CMAKE_SOURCE_DIR}/resources/shaders/3.3.shader.vert
+    ${CMAKE_SOURCE_DIR}/resources/shaders/3.3.shader.frag
 )
 
 target_include_directories(${target_name} PUBLIC 

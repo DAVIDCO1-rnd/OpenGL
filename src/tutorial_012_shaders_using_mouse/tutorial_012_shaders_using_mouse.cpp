@@ -172,8 +172,8 @@ int main()
 		return -1;
 	}
 
-	std::string vertex_shader_filename = "using_mouse.vs";
-	std::string fragment_shader_filename = "using_mouse.fs";
+	std::string vertex_shader_filename = "using_mouse.vert";
+	std::string fragment_shader_filename = "using_mouse.frag";
 	std::filesystem::path current_folder_path = std::filesystem::current_path();
 	std::filesystem::path folder_name = current_folder_path.filename();
 	//std::filesystem::path main_folder_name = current_folder_path.parent_path().filename();

@@ -14,8 +14,8 @@ add_executable(${target_name}
     ${CMAKE_SOURCE_DIR}/Third_party/Includes/GLFW/glfw3native.h
     ${CMAKE_SOURCE_DIR}/Third_party/Includes/KHR/khrplatform.h
     ${CMAKE_SOURCE_DIR}/Third_party/glad/src/glad.c
-    ${CMAKE_SOURCE_DIR}/resources/shaders/clouds.vs
-    ${CMAKE_SOURCE_DIR}/resources/shaders/clouds.fs
+    ${CMAKE_SOURCE_DIR}/resources/shaders/clouds.vert
+    ${CMAKE_SOURCE_DIR}/resources/shaders/clouds.frag
 )
 
 target_include_directories(${target_name} PUBLIC 

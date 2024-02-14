@@ -98,8 +98,8 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    std::string vertex_shader_filename = "rainforest.vs";
-    std::string fragment_shader_filename = "rainforest.fs";
+    std::string vertex_shader_filename = "rainforest.vert";
+    std::string fragment_shader_filename = "rainforest.frag";
     std::filesystem::path current_folder_path = std::filesystem::current_path();
     std::filesystem::path folder_name = current_folder_path.filename();
     //std::filesystem::path main_folder_name = current_folder_path.parent_path().filename();

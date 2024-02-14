@@ -17,8 +17,8 @@ add_executable(${target_name}
     ${CMAKE_SOURCE_DIR}/Third_party/glad/src/glad.c
     ${stb_image_folder}/stb_image.cpp
     ${stb_image_folder}/stb_image.h
-    ${CMAKE_SOURCE_DIR}/resources/shaders/rainforest.vs
-    ${CMAKE_SOURCE_DIR}/resources/shaders/rainforest.fs
+    ${CMAKE_SOURCE_DIR}/resources/shaders/rainforest.vert
+    ${CMAKE_SOURCE_DIR}/resources/shaders/rainforest.frag
 )
 
 target_include_directories(${target_name} PUBLIC 
